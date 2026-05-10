@@ -1,0 +1,25 @@
+
+.env
+.env.local
+.env.*.local
+
+# Node and build
+node_modules/
+**/node_modules/
+dist/
+**/dist/
+
+# Logs
+logs
+*.log
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+Thumbs.db
+.DS_Store
+
+# Convex local envs
+convex/.env.local

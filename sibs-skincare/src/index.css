@@ -1,0 +1,33 @@
+/* css-ignore-unknown-at-rules */
+@import 'tailwindcss';
+
+@theme {
+  --font-display: 'Playball', cursive;
+  --font-cursive: 'Great Vibes', cursive;
+  --font-body: 'Playfair Display', serif;
+  --color-primary: #F2529D;
+  --color-secondary: #F252AA;
+  --color-accent: #BF9C34;
+}
+
+@layer base {
+  body {
+    @apply font-body bg-[#FAFAFA] text-[#333] overflow-x-hidden;
+  }
+}
+
+.reveal {
+  opacity: 1 !important;
+  visibility: visible !important;
+  transform: translateY(0) !important;
+}
+
+.hero-title, .hero-p, .hero-btn, .hero-img-wrap {
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+.parallax-wrap {
+  overflow: hidden;
+  border-radius: 2rem;
+}

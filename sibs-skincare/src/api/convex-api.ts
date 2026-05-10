@@ -1,0 +1,600 @@
+/**
+ * Convex API Configuration & Helpers
+ * Central hub for all backend API calls
+ * Base URL: https://proficient-akita-599.convex.site
+ */
+
+const API_BASE = "https://proficient-akita-599.convex.site";
+const AUTH_TOKEN_KEY = "sibs-style-auth-token";
+const AUTH_USER_KEY = "sibs-style-auth-user";
+
+export interface AuthUser {
+  id: string;
+  fullName: string;
+  email: string;
+  phone: string;
+  role: "customer" | "admin";
+  preferredLocation: string | null;
+  skinPreferences: string[];
+  allergies: string[];
+  emailVerified: boolean;
+  isActive: boolean;
+  lastLoginAt: number | null;
+  createdAt: number;
+  updatedAt: number;
+}
+
+export interface AuthSession {
+  token: string;
+  user: AuthUser;
+}
+
+// ==================== TYPES ====================
+export interface Service {
+  id: string;
+  slug: string;
+  name: string;
+  shortDescription: string;
+  fullDescription: string;
+  priceCents: number;
+  durationMinutes: number;
+  category: string;
+  imageUrl: string;
+  featured: boolean;
+  active: boolean;
+  sortOrder: number;
+  keyBenefits: string[];
+  createdAt: number;
+  updatedAt: number;
+}
+
+export interface TimeSlot {
+  timeLabel: string;
+  available: boolean;
+}
+
+export interface Availability {
+  date: string;
+  slots: TimeSlot[];
+  appointmentCount: number;
+}
+
+export interface Appointment {
+  id: string;
+  userId: string | null;
+  guestName: string;
+  guestEmail: string;
+  guestPhone: string;
+  serviceId: string;
+  serviceName: string;
+  serviceSlug: string;
+  servicePriceCents: number;
+  servicePrice: string;
+  serviceDurationMinutes: number;
+  appointmentDate: string;
+  appointmentTimeLabel: string;
+  appointmentTime: string;
+  startMinutes: number;
+  endMinutes: number;
+  startTimeLabel: string;
+  endTimeLabel: string;
+  location: string;
+  notes: string;
+  status: "pending" | "confirmed" | "cancelled" | "completed";
+  assignedStylistId: string | null;
+  assignedStylistName: string | null;
+  source: string;
+  createdAt: number;
+  updatedAt: number;
+}
+
+export interface Review {
+  id: string;
+  reviewId?: string;
+  name: string;
+  email: string;
+  role: string;
+  rating: number;
+  mainQuote: string;
+  subQuote1: string;
+  subQuote2: string;
+  avatarUrl: string;
+  serviceName: string | null;
+  isApproved: boolean;
+  featured: boolean;
+  sortOrder: number;
+  createdAt: number;
+  updatedAt: number;
+}
+
+export interface AdminAppointment extends Appointment {}
+
+export interface AdminReview extends Review {}
+
+export interface GalleryItem {
+  id: string;
+  title: string;
+  category: string;
+  caption: string;
+  altText: string;
+  imageUrl: string;
+  featured: boolean;
+  sortOrder: number;
+  createdAt: number;
+  updatedAt: number;
+}
+
+export interface Promotion {
+  id: string;
+  title: string;
+  description: string;
+  discountPercentage: number;
+  code: string;
+  imageUrl: string;
+  featured: boolean;
+  active: boolean;
+  startDate: string;
+  endDate: string;
+  createdAt: number;
+  updatedAt: number;
+}
+
+export interface Stylist {
+  id: string;
+  name: string;
+  bio: string;
+  imageUrl: string;
+  specialties: string[];
+  yearsOfExperience: number;
+  isActive: boolean;
+  createdAt: number;
+  updatedAt: number;
+}
+
+export interface BusinessProfile {
+  id: string;
+  name: string;
+  tagline: string;
+  description: string;
+  email: string;
+  phone: string;
+  addressLine1: string;
+  addressLine2?: string;
+  city: string;
+  state: string;
+  postalCode: string;
+  timezone: string;
+  logoUrl: string;
+  socialInstagram?: string;
+  socialFacebook?: string;
+  openingHours: {
+    mondayFriday: string;
+    saturday: string;
+    sunday: string;
+  };
+  standardSlots: string[];
+  bookingLeadMinutes: number;
+  bookingIntervalMinutes: number;
+  createdAt: number;
+  updatedAt: number;
+}
+
+function readStoredJson<T>(key: string): T | null {
+  if (typeof window === "undefined") {
+    return null;
+  }
+
+  const rawValue = window.localStorage.getItem(key);
+  if (!rawValue) {
+    return null;
+  }
+
+  try {
+    return JSON.parse(rawValue) as T;
+  } catch {
+    return null;
+  }
+}
+
+function writeStoredJson(key: string, value: unknown) {
+  if (typeof window === "undefined") {
+    return;
+  }
+
+  window.localStorage.setItem(key, JSON.stringify(value));
+}
+
+export function getStoredAuthToken(): string | null {
+  if (typeof window === "undefined") {
+    return null;
+  }
+
+  return window.localStorage.getItem(AUTH_TOKEN_KEY);
+}
+
+export function setStoredAuthSession(session: AuthSession) {
+  writeStoredJson(AUTH_USER_KEY, session.user);
+  if (typeof window !== "undefined") {
+    window.localStorage.setItem(AUTH_TOKEN_KEY, session.token);
+    window.dispatchEvent(new Event("sibs-style-auth-change"));
+  }
+}
+
+export function clearStoredAuthSession() {
+  if (typeof window === "undefined") {
+    return;
+  }
+
+  window.localStorage.removeItem(AUTH_TOKEN_KEY);
+  window.localStorage.removeItem(AUTH_USER_KEY);
+  window.dispatchEvent(new Event("sibs-style-auth-change"));
+}
+
+export function getStoredAuthUser(): AuthUser | null {
+  return readStoredJson<AuthUser>(AUTH_USER_KEY);
+}
+
+async function requestJson<T>(path: string, init: RequestInit = {}, token?: string): Promise<T> {
+  const headers = new Headers(init.headers ?? {});
+  if (init.body && !headers.has("Content-Type")) {
+    headers.set("Content-Type", "application/json");
+  }
+  if (token) {
+    headers.set("Authorization", `Bearer ${token}`);
+  }
+
+  const response = await fetch(`${API_BASE}${path}`, {
+    ...init,
+    headers,
+  });
+
+  const payload = await response.json().catch(() => null) as { ok?: boolean; data?: T; error?: string } | null;
+  if (!response.ok || payload?.ok === false) {
+    throw new Error(payload?.error || "Request failed");
+  }
+
+  return (payload?.data ?? null) as T;
+}
+
+// ==================== SERVICES ====================
+
+/**
+ * Fetch all active services
+ * Used by: BookingPage, HomePage
+ */
+export async function getServices(): Promise<Service[]> {
+  try {
+    const response = await fetch(`${API_BASE}/api/services`);
+    if (!response.ok) throw new Error("Failed to fetch services");
+    const data = await response.json();
+    return data.data || [];
+  } catch (error) {
+    console.error("Error fetching services:", error);
+    throw error;
+  }
+}
+
+/**
+ * Fetch specific service by ID
+ * Used by: Service detail views
+ */
+export async function getServiceById(serviceId: string): Promise<Service | null> {
+  try {
+    const services = await getServices();
+    return services.find(s => s.id === serviceId) || null;
+  } catch (error) {
+    console.error("Error fetching service by ID:", error);
+    return null;
+  }
+}
+
+// ==================== AVAILABILITY ====================
+
+/**
+ * Get available time slots for a specific date and service
+ * Used by: BookingPage (Availability section)
+ */
+export async function getAvailability(date: string, serviceId?: string): Promise<Availability | null> {
+  try {
+    const url = new URL(`${API_BASE}/api/availability`);
+    url.searchParams.append("date", date);
+    if (serviceId) url.searchParams.append("serviceId", serviceId);
+
+    const response = await fetch(url.toString());
+    if (!response.ok) throw new Error("Failed to fetch availability");
+    const data = await response.json();
+    return data.data || null;
+  } catch (error) {
+    console.error("Error fetching availability:", error);
+    return null;
+  }
+}
+
+// ==================== APPOINTMENTS ====================
+
+/**
+ * Create a new appointment booking
+ * Used by: BookingPage (Confirm Booking)
+ */
+export async function createAppointment(appointmentData: {
+  fullName: string;
+  email: string;
+  phone: string;
+  serviceId: string;
+  appointmentDate: string;
+  appointmentTime: string;
+  location: string;
+  info: string;
+}, authToken: string | null = getStoredAuthToken()): Promise<Appointment | null> {
+  try {
+    if (!authToken) {
+      throw new Error("Please sign in before booking a ritual.");
+    }
+
+    return await requestJson<Appointment>("/api/appointments", {
+      method: "POST",
+      body: JSON.stringify(appointmentData),
+    }, authToken);
+  } catch (error) {
+    console.error("Error creating appointment:", error);
+    throw error;
+  }
+}
+
+export async function login(credentials: { email: string; password: string }): Promise<AuthSession> {
+  const session = await requestJson<AuthSession>("/api/auth/login", {
+    method: "POST",
+    body: JSON.stringify(credentials),
+  });
+  setStoredAuthSession(session);
+  return session;
+}
+
+export async function register(accountData: {
+  fullName: string;
+  email: string;
+  phone: string;
+  password: string;
+  preferredLocation?: string;
+  skinPreferences?: string[];
+  allergies?: string[];
+}): Promise<AuthSession> {
+  const session = await requestJson<AuthSession>("/api/auth/register", {
+    method: "POST",
+    body: JSON.stringify(accountData),
+  });
+  setStoredAuthSession(session);
+  return session;
+}
+
+export async function getCurrentAuthUser(authToken: string | null = getStoredAuthToken()): Promise<AuthUser | null> {
+  if (!authToken) {
+    return null;
+  }
+
+  try {
+    return await requestJson<AuthUser>("/api/auth/me", { method: "GET" }, authToken);
+  } catch (error) {
+    console.error("Error loading auth session:", error);
+    return getStoredAuthUser();
+  }
+}
+
+export async function getAdminAppointments(authToken: string | null = getStoredAuthToken()): Promise<AdminAppointment[]> {
+  if (!authToken) {
+    throw new Error("Please sign in before opening the admin dashboard.");
+  }
+
+  return await requestJson<AdminAppointment[]>("/api/admin/appointments", { method: "GET" }, authToken);
+}
+
+export async function getAdminReviews(authToken: string | null = getStoredAuthToken()): Promise<AdminReview[]> {
+  if (!authToken) {
+    throw new Error("Please sign in before opening the admin dashboard.");
+  }
+
+  return await requestJson<AdminReview[]>("/api/admin/reviews", { method: "GET" }, authToken);
+}
+
+export async function updateAppointmentStatus(params: {
+  appointmentId: string;
+  status: Appointment["status"];
+  assignedStylistId?: string | null;
+  authToken?: string | null;
+}): Promise<{ appointmentId: string }> {
+  const authToken = params.authToken ?? getStoredAuthToken();
+  if (!authToken) {
+    throw new Error("Please sign in before updating bookings.");
+  }
+
+  return await requestJson<{ appointmentId: string }>(`/api/appointments/${params.appointmentId}`, {
+    method: "PUT",
+    body: JSON.stringify({
+      status: params.status,
+      assignedStylistId: params.assignedStylistId ?? null,
+    }),
+  }, authToken);
+}
+
+export async function moderateReview(params: {
+  reviewId: string;
+  isApproved: boolean;
+  featured?: boolean;
+  sortOrder?: number;
+  authToken?: string | null;
+}): Promise<{ reviewId: string }> {
+  const authToken = params.authToken ?? getStoredAuthToken();
+  if (!authToken) {
+    throw new Error("Please sign in before moderating reviews.");
+  }
+
+  return await requestJson<{ reviewId: string }>(`/api/reviews/${params.reviewId}`, {
+    method: "PUT",
+    body: JSON.stringify({
+      isApproved: params.isApproved,
+      featured: params.featured,
+      sortOrder: params.sortOrder,
+    }),
+  }, authToken);
+}
+
+export async function uploadGalleryItem(params: {
+  title: string;
+  category: string;
+  caption?: string;
+  altText?: string;
+  imageUrl?: string | null;
+  featured?: boolean;
+  sortOrder?: number;
+  authToken?: string | null;
+}): Promise<GalleryItem> {
+  const authToken = params.authToken ?? getStoredAuthToken();
+  if (!authToken) {
+    throw new Error("Please sign in before uploading gallery content.");
+  }
+
+  return await requestJson<GalleryItem>("/api/gallery/upload", {
+    method: "POST",
+    body: JSON.stringify({
+      title: params.title,
+      category: params.category,
+      caption: params.caption ?? "",
+      altText: params.altText ?? params.title,
+      imageUrl: params.imageUrl ?? null,
+      featured: params.featured ?? false,
+      sortOrder: params.sortOrder ?? Date.now(),
+    }),
+  }, authToken);
+}
+
+// ==================== GALLERY ====================
+
+/**
+ * Fetch all gallery items
+ * Used by: GalleryPage, HomePage
+ */
+export async function getGallery(): Promise<GalleryItem[]> {
+  try {
+    const response = await fetch(`${API_BASE}/api/gallery`);
+    if (!response.ok) throw new Error("Failed to fetch gallery");
+    const data = await response.json();
+    return data.data || [];
+  } catch (error) {
+    console.error("Error fetching gallery:", error);
+    throw error;
+  }
+}
+
+// ==================== REVIEWS ====================
+
+/**
+ * Fetch all approved reviews/testimonials
+ * Used by: HomePage, TestimonialsPage
+ */
+export async function getReviews(): Promise<Review[]> {
+  try {
+    const response = await fetch(`${API_BASE}/api/reviews`);
+    if (!response.ok) throw new Error("Failed to fetch reviews");
+    const data = await response.json();
+    return data.data || [];
+  } catch (error) {
+    console.error("Error fetching reviews:", error);
+    throw error;
+  }
+}
+
+/**
+ * Submit a new review
+ */
+export async function submitReview(reviewData: {
+  name: string;
+  email: string;
+  rating: number;
+  mainQuote: string;
+  subQuote1?: string;
+  subQuote2?: string;
+  serviceName?: string;
+  serviceId?: string;
+}, authToken: string | null = getStoredAuthToken()): Promise<{ reviewId: string } | null> {
+  try {
+    if (!authToken) {
+      throw new Error("Please sign in before sharing a chronicle.");
+    }
+
+    return await requestJson<{ reviewId: string }>("/api/reviews", {
+      method: "POST",
+      body: JSON.stringify(reviewData),
+    }, authToken);
+  } catch (error) {
+    console.error("Error submitting review:", error);
+    throw error;
+  }
+}
+
+// ==================== PROMOTIONS ====================
+
+/**
+ * Fetch all active promotions
+ * Used by: OffersPage, HomePage
+ */
+export async function getPromotions(): Promise<Promotion[]> {
+  try {
+    const response = await fetch(`${API_BASE}/api/promotions`);
+    if (!response.ok) throw new Error("Failed to fetch promotions");
+    const data = await response.json();
+    return data.data || [];
+  } catch (error) {
+    console.error("Error fetching promotions:", error);
+    throw error;
+  }
+}
+
+// ==================== STYLISTS ====================
+
+/**
+ * Fetch all active stylists/staff
+ * Used by: StylistsPage, BookingPage (admin)
+ */
+export async function getStylists(): Promise<Stylist[]> {
+  try {
+    const response = await fetch(`${API_BASE}/api/staff`);
+    if (!response.ok) throw new Error("Failed to fetch stylists");
+    const data = await response.json();
+    return data.data || [];
+  } catch (error) {
+    console.error("Error fetching stylists:", error);
+    throw error;
+  }
+}
+
+// ==================== UTILITY FUNCTIONS ====================
+
+/**
+ * Format price from cents to currency string (AED)
+ */
+export function formatPrice(priceCents: number): string {
+  const amount = (priceCents / 100).toLocaleString('en-AE', {
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
+  });
+  return `${amount} AED`;
+}
+
+/**
+ * Convert duration in minutes to readable format (e.g., "75 MINS")
+ */
+export function formatDuration(minutes: number): string {
+  return `${minutes} MINS`;
+}
+
+/**
+ * Format date string (YYYY-MM-DD to readable format)
+ */
+export function formatDate(dateString: string): string {
+  return new Date(dateString).toLocaleDateString("en-US", {
+    weekday: "short",
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  });
+}

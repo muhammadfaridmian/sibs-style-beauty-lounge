@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "convex": "^1.35.1",
+    "firebase": "^12.12.1"
+  }
+}
