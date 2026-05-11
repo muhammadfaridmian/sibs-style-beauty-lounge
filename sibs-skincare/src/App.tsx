@@ -1,4 +1,4 @@
-﻿import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { BrowserRouter as Router, Routes, Route, Link, useLocation, useNavigate } from 'react-router-dom';
 import { Menu, X, ChevronRight } from 'lucide-react';
 import gsap from 'gsap';
@@ -127,6 +127,19 @@ const Navigation = () => {
     return () => window.removeEventListener('sibs-style-auth-change', syncAuthState);
   }, []);
 
+  useEffect(() => {
+    if (!isMenuOpen) {
+      return;
+    }
+
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+
+    return () => {
+      document.body.style.overflow = previousOverflow;
+    };
+  }, [isMenuOpen]);
+
   const handleSignOut = () => {
     // Sign out clears the stored session and drops the user back home.
     // The UI also closes the menu so the logout feels like a clean reset.
@@ -229,24 +242,24 @@ const Navigation = () => {
 
       {/* Mobile Menu */}
       <div
-        className={`fixed inset-0 z-[100] h-[100dvh] overflow-y-auto overscroll-contain touch-pan-y text-white transition-all duration-700 ease-[cubic-bezier(0.19,1,0.22,1)] ${
+        className={`fixed inset-0 z-[100] h-[100dvh] overflow-y-auto overscroll-contain touch-pan-y bg-[#0A0E1A] text-white transition-all duration-700 ease-[cubic-bezier(0.19,1,0.22,1)] ${
           isMenuOpen ? 'opacity-100 visible translate-y-0' : 'opacity-0 invisible -translate-y-full'
         }`}
         style={{ WebkitOverflowScrolling: 'touch' }}
       >
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(242,82,157,0.22),transparent_34%),radial-gradient(circle_at_bottom_left,rgba(191,156,52,0.16),transparent_30%),linear-gradient(180deg,#0A0E1A_0%,#04070F_100%)]" />
-        <div className="absolute inset-x-6 top-5 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent" />
+        <div className="absolute inset-0 bg-[#0A0E1A]" />
+        <div className="absolute inset-x-6 top-5 h-px bg-[#273147]" />
 
-        <div className="relative flex min-h-[100dvh] flex-col px-3 py-3 sm:px-6 sm:py-6">
+        <div className="relative flex min-h-[100dvh] w-full flex-col bg-[#0A0E1A] px-3 py-3 sm:px-6 sm:py-6">
           <div className="rounded-[2rem] border border-[#273147] bg-[#111827] px-4 py-4 shadow-[0_30px_90px_-30px_rgba(0,0,0,0.85)]">
             <div className="flex items-start justify-between gap-4">
               <div className="min-w-0">
                 <span className="block text-3xl font-display italic text-[#F2529D] sm:text-4xl">Sibs Style</span>
-                <p className="mt-2 text-[10px] font-black uppercase tracking-[0.45em] text-white/35">Curated mobile navigation</p>
+                <p className="mt-2 text-[10px] font-black uppercase tracking-[0.45em] text-[#9CA3AF]">Curated mobile navigation</p>
               </div>
               <button
                 onClick={() => setIsMenuOpen(false)}
-                className="flex h-12 w-12 items-center justify-center rounded-full border border-white/10 bg-black/20 text-white transition-transform hover:rotate-90"
+                className="flex h-12 w-12 items-center justify-center rounded-full border border-[#273147] bg-[#0B0F1A] text-white transition-transform hover:rotate-90"
                 aria-label="Close navigation menu"
               >
                 <X size={30} />
@@ -256,12 +269,12 @@ const Navigation = () => {
 
           <div className="mt-4 rounded-[2rem] border border-[#273147] bg-[#111827] p-4 shadow-[0_20px_50px_-25px_rgba(0,0,0,0.85)]">
             <p className="text-[#F2529D] uppercase tracking-[0.4em] text-[10px] font-black">Navigation</p>
-            <p className="mt-3 max-w-xs text-sm leading-relaxed text-white/70">
+            <p className="mt-3 max-w-xs text-sm leading-relaxed text-[#D1D5DB]">
               Move through the lounge edit, treatments, stories, and contact details.
             </p>
           </div>
 
-          <div className="flex-1 min-h-0 overflow-y-auto py-4 pr-1">
+          <div className="flex-1 min-h-0 w-full overflow-y-auto bg-[#0A0E1A] py-4 pr-1">
             <div className="space-y-3">
               {navLinks.map((link, index) => {
                 const isActive = location.pathname === link.path;
@@ -273,29 +286,29 @@ const Navigation = () => {
                     onClick={() => setIsMenuOpen(false)}
                     className={`group flex items-center justify-between gap-3 rounded-[1.6rem] border px-4 py-4 transition-all duration-300 sm:px-5 sm:py-5 ${
                       isActive
-                        ? 'border-[#F2529D]/60 bg-[#F2529D]/12 shadow-[0_18px_50px_-25px_rgba(242,82,157,0.65)]'
-                        : 'border-white/10 bg-white/[0.03] hover:border-white/20 hover:bg-white/[0.08]'
+                        ? 'border-[#F2529D] bg-[#1A1220] shadow-[0_18px_50px_-25px_rgba(242,82,157,0.45)]'
+                        : 'border-[#273147] bg-[#111827] hover:border-[#F2529D] hover:bg-[#141b2b]'
                     }`}
                   >
                     <div className="flex min-w-0 items-center gap-4">
                       <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full border text-[10px] font-black uppercase tracking-[0.35em] transition-colors ${
                         isActive
-                          ? 'border-[#F2529D]/60 bg-[#F2529D]/15 text-[#F2529D]'
-                          : 'border-white/10 bg-black/20 text-white/50 group-hover:border-[#F2529D]/30 group-hover:text-[#F2529D]'
+                          ? 'border-[#F2529D] bg-[#3B1029] text-[#F2529D]'
+                          : 'border-[#273147] bg-[#0B0F1A] text-[#D1D5DB] group-hover:border-[#F2529D] group-hover:text-[#F2529D]'
                       }`}>
                         {String(index + 1).padStart(2, '0')}
                       </div>
                       <div className="min-w-0">
-                        <p className={`truncate font-display italic leading-none text-[clamp(1.7rem,6.4vw,2.45rem)] ${isActive ? 'text-white' : 'text-white/95'}`}>
+                        <p className={`truncate font-display italic leading-none text-[clamp(1.7rem,6.4vw,2.45rem)] ${isActive ? 'text-white' : 'text-[#F9FAFB]'}`}>
                           {link.name}
                         </p>
-                        <p className="mt-1 text-[10px] font-black uppercase tracking-[0.35em] text-white/30">
+                        <p className="mt-1 text-[10px] font-black uppercase tracking-[0.35em] text-[#9CA3AF]">
                           {isActive ? 'Current page' : 'Open page'}
                         </p>
                       </div>
                     </div>
 
-                    <span className={`text-sm font-black uppercase tracking-[0.35em] transition-colors ${isActive ? 'text-[#F2529D]' : 'text-white/25 group-hover:text-white/55'}`}>
+                    <span className={`text-sm font-black uppercase tracking-[0.35em] transition-colors ${isActive ? 'text-[#F2529D]' : 'text-[#9CA3AF] group-hover:text-white'}`}>
                       <ChevronRight size={18} />
                     </span>
                   </Link>
@@ -313,7 +326,7 @@ const Navigation = () => {
                 <p className="truncate font-display italic text-2xl leading-none text-white">
                   {currentUser ? currentUser.fullName : 'Guest access'}
                 </p>
-                <p className="mt-2 text-sm text-white/60">
+                <p className="mt-2 text-sm text-[#D1D5DB]">
                   {currentUser
                     ? currentUser.role === 'admin'
                       ? 'Admin session active.'
@@ -325,7 +338,7 @@ const Navigation = () => {
               {currentUser ? (
                 <button
                   onClick={handleSignOut}
-                  className="shrink-0 rounded-full border border-white/10 bg-black/30 px-4 py-3 text-[10px] font-black uppercase tracking-[0.35em] text-white hover:border-[#F2529D]/40 hover:text-[#F2529D] transition-colors"
+                  className="shrink-0 rounded-full border border-[#273147] bg-[#0B0F1A] px-4 py-3 text-[10px] font-black uppercase tracking-[0.35em] text-white hover:border-[#F2529D] hover:text-[#F2529D] transition-colors"
                 >
                   Sign out
                 </button>
@@ -333,7 +346,7 @@ const Navigation = () => {
                 <Link
                   to="/auth"
                   onClick={() => setIsMenuOpen(false)}
-                  className="shrink-0 rounded-full bg-[#F2529D] px-4 py-3 text-[10px] font-black uppercase tracking-[0.35em] text-white hover:bg-white hover:text-[#0A0E1A] transition-colors"
+                  className="shrink-0 rounded-full bg-[#F2529D] px-4 py-3 text-[10px] font-black uppercase tracking-[0.35em] text-white hover:bg-[#FF6FB0] hover:text-[#0A0E1A] transition-colors"
                 >
                   Sign in
                 </Link>
@@ -341,12 +354,12 @@ const Navigation = () => {
             </div>
           </div>
 
-          <div className="grid gap-4 border-t border-white/10 pt-4 pb-6 sm:grid-cols-2">
+          <div className="grid w-full gap-4 border-t border-[#273147] bg-[#0A0E1A] pt-4 pb-6 sm:grid-cols-2">
             <div className="rounded-[1.5rem] border border-[#273147] bg-[#111827] p-4">
               <p className="text-[10px] font-black uppercase tracking-[0.35em] text-[#F2529D]">
                 Specialty Beauty Lounge
               </p>
-              <p className="mt-3 text-sm leading-relaxed text-gray-300">
+              <p className="mt-3 text-sm leading-relaxed text-[#D1D5DB]">
                 Al Hashar Building, Salah Al Din St, Office 301
                 <br />
                 Muteena, Deira, Dubai
@@ -355,7 +368,7 @@ const Navigation = () => {
               </p>
             </div>
 
-            <div className="rounded-[1.5rem] border border-white/10 bg-[#F2529D] px-4 py-4 text-white shadow-[0_16px_40px_-20px_rgba(242,82,157,0.75)] transition-transform hover:scale-[1.01]">
+            <div className="rounded-[1.5rem] border border-[#F2529D] bg-[#F2529D] px-4 py-4 text-white shadow-[0_16px_40px_-20px_rgba(242,82,157,0.75)] transition-transform hover:scale-[1.01]">
               <Link to="/booking" onClick={() => setIsMenuOpen(false)} className="flex h-full items-center justify-between gap-4">
                 <div>
                   <p className="text-[10px] font-black uppercase tracking-[0.35em] text-white/70">Reserve</p>
@@ -367,15 +380,15 @@ const Navigation = () => {
 
             <div className="flex items-center justify-between rounded-[1.5rem] border border-[#273147] bg-[#111827] px-4 py-4 sm:col-span-2">
               <div>
-                <p className="text-[10px] font-black uppercase tracking-[0.35em] text-white/40">Stay connected</p>
-                <p className="mt-2 text-sm text-white/65">Follow the visual journal for new edits and offers.</p>
+                <p className="text-[10px] font-black uppercase tracking-[0.35em] text-[#9CA3AF]">Stay connected</p>
+                <p className="mt-2 text-sm text-[#D1D5DB]">Follow the visual journal for new edits and offers.</p>
               </div>
 
-              <div className="flex gap-3 text-white/60">
-                <a href="https://www.instagram.com/sibsstylebeauty?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw==" target="_blank" rel="noopener noreferrer" aria-label="Instagram" className="flex h-11 w-11 items-center justify-center rounded-full border border-[#273147] bg-[#111827] transition-all hover:border-[#F2529D]/50 hover:text-[#F2529D]">
+              <div className="flex gap-3 text-[#D1D5DB]">
+                <a href="https://www.instagram.com/sibsstylebeauty?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw==" target="_blank" rel="noopener noreferrer" aria-label="Instagram" className="flex h-11 w-11 items-center justify-center rounded-full border border-[#273147] bg-[#111827] transition-all hover:border-[#F2529D] hover:text-[#F2529D]">
                   <span className="text-[10px] font-black uppercase tracking-[0.35em]">ig</span>
                 </a>
-                <a href="https://www.facebook.com/profile.php?id=61584300861932" target="_blank" rel="noopener noreferrer" aria-label="Facebook" className="flex h-11 w-11 items-center justify-center rounded-full border border-[#273147] bg-[#111827] transition-all hover:border-[#4267B2]/50 hover:text-[#4267B2]">
+                <a href="https://www.facebook.com/profile.php?id=61584300861932" target="_blank" rel="noopener noreferrer" aria-label="Facebook" className="flex h-11 w-11 items-center justify-center rounded-full border border-[#273147] bg-[#111827] transition-all hover:border-[#4267B2] hover:text-[#4267B2]">
                   <span className="text-[10px] font-black uppercase tracking-[0.35em]">fb</span>
                 </a>
               </div>
