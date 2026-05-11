@@ -32,6 +32,7 @@ export const seedDefaults = mutation({
       promotions: 0,
       adminUser: 0,
     };
+    // The summary object is useful for quick CLI feedback when the seed command finishes.
 
     // The business profile is the public-facing salon card, so it seeds first.
     const existingBusinessProfile = await ctx.db.query("businessProfile").take(1);
@@ -53,6 +54,7 @@ export const seedDefaults = mutation({
     // Services are the backbone of booking, so they are the next thing we seed.
     const existingServices = await ctx.db.query("services").take(100);
     if (existingServices.length === 0) {
+      // A fresh database gets the service list inserted in the default order.
       for (const service of defaultServices) {
         await ctx.db.insert("services", {
           ...service,
@@ -62,6 +64,7 @@ export const seedDefaults = mutation({
         summary.services += 1;
       }
     } else if (overwriteSeedContent) {
+      // Existing services are matched by slug so edits stay stable across re-seeds.
       const servicesBySlug = new Map(existingServices.map((service) => [service.slug, service]));
       for (const service of defaultServices) {
         const existingService = servicesBySlug.get(service.slug);
@@ -95,6 +98,7 @@ export const seedDefaults = mutation({
     // Stylists feed both the public team page and the admin assignment controls.
     const existingStylists = await ctx.db.query("stylists").take(100);
     if (existingStylists.length === 0) {
+      // The first pass inserts each stylist as a standalone record.
       for (const stylist of defaultStylists) {
         await ctx.db.insert("stylists", {
           ...stylist,
@@ -104,6 +108,7 @@ export const seedDefaults = mutation({
         summary.stylists += 1;
       }
     } else if (overwriteSeedContent) {
+      // Matching by name is enough here because the default stylist names are stable.
       const stylistsByName = new Map(existingStylists.map((stylist) => [stylist.name, stylist]));
       for (const stylist of defaultStylists) {
         const existingStylist = stylistsByName.get(stylist.name);
@@ -133,6 +138,7 @@ export const seedDefaults = mutation({
     // Gallery items can either point at stored files or at hosted image URLs.
     const existingGalleryItems = await ctx.db.query("galleryItems").take(100);
     if (existingGalleryItems.length === 0) {
+      // The seeded gallery starts with external URLs so it works before uploads exist.
       for (const item of defaultGalleryItems) {
         await ctx.db.insert("galleryItems", {
           ...item,
@@ -144,6 +150,7 @@ export const seedDefaults = mutation({
         summary.galleryItems += 1;
       }
     } else if (overwriteSeedContent) {
+      // Titles are used as the stable lookup key for the default gallery set.
       const galleryByTitle = new Map(existingGalleryItems.map((item) => [item.title, item]));
       for (const item of defaultGalleryItems) {
         const existingItem = galleryByTitle.get(item.title);
@@ -176,6 +183,7 @@ export const seedDefaults = mutation({
     // Reviews seed with public-facing quotes, but moderation still controls visibility.
     const existingReviews = await ctx.db.query("reviews").take(100);
     if (existingReviews.length === 0) {
+      // The public review feed starts with approved quotes so the site never feels empty.
       for (const review of defaultReviews) {
         await ctx.db.insert("reviews", {
           ...review,
@@ -188,6 +196,7 @@ export const seedDefaults = mutation({
         summary.reviews += 1;
       }
     } else if (overwriteSeedContent) {
+      // Email plus sort order gives the default reviews a predictable identity across refreshes.
       const reviewsByEmailAndOrder = new Map(
         existingReviews.map((review) => [`${review.email}:${review.sortOrder}`, review]),
       );
@@ -228,6 +237,7 @@ export const seedDefaults = mutation({
     // Promotions power the offers page and the featured promo cards on the homepage.
     const existingPromotions = await ctx.db.query("promotions").take(100);
     if (existingPromotions.length === 0) {
+      // The seed data includes both marketing copy and the code the UI displays.
       for (const promotion of defaultPromotions) {
         await ctx.db.insert("promotions", {
           ...promotion,
@@ -237,6 +247,7 @@ export const seedDefaults = mutation({
         summary.promotions += 1;
       }
     } else if (overwriteSeedContent) {
+      // Codes act as the lookup key so the same offer keeps the same identity after reseeding.
       const promotionsByCode = new Map(existingPromotions.map((promotion) => [promotion.code, promotion]));
       for (const promotion of defaultPromotions) {
         const existingPromotion = promotionsByCode.get(promotion.code);
@@ -318,6 +329,7 @@ export const seedDefaults = mutation({
       summary.adminUser = 1;
     }
 
+    // Returning the counters makes it easy to confirm what the seed actually changed.
     return summary;
   },
 });

@@ -6,7 +6,9 @@ import gsap from 'gsap';
 const ContactPage = () => {
     // This screen is mostly a contact card and directions page, not a data-heavy flow.
     useEffect(() => {
+        // Each route entry starts at the top so the contact header reads like a fresh page.
         window.scrollTo(0, 0);
+        // The animation sequence is intentionally simple: hero, card, then footer.
         const tl = gsap.timeline({ defaults: { ease: 'power3.out' } });
         
         tl.fromTo('.contact-header', 
@@ -42,6 +44,7 @@ const ContactPage = () => {
                 <div className="bg-white rounded-[3rem] overflow-hidden shadow-2xl border border-gray-100 relative">
                     
                     {/* Hero Image Section with Banner */}
+                    {/* The banner doubles as the visual anchor and repeats the salon address in one place. */}
                     <div className="relative h-[450px]">
                         <img 
                             src="https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?q=80&w=2000&auto=format&fit=crop" 
@@ -65,6 +68,7 @@ const ContactPage = () => {
                         <div className="space-y-10">
                             <h3 className="text-3xl font-display text-[#BF9C34] italic font-black">Send us a Message</h3>
                             {/* The form is here for layout and feel. The real contact details are below it. */}
+                            {/* Keeping the fields static avoids pretending there is a submission backend in this page. */}
                             <form className="space-y-8" onClick={(e) => e.preventDefault()}>
                                 <div className="space-y-2">
                                     <label className="text-xs font-black uppercase tracking-widest text-gray-400">Full Name</label>
@@ -137,6 +141,7 @@ const ContactPage = () => {
                             </div>
 
                             {/* Minimal Map UI */}
+                            {/* A linked image is lighter than an embedded map and still gives users a clear tap target. */}
                             <a 
                                 href="https://share.google/lWLJiTBONnJlR29z7" 
                                 target="_blank" 
@@ -164,6 +169,7 @@ const ContactPage = () => {
             </div>
 
             {/* Specialized Footer */}
+            {/* The footer uses a darker palette so the utility links feel separate from the contact card above. */}
             <footer className="mt-32 pt-24 pb-12 bg-[#0A0E1A] text-white px-6 contact-footer">
                 <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-24 items-start">
                     <div className="space-y-8">

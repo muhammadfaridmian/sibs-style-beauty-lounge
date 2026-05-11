@@ -4,6 +4,7 @@ import { ArrowRight, X } from 'lucide-react';
 import gsap from 'gsap';
 
 const OffersPage = () => {
+    // The panel state controls both the modal overlay and the body scroll lock.
     const [isPanelOpen, setIsPanelOpen] = useState(false);
     const containerRef = useRef<HTMLDivElement>(null);
 
@@ -17,6 +18,7 @@ const OffersPage = () => {
         );
 
         // Header animation
+        // The hero needs to settle before the rest of the page starts competing for attention.
         gsap.fromTo('.offers-header',
             { opacity: 0, scale: 0.95 },
             { opacity: 1, scale: 1, duration: 1.5, ease: 'expo.out', delay: 0.3 }
@@ -52,6 +54,7 @@ const OffersPage = () => {
     }, [isPanelOpen]);
 
     const featuredOffers = [
+        // These are the headline offers that get promoted before the detailed grid opens.
         {
             id: 1,
             title: 'Glow Membership',
@@ -76,6 +79,7 @@ const OffersPage = () => {
     ];
 
     const allOffers = [
+        // The modal uses a denser version of the offer list so users can compare promos quickly.
         {
             id: '01',
             image: 'https://images.unsplash.com/photo-1612817288484-6f916006741a?w=600',
@@ -183,6 +187,7 @@ const OffersPage = () => {
                     className='fixed inset-0 z-[100] bg-black/40 backdrop-blur-3xl flex items-center justify-center p-4 panel-overlay'
                 >
                     {/* Animated background particles for luxury feel */}
+                    {/* The background glow keeps the modal from feeling like a plain dialog box. */}
                     <div className="absolute inset-0 pointer-events-none opacity-20">
                         <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-[#F2529D] rounded-full blur-[180px] animate-pulse"></div>
                         <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-[#BF9C34] rounded-full blur-[180px] animate-pulse delay-1000"></div>
@@ -199,6 +204,7 @@ const OffersPage = () => {
                             </div>
                             <button 
                                 onClick={() => {
+                                                                        // Closing reverses the intro motion instead of snapping the panel away.
                                     const tl = gsap.timeline();
                                     tl.to('.selection-panel', { y: 100, opacity: 0, duration: 0.5, ease: 'power3.in' })
                                       .to('.panel-overlay', { opacity: 0, duration: 0.5, onComplete: () => setIsPanelOpen(false) }, '-=0.3');
@@ -210,6 +216,7 @@ const OffersPage = () => {
                         </div>
                         
                         <div className='flex-1 overflow-y-auto px-8 md:px-12 py-10 md:py-16 bg-white custom-scrollbar'>
+                            {/* The scrollable body behaves like a catalog so the cards can breathe on larger screens. */}
                             <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-12'>
                                 {allOffers.map((offer, idx) => (
                                     <div key={idx} className='offer-card-anim group cursor-pointer bg-[#FAF9F6] p-8 md:p-10 rounded-[2.5rem] md:rounded-[3rem] border border-gray-100 hover:bg-black transition-all duration-700 hover:shadow-2xl hover:-translate-y-2'>
@@ -239,6 +246,7 @@ const OffersPage = () => {
                         </div>
                         
                         <div className='px-8 md:px-12 py-8 md:py-10 bg-white border-t border-gray-100 text-center z-[110] relative'>
+                            {/* The footer CTA keeps the modal focused on booking rather than just browsing. */}
                             <div className="absolute inset-x-0 -top-8 h-8 bg-gradient-to-t from-white to-transparent pointer-events-none"></div>
                             <Link 
                                 to='/booking' 

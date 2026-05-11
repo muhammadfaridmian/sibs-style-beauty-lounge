@@ -2,6 +2,7 @@
 @import 'tailwindcss';
 
 /* This file keeps the global look steady so every page feels like the same lounge. */
+/* The tokens below are the shared design language for the whole app. */
 @theme {
   --font-display: 'Playball', cursive;
   --font-cursive: 'Great Vibes', cursive;
@@ -14,11 +15,13 @@
 @layer base {
   body {
     /* Base page style before any page-specific section kicks in. */
+    /* The default canvas stays warm and neutral so the pink and gold accents can stand out. */
     @apply font-body bg-[#FAFAFA] text-[#333] overflow-x-hidden;
   }
 }
 
 /* These helpers keep animation targets visible after GSAP finishes. */
+/* They prevent hidden motion states from leaking into the final static layout. */
 .reveal {
   opacity: 1 !important;
   visibility: visible !important;
@@ -32,6 +35,7 @@
 
 .parallax-wrap {
   /* This keeps image frames from spilling outside the rounded corners. */
+  /* It matters most on the gallery and hero sections where zoom effects are common. */
   overflow: hidden;
   border-radius: 2rem;
 }

@@ -1,27 +1,38 @@
 export const defaultBusinessProfile = {
   // This is the public salon card the site reads for contact and branding.
+  // It is the first thing the homepage, footer, and contact page all pull from.
   name: "Sibs Style Beauty Lounge",
+  // The tagline is the short marketing line that sits under the brand name.
   tagline: "Bespoke beauty services tailored for you",
+  // The longer description gives the site a calmer, editorial tone.
   description:
     "An editorial skincare destination where each visit is curated through texture, scent, and scientific precision.",
+  // These contact details show up everywhere a visitor might try to reach the lounge.
   email: "mcjalandoni@yahoo.com",
   phone: "052 906 3016",
+  // The address is split into parts so the UI can display it in different layouts.
   addressLine1: "Al Hashar Building - Salah Al Din St - Office no 301 - Main Road",
   addressLine2: "next to Crown Plaza Hotel - Muteena - Deira",
   city: "Dubai",
   state: "",
   postalCode: "UAE",
+  // Availability logic needs the local timezone so days and opening hours stay correct.
   timezone: "Asia/Dubai",
+  // The logo is used as a brand image in the header and any future marketing cards.
   logoUrl: "https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?q=80&w=800&auto=format&fit=crop",
+  // This link lets the site open directions directly in Google Maps.
   googleMapsUrl: "https://share.google/lWLJiTBONnJlR29z7",
+  // Social links are surfaced in the footer and mobile navigation.
   socialInstagram: "https://www.instagram.com/sibsstylebeauty?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw==",
   socialFacebook: "https://www.facebook.com/profile.php?id=61584300861932",
+  // These are the human-readable opening-hour labels shown on the contact page.
   openingHours: {
     mondayFriday: "Monday OFF | Tuesday-Thursday 10:00 AM - 9:00 PM | Friday-Sunday 10:00 AM - 10:00 PM",
     saturday: "Saturday 10:00 AM - 10:00 PM",
     sunday: "Sunday 10:00 AM - 10:00 PM",
   },
   // The booking page uses this same address when it creates a new appointment.
+  // The weekly schedule is the machine-readable version that powers availability checks.
   weeklyHours: {
     monday: "OFF",
     tuesday: "10:00 AM - 9:00 PM",
@@ -31,6 +42,7 @@ export const defaultBusinessProfile = {
     saturday: "10:00 AM - 10:00 PM",
     sunday: "10:00 AM - 10:00 PM",
   },
+  // The booking page loops over these labels when it builds the calendar slots.
   standardSlots: [
     "10:00 AM",
     "11:00 AM",
@@ -45,15 +57,20 @@ export const defaultBusinessProfile = {
     "08:00 PM",
     "09:00 PM",
   ],
+  // Lead time keeps same-day bookings from being too last minute.
   bookingLeadMinutes: 0,
+  // The app uses one-hour steps when it compares services and openings.
   bookingIntervalMinutes: 60,
-// These are the service cards shown to customers before they book.
+  // If Convex has no profile yet, these defaults keep the app usable on first launch.
 };
 
+// The single appointment location is reused everywhere so the booking data stays consistent.
 export const defaultAppointmentLocation =
   "Al Hashar Building - Salah Al Din St - Office no 301 - Main Road - next to Crown Plaza Hotel - Muteena - Deira, Dubai, UAE";
 
+// Each service follows the same shape so the UI can render cards, details, and booking info from one list.
 export const defaultServices = [
+  // This is the flagship treatment card that the homepage promotes most heavily.
   {
     slug: "signature-radiance",
     name: "The Signature Radiance",
@@ -70,6 +87,7 @@ export const defaultServices = [
     sortOrder: 1,
     keyBenefits: ["Deep hydration", "Glow restoration", "Botanical infusion"],
   },
+  // This second ritual is the sculpting-focused option for visitors who want a lifting effect.
   {
     slug: "ethereal-sculpting",
     name: "Ethereal Sculpting",
@@ -86,6 +104,7 @@ export const defaultServices = [
     sortOrder: 2,
     keyBenefits: ["De-puffing", "Lymphatic drainage", "Lifted finish"],
   },
+  // This one leans into cleansing and pore refinement.
   {
     slug: "botanical-clarifier",
     name: "Botanical Clarifier",
@@ -102,6 +121,7 @@ export const defaultServices = [
     sortOrder: 3,
     keyBenefits: ["Pore refinement", "Detox support", "Balanced glow"],
   },
+  // This service exists for barrier support and softer, comfort-first skin care.
   {
     slug: "silk-protein-infusion",
     name: "Silk Protein Infusion",
@@ -118,6 +138,7 @@ export const defaultServices = [
     sortOrder: 4,
     keyBenefits: ["Barrier support", "Amino acid care", "Silky finish"],
   },
+  // This entry is the brighter vitamin-heavy treatment card.
   {
     slug: "antioxidant-berry-blast",
     name: "Antioxidant Berry Blast",
@@ -134,6 +155,7 @@ export const defaultServices = [
     sortOrder: 5,
     keyBenefits: ["Vitamin boost", "Tone brightness", "Environmental defense"],
   },
+  // The final service is the more intensive resurfacing option.
   {
     slug: "deep-tissue-resurfacing",
     name: "Deep Tissue Resurfacing",
@@ -153,7 +175,9 @@ export const defaultServices = [
 ];
 
 // These are the staff cards shown on the artisans page and in admin tools.
+// The same records also feed the stylist dropdowns used by booking and moderation screens.
 export const defaultStylists = [
+  // Elena is the main featured specialist in the public team showcase.
   {
     name: "Elena Vance",
     role: "Master Aesthetician",
@@ -165,6 +189,7 @@ export const defaultStylists = [
     active: true,
     sortOrder: 1,
   },
+  // Julian is the consulting-focused specialist with a calmer, more analytical profile.
   {
     name: "Julian Thorne",
     role: "Skin Health Consultant",
@@ -176,6 +201,7 @@ export const defaultStylists = [
     active: true,
     sortOrder: 2,
   },
+  // Sienna rounds out the team with a more experience-led ritual design role.
   {
     name: "Sienna Rose",
     role: "Ritual Architect",
@@ -190,7 +216,9 @@ export const defaultStylists = [
 ];
 
 // These promotions power the offers page and the seasonal specials section.
+// Each one is shaped to be a small marketing card rather than a full landing page.
 export const defaultPromotions = [
+  // This is the main membership offer that the offers page highlights first.
   {
     title: "Glow Membership",
     description:
@@ -205,6 +233,7 @@ export const defaultPromotions = [
     startDate: "2024-01-01",
     endDate: "2026-12-31",
   },
+  // This one changes with the season so the site can feel current.
   {
     title: "Seasonal Rituals",
     description:
@@ -219,6 +248,7 @@ export const defaultPromotions = [
     startDate: "2024-01-01",
     endDate: "2026-12-31",
   },
+  // This card is the value-focused bundle offer.
   {
     title: "Bundle & Save",
     description:
@@ -236,7 +266,9 @@ export const defaultPromotions = [
 ];
 
 // These gallery items are the visual catalogue for the lounge.
+// The gallery page and homepage pull from the same set so the visuals stay in sync.
 export const defaultGalleryItems = [
+  // This is the hero product edit that opens the gallery set.
   {
     title: "Radiance Elixir",
     category: "Product Edit",
@@ -247,6 +279,7 @@ export const defaultGalleryItems = [
     active: true,
     sortOrder: 1,
   },
+  // Texture-focused image that gives the gallery some softness.
   {
     title: "Satin Touch",
     category: "Texture Study",
@@ -257,6 +290,7 @@ export const defaultGalleryItems = [
     active: true,
     sortOrder: 2,
   },
+  // A wide interior image that helps show the lounge atmosphere.
   {
     title: "The Sanctuary",
     category: "Space",
@@ -267,6 +301,7 @@ export const defaultGalleryItems = [
     active: true,
     sortOrder: 3,
   },
+  // Warm amber tones are used here to add contrast.
   {
     title: "Golden Hour",
     category: "Oil Infusion",
@@ -277,6 +312,7 @@ export const defaultGalleryItems = [
     active: true,
     sortOrder: 4,
   },
+  // Dark velvet keeps the visual mood a little more dramatic.
   {
     title: "Velvet Lounge",
     category: "Interior",
@@ -287,6 +323,7 @@ export const defaultGalleryItems = [
     active: true,
     sortOrder: 5,
   },
+  // This shot shows a hands-on self-care ritual.
   {
     title: "The Ritual",
     category: "Self Care",
@@ -297,6 +334,7 @@ export const defaultGalleryItems = [
     active: true,
     sortOrder: 6,
   },
+  // Bottles and tools give the catalogue a more curated shelf look.
   {
     title: "Curated Essentials",
     category: "Collection",
@@ -307,6 +345,7 @@ export const defaultGalleryItems = [
     active: true,
     sortOrder: 7,
   },
+  // Abstract light is used to break up the product imagery.
   {
     title: "Inner Glow",
     category: "Abstract",
@@ -317,6 +356,7 @@ export const defaultGalleryItems = [
     active: true,
     sortOrder: 8,
   },
+  // This microscopic edit keeps the gallery feeling precise and editorial.
   {
     title: "Botanical Essence",
     category: "Micro Edit",
@@ -327,6 +367,7 @@ export const defaultGalleryItems = [
     active: true,
     sortOrder: 9,
   },
+  // Minimalist shelf styling keeps the feed from feeling too busy.
   {
     title: "The Shelfie",
     category: "Minimalism",
@@ -337,6 +378,7 @@ export const defaultGalleryItems = [
     active: true,
     sortOrder: 10,
   },
+  // This close-up skin image reinforces the skincare focus.
   {
     title: "Raw Texture",
     category: "Skin Study",
@@ -347,6 +389,7 @@ export const defaultGalleryItems = [
     active: true,
     sortOrder: 11,
   },
+  // The tool shot closes the gallery with a more technical finish.
   {
     title: "Crafted Precision",
     category: "Tools",
@@ -360,7 +403,9 @@ export const defaultGalleryItems = [
 ];
 
 // These reviews are starter testimonials so the homepage does not look empty.
+// They are approved up front because they are meant to be visible on first launch.
 export const defaultReviews = [
+  // This review is the long, detailed guest story that opens the set.
   {
     name: "Gerardine Alcala",
     role: "Verified Guest",
@@ -378,6 +423,7 @@ export const defaultReviews = [
     isApproved: true,
     sortOrder: 1,
   },
+  // The second review is a shorter but equally positive guest note.
   {
     name: "Mikaelah Paloma",
     role: "Verified Guest",
@@ -395,6 +441,7 @@ export const defaultReviews = [
     isApproved: true,
     sortOrder: 2,
   },
+  // This last one keeps the page feeling balanced with another verified voice.
   {
     name: "Guendez Narimane",
     role: "Verified Guest",
@@ -416,10 +463,14 @@ export const defaultReviews = [
 
 export const defaultAdminCredentials = {
   // The real values should come from env vars on your machine, not from GitHub.
+  // These defaults exist only so a fresh local database can be seeded without extra setup.
   fullName: process.env.DEFAULT_ADMIN_FULLNAME || "Sibs Style Admin",
+  // The admin email is normalized later so sign-in uses one predictable address.
   email: process.env.DEFAULT_ADMIN_EMAIL || "admin@example.com",
+  // This phone number is only a placeholder until you supply your own environment value.
   phone: process.env.DEFAULT_ADMIN_PHONE || "000-000-0000",
   // NOTE: For security, set a strong password in your local env (DEFAULT_ADMIN_PASSWORD).
   // The fallback below is intentionally weak so the seeded account is not privileged in public repos.
+  // The weak fallback is deliberate because this file is part of a public seed set.
   password: process.env.DEFAULT_ADMIN_PASSWORD || "changeme",
 };

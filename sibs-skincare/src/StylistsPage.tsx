@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import gsap from 'gsap';
 
 const StylistsPage: React.FC = () => {
+  // The page fade starts from the outer wrapper so the layout appears as one curated spread.
   const containerRef = React.useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -36,6 +37,7 @@ const StylistsPage: React.FC = () => {
   }, []);
 
   const stylists = [
+    // These bios are written like editorial profiles rather than plain staff records.
     {
       name: 'Elena Vance',
       role: 'MASTER AESTHETICIAN',
@@ -106,6 +108,7 @@ const StylistsPage: React.FC = () => {
 
       {/* Quote Section */}
       <div className='quote-section max-w-4xl mx-auto px-4 py-32 text-center'>
+        {/* The quote gives the page a closing note so it reads like a magazine feature. */}
         <div className='flex justify-center mb-8'>
             <div className='text-[#BF9C34] scale-150 transform rotate-12'>✦</div>
             <div className='text-[#BF9C34] scale-100 transform -translate-y-4 -rotate-12 ml-1'>✦</div>
@@ -116,6 +119,7 @@ const StylistsPage: React.FC = () => {
       </div>
 
       {/* Simple Footer */}
+      {/* The footer stays lighter and more minimal than the hero and cards above it. */}
       <footer className='border-t border-gray-100 bg-white py-24'>
         <div className='max-w-7xl mx-auto px-8'>
           <div className='grid grid-cols-1 md:grid-cols-4 gap-16'>
