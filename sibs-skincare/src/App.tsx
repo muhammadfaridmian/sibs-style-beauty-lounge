@@ -229,7 +229,7 @@ const Navigation = () => {
 
       {/* Mobile Menu */}
       <div
-        className={`fixed inset-0 z-[100] h-[100dvh] overflow-y-auto overscroll-contain text-white transition-all duration-700 ease-[cubic-bezier(0.19,1,0.22,1)] ${
+        className={`fixed inset-0 z-[100] h-[100dvh] overflow-hidden text-white transition-all duration-700 ease-[cubic-bezier(0.19,1,0.22,1)] ${
           isMenuOpen ? 'opacity-100 visible translate-y-0' : 'opacity-0 invisible -translate-y-full'
         }`}
       >
@@ -253,7 +253,7 @@ const Navigation = () => {
             </div>
           </div>
 
-          <div className="mt-4 rounded-[2rem] border border-white/10 bg-black/20 p-4 shadow-[0_20px_50px_-25px_rgba(0,0,0,0.85)] backdrop-blur-xl">
+          <div className="mt-4 rounded-[2rem] border border-[#273147] bg-[#111827] p-4 shadow-[0_20px_50px_-25px_rgba(0,0,0,0.85)]">
             <p className="text-[#F2529D] uppercase tracking-[0.4em] text-[10px] font-black">Navigation</p>
             <p className="mt-3 max-w-xs text-sm leading-relaxed text-white/70">
               Move through the lounge edit, treatments, stories, and contact details.
@@ -303,7 +303,7 @@ const Navigation = () => {
             </div>
           </div>
 
-          <div className="rounded-[1.5rem] border border-white/10 bg-white/[0.04] p-4 backdrop-blur-xl">
+          <div className="rounded-[1.5rem] border border-[#273147] bg-[#111827] p-4">
             <p className="text-[10px] font-black uppercase tracking-[0.35em] text-[#F2529D]">
               Account
             </p>
@@ -340,8 +340,8 @@ const Navigation = () => {
             </div>
           </div>
 
-          <div className="grid gap-3 border-t border-white/10 pt-4 pb-4 sm:grid-cols-2">
-            <div className="rounded-[1.5rem] border border-white/10 bg-white/[0.04] p-4 backdrop-blur-xl">
+          <div className="grid gap-4 border-t border-white/10 pt-4 pb-6 sm:grid-cols-2">
+            <div className="rounded-[1.5rem] border border-[#273147] bg-[#111827] p-4">
               <p className="text-[10px] font-black uppercase tracking-[0.35em] text-[#F2529D]">
                 Specialty Beauty Lounge
               </p>
@@ -364,9 +364,9 @@ const Navigation = () => {
               </Link>
             </div>
 
-            <div className="flex items-center justify-between rounded-[1.5rem] border border-white/10 bg-black/30 px-4 py-4 sm:col-span-2">
+            <div className="flex items-center justify-between rounded-[1.5rem] border border-[#273147] bg-[#111827] px-4 py-4 sm:col-span-2">
               <div>
-                <p className="text-[10px] font-black uppercase tracking-[0.35em] text-white/35">Stay connected</p>
+                <p className="text-[10px] font-black uppercase tracking-[0.35em] text-white/40">Stay connected</p>
                 <p className="mt-2 text-sm text-white/65">Follow the visual journal for new edits and offers.</p>
               </div>
 

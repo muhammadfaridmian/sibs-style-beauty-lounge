@@ -242,7 +242,6 @@ const HomePage = () => {
 
             <div 
               className="bg-[#FAF9F6] w-[calc(100vw-1rem)] md:w-full max-w-7xl h-[calc(100dvh-1rem)] md:h-[85vh] rounded-[1.5rem] sm:rounded-[2rem] md:rounded-[5rem] shadow-[0_0_60px_rgba(0,0,0,0.35)] md:shadow-[0_0_120px_rgba(0,0,0,0.6)] relative flex flex-col collection-panel overflow-hidden overflow-x-hidden md:[transform:perspective(1000px)]"
-            style={{ position: 'fixed', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', willChange: 'transform, opacity' }}
             >
                 {/* Header */}
             <div className="flex-none p-4 sm:p-6 md:p-14 border-b border-gray-100 flex justify-between items-center bg-white/80 backdrop-blur-xl relative z-10">

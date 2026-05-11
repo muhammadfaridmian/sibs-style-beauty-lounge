@@ -14,7 +14,7 @@ const OffersPage = () => {
         // This page is really a promo showcase, so the opening motion stays soft and clean.
         gsap.fromTo(containerRef.current, 
             { opacity: 0, y: 30 }, 
-            { opacity: 1, y: 0, duration: 1.2, ease: 'power3.out' }
+            { opacity: 1, y: 0, duration: 1.2, ease: 'power3.out', clearProps: 'transform' }
         );
 
         // Header animation
@@ -195,7 +195,6 @@ const OffersPage = () => {
 
                     <div 
                         className='bg-white w-[calc(100vw-1rem)] sm:w-[95%] max-w-7xl h-[calc(100dvh-1rem)] sm:h-[85vh] rounded-[2rem] sm:rounded-[3rem] md:rounded-[4rem] overflow-hidden overflow-x-hidden shadow-[0_0_100px_rgba(0,0,0,0.5)] relative flex flex-col selection-panel'
-                        style={{ position: 'fixed', top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }}
                     >
                         <div className='flex-none flex justify-between items-center px-5 sm:px-8 md:px-12 py-4 sm:py-5 md:py-6 border-b border-gray-100 bg-white relative z-10'>
                             <div className="flex items-center gap-4">
