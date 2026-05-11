@@ -229,14 +229,14 @@ const Navigation = () => {
 
       {/* Mobile Menu */}
       <div
-        className={`fixed inset-0 z-[100] overflow-hidden text-white transition-all duration-700 ease-[cubic-bezier(0.19,1,0.22,1)] ${
+        className={`fixed inset-0 z-[100] h-[100dvh] overflow-y-auto overscroll-contain text-white transition-all duration-700 ease-[cubic-bezier(0.19,1,0.22,1)] ${
           isMenuOpen ? 'opacity-100 visible translate-y-0' : 'opacity-0 invisible -translate-y-full'
         }`}
       >
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(242,82,157,0.22),transparent_34%),radial-gradient(circle_at_bottom_left,rgba(191,156,52,0.16),transparent_30%),linear-gradient(180deg,#0A0E1A_0%,#04070F_100%)]" />
         <div className="absolute inset-x-6 top-5 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent" />
 
-        <div className="relative flex h-full min-h-0 flex-col px-4 py-4 sm:px-6 sm:py-6">
+        <div className="relative flex min-h-full flex-col px-3 py-3 sm:px-6 sm:py-6">
           <div className="rounded-[2rem] border border-white/10 bg-white/5 px-4 py-4 shadow-[0_30px_90px_-30px_rgba(0,0,0,0.85)] backdrop-blur-2xl">
             <div className="flex items-start justify-between gap-4">
               <div className="min-w-0">
@@ -285,7 +285,7 @@ const Navigation = () => {
                         {String(index + 1).padStart(2, '0')}
                       </div>
                       <div className="min-w-0">
-                        <p className={`truncate font-display italic leading-none text-[clamp(2rem,7vw,2.9rem)] ${isActive ? 'text-white' : 'text-white/95'}`}>
+                        <p className={`truncate font-display italic leading-none text-[clamp(1.7rem,6.4vw,2.45rem)] ${isActive ? 'text-white' : 'text-white/95'}`}>
                           {link.name}
                         </p>
                         <p className="mt-1 text-[10px] font-black uppercase tracking-[0.35em] text-white/30">
@@ -340,7 +340,7 @@ const Navigation = () => {
             </div>
           </div>
 
-          <div className="grid gap-3 border-t border-white/10 pt-4 sm:grid-cols-2">
+          <div className="grid gap-3 border-t border-white/10 pt-4 pb-4 sm:grid-cols-2">
             <div className="rounded-[1.5rem] border border-white/10 bg-white/[0.04] p-4 backdrop-blur-xl">
               <p className="text-[10px] font-black uppercase tracking-[0.35em] text-[#F2529D]">
                 Specialty Beauty Lounge

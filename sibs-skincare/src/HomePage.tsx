@@ -241,14 +241,14 @@ const HomePage = () => {
             </div>
 
             <div 
-              className="bg-[#FAF9F6] w-full max-w-7xl h-[90vh] md:h-[85vh] rounded-[2rem] md:rounded-[5rem] shadow-[0_0_60px_rgba(0,0,0,0.35)] md:shadow-[0_0_120px_rgba(0,0,0,0.6)] relative flex flex-col collection-panel overflow-hidden md:[transform:perspective(1000px)]"
-              style={{ position: 'fixed', top: isMobileViewport() ? '2%' : '5%', willChange: 'transform, opacity' }}
+            className="bg-[#FAF9F6] w-[calc(100vw-1rem)] md:w-full max-w-7xl h-[calc(100dvh-1rem)] md:h-[85vh] rounded-[1.5rem] sm:rounded-[2rem] md:rounded-[5rem] shadow-[0_0_60px_rgba(0,0,0,0.35)] md:shadow-[0_0_120px_rgba(0,0,0,0.6)] relative flex flex-col collection-panel overflow-hidden md:[transform:perspective(1000px)]"
+            style={{ position: 'fixed', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', willChange: 'transform, opacity' }}
             >
                 {/* Header */}
-                <div className="flex-none p-6 md:p-14 border-b border-gray-100 flex justify-between items-center bg-white/80 backdrop-blur-xl relative z-10">
+            <div className="flex-none p-4 sm:p-6 md:p-14 border-b border-gray-100 flex justify-between items-center bg-white/80 backdrop-blur-xl relative z-10">
                     <div>
-                        <span className="text-[9px] md:text-[10px] font-black tracking-[0.5em] text-[#F2529D] uppercase block mb-2 md:mb-3">CURATED SELECTION</span>
-                        <h2 className="text-3xl md:text-6xl font-display italic font-black text-black tracking-tighter">The Botanical Lab</h2>
+                <span className="text-[8px] sm:text-[9px] md:text-[10px] font-black tracking-[0.45em] sm:tracking-[0.5em] text-[#F2529D] uppercase block mb-2 md:mb-3">CURATED SELECTION</span>
+                <h2 className="text-2xl sm:text-3xl md:text-6xl font-display italic font-black text-black tracking-tighter">The Botanical Lab</h2>
                     </div>
                     <button 
                         onClick={() => {
@@ -264,29 +264,29 @@ const HomePage = () => {
                               .to('.collection-panel', { y: 50, opacity: 0, scale: 0.95, duration: 0.4, ease: 'expo.in' }, '-=0.1')
                               .to('.collection-overlay', { opacity: 0, duration: 0.3, onComplete: () => setIsCollectionOpen(false) }, '-=0.2');
                         }}
-                        className="bg-black text-white p-3 md:p-6 rounded-full hover:bg-[#F2529D] transition-all hover:rotate-90 shadow-2xl group shrink-0 ml-4"
+                        className="bg-black text-white p-2.5 sm:p-3 md:p-6 rounded-full hover:bg-[#F2529D] transition-all hover:rotate-90 shadow-2xl group shrink-0 ml-3 sm:ml-4"
                     >
                         <X className="w-5 h-5 md:w-8 md:h-8 group-hover:scale-110" />
                     </button>
                 </div>
 
                 {/* Grid View */}
-                <div className="flex-1 overflow-y-auto p-6 md:p-20 custom-scrollbar relative">
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 md:gap-16">
+                    <div className="flex-1 overflow-y-auto p-4 sm:p-6 md:p-20 custom-scrollbar relative">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-8 md:gap-16">
                         {products.map((product, idx) => (
                             <div key={idx} className="product-card-anim group">
-                                <div className="aspect-[4/5] rounded-[2rem] md:rounded-[3rem] overflow-hidden bg-white shadow-xl mb-4 md:mb-8 relative group-hover:shadow-[0_30px_70px_-15px_rgba(0,0,0,0.15)] transition-all duration-700">
+                            <div className="aspect-[4/5] rounded-[1.5rem] sm:rounded-[2rem] md:rounded-[3rem] overflow-hidden bg-white shadow-xl mb-4 sm:mb-6 md:mb-8 relative group-hover:shadow-[0_30px_70px_-15px_rgba(0,0,0,0.15)] transition-all duration-700">
                                   <img src={product.img} loading="eager" decoding="async" className="w-full h-full object-cover grayscale-[0.2] md:group-hover:grayscale-0 md:group-hover:scale-110 transition-all duration-1000" alt={product.name} />
-                                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-all duration-500 flex flex-col justify-end p-6 md:p-10">
-                                        <button className="w-full py-4 md:py-5 bg-white/90 md:bg-white text-black text-[10px] md:text-xs font-black tracking-[0.2em] uppercase rounded-xl hover:bg-[#F2529D] hover:text-white transition-all transform translate-y-0 md:translate-y-4 md:group-hover:translate-y-0 duration-500">
+                              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-all duration-500 flex flex-col justify-end p-4 sm:p-6 md:p-10">
+                                <button className="w-full py-3 sm:py-4 md:py-5 bg-white/90 md:bg-white text-black text-[10px] md:text-xs font-black tracking-[0.2em] uppercase rounded-xl hover:bg-[#F2529D] hover:text-white transition-all transform translate-y-0 md:translate-y-4 md:group-hover:translate-y-0 duration-500">
                                             Quick View
                                         </button>
                                     </div>
-                                    <div className="absolute top-4 right-4 md:top-8 md:right-8 p-2 md:p-3 bg-white/20 backdrop-blur-md rounded-full text-white opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity">
+                              <div className="absolute top-4 right-4 md:top-8 md:right-8 p-2 md:p-3 bg-white/20 backdrop-blur-md rounded-full text-white opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity">
                                         <Heart size={16} fill="white" className="md:w-5 md:h-5" />
                                     </div>
                                 </div>
-                                <div className="space-y-2 md:space-y-3">
+                            <div className="space-y-1.5 sm:space-y-2 md:space-y-3">
                                     <div className="flex flex-col sm:flex-row justify-between sm:items-center text-[10px] md:text-xs font-black tracking-[0.2em] md:tracking-[0.3em] text-[#F2529D] uppercase gap-2 sm:gap-0">
                                         <span>{product.note}</span>
                                         <div className="flex items-center gap-1.5 bg-[#BF9C34]/5 px-2 py-1 md:px-3 md:py-1 rounded-full w-fit">
@@ -303,11 +303,11 @@ const HomePage = () => {
                 </div>
 
                 {/* Footer Section */}
-                <div className="flex-none p-6 md:p-14 bg-white/80 backdrop-blur-md border-t border-gray-100 flex flex-col md:flex-row justify-between items-center gap-6 md:gap-8">
-                    <p className="text-sm md:text-xl font-medium text-gray-500 italic max-w-2xl text-center md:text-left leading-relaxed">
+                <div className="flex-none p-4 sm:p-6 md:p-14 bg-white/80 backdrop-blur-md border-t border-gray-100 flex flex-col md:flex-row justify-between items-center gap-4 sm:gap-6 md:gap-8">
+                  <p className="text-xs sm:text-sm md:text-xl font-medium text-gray-500 italic max-w-2xl text-center md:text-left leading-relaxed">
                         Our botanical formulations are hand-crafted in small batches to preserve nutrient integrity and enzymatic activity.
                     </p>
-                    <button className="w-full md:w-auto flex justify-center items-center gap-4 md:gap-6 bg-black text-white px-8 md:px-14 py-4 md:py-6 rounded-xl md:rounded-2xl text-[10px] md:text-xs font-black tracking-[0.2em] md:tracking-[0.3em] uppercase hover:bg-[#BF9C34] transition-all shadow-xl active:scale-95 group shrink-0">
+                  <button className="w-full md:w-auto flex justify-center items-center gap-3 sm:gap-4 md:gap-6 bg-black text-white px-6 sm:px-8 md:px-14 py-3 sm:py-4 md:py-6 rounded-xl md:rounded-2xl text-[10px] md:text-xs font-black tracking-[0.2em] md:tracking-[0.3em] uppercase hover:bg-[#BF9C34] transition-all shadow-xl active:scale-95 group shrink-0">
                         EXPLORE FULL CATALOGUE
                         <ShoppingBag size={18} className="md:w-[22px] md:h-[22px] group-hover:animate-bounce" />
                     </button>

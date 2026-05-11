@@ -184,7 +184,7 @@ const OffersPage = () => {
 
             {isPanelOpen && (
                 <div 
-                    className='fixed inset-0 z-[100] bg-black/40 backdrop-blur-3xl flex items-center justify-center p-4 panel-overlay'
+                    className='fixed inset-0 z-[100] bg-black/40 backdrop-blur-3xl flex items-center justify-center p-2 sm:p-4 panel-overlay'
                 >
                     {/* Animated background particles for luxury feel */}
                     {/* The background glow keeps the modal from feeling like a plain dialog box. */}
@@ -194,13 +194,13 @@ const OffersPage = () => {
                     </div>
 
                     <div 
-                        className='bg-white w-[95%] max-w-7xl h-[85vh] rounded-[3rem] md:rounded-[4rem] overflow-hidden shadow-[0_0_100px_rgba(0,0,0,0.5)] relative flex flex-col selection-panel'
-                        style={{ position: 'fixed', top: '7%', left: '50%', transform: 'translateX(-50%)' }}
+                        className='bg-white w-[calc(100vw-1rem)] sm:w-[95%] max-w-7xl h-[calc(100dvh-1rem)] sm:h-[85vh] rounded-[2rem] sm:rounded-[3rem] md:rounded-[4rem] overflow-hidden shadow-[0_0_100px_rgba(0,0,0,0.5)] relative flex flex-col selection-panel'
+                        style={{ position: 'fixed', top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }}
                     >
-                        <div className='flex-none flex justify-between items-center px-8 md:px-12 py-5 md:py-6 border-b border-gray-100 bg-white relative z-10'>
+                        <div className='flex-none flex justify-between items-center px-5 sm:px-8 md:px-12 py-4 sm:py-5 md:py-6 border-b border-gray-100 bg-white relative z-10'>
                             <div className="flex items-center gap-4">
                                 <div className="w-1 h-8 bg-[#F2529D] rounded-full"></div>
-                                <h2 className='text-4xl md:text-5xl font-display italic font-black text-black tracking-tighter'>Exclusive Selection</h2>
+                                <h2 className='text-2xl sm:text-4xl md:text-5xl font-display italic font-black text-black tracking-tighter'>Exclusive Selection</h2>
                             </div>
                             <button 
                                 onClick={() => {
@@ -209,33 +209,33 @@ const OffersPage = () => {
                                     tl.to('.selection-panel', { y: 100, opacity: 0, duration: 0.5, ease: 'power3.in' })
                                       .to('.panel-overlay', { opacity: 0, duration: 0.5, onComplete: () => setIsPanelOpen(false) }, '-=0.3');
                                 }} 
-                                className='bg-black text-white p-3 md:p-4 rounded-full hover:rotate-90 transition-all duration-500 shadow-xl hover:bg-[#F2529D] group'
+                                className='bg-black text-white p-2.5 sm:p-3 md:p-4 rounded-full hover:rotate-90 transition-all duration-500 shadow-xl hover:bg-[#F2529D] group shrink-0'
                             >
-                                <X className="w-7 h-7 md:w-8 md:h-8 group-hover:scale-110" />
+                                <X className="w-6 h-6 sm:w-7 sm:h-7 md:w-8 md:h-8 group-hover:scale-110" />
                             </button>
                         </div>
                         
-                        <div className='flex-1 overflow-y-auto px-8 md:px-12 py-10 md:py-16 bg-white custom-scrollbar'>
+                        <div className='flex-1 overflow-y-auto px-4 sm:px-8 md:px-12 py-4 sm:py-10 md:py-16 bg-white custom-scrollbar'>
                             {/* The scrollable body behaves like a catalog so the cards can breathe on larger screens. */}
-                            <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-12'>
+                            <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-8 md:gap-12'>
                                 {allOffers.map((offer, idx) => (
-                                    <div key={idx} className='offer-card-anim group cursor-pointer bg-[#FAF9F6] p-8 md:p-10 rounded-[2.5rem] md:rounded-[3rem] border border-gray-100 hover:bg-black transition-all duration-700 hover:shadow-2xl hover:-translate-y-2'>
-                                        <div className='aspect-square rounded-[2rem] overflow-hidden shadow-2xl mb-8 group-hover:scale-105 transition-all duration-700 relative'>
+                                    <div key={idx} className='offer-card-anim group cursor-pointer bg-[#FAF9F6] p-5 sm:p-8 md:p-10 rounded-[2rem] sm:rounded-[2.5rem] md:rounded-[3rem] border border-gray-100 hover:bg-black transition-all duration-700 hover:shadow-2xl hover:-translate-y-2'>
+                                        <div className='aspect-square rounded-[1.5rem] sm:rounded-[2rem] overflow-hidden shadow-2xl mb-5 sm:mb-8 group-hover:scale-105 transition-all duration-700 relative'>
                                             <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 z-10"></div>
                                             <img src={offer.image} className='w-full h-full object-cover transition-all duration-1000' alt={offer.title} />
                                         </div>
-                                        <div className='space-y-4'>
+                                        <div className='space-y-3 sm:space-y-4'>
                                             <div className='flex justify-between items-start'>
-                                                <h4 className='text-3xl font-display italic font-black text-gray-900 group-hover:text-[#F2529D] mb-2 uppercase tracking-tight transition-colors duration-500 line-clamp-2'>{offer.title}</h4>
-                                                <span className='px-4 py-1 bg-[#F2529D] text-white text-[10px] font-black tracking-widest rounded-full shrink-0 uppercase'>{offer.id}</span>
+                                                <h4 className='text-2xl sm:text-3xl font-display italic font-black text-gray-900 group-hover:text-[#F2529D] mb-2 uppercase tracking-tight transition-colors duration-500 line-clamp-2'>{offer.title}</h4>
+                                                <span className='px-3 py-1 bg-[#F2529D] text-white text-[10px] font-black tracking-widest rounded-full shrink-0 uppercase'>{offer.id}</span>
                                             </div>
-                                            <p className='text-base text-gray-500 group-hover:text-white/60 mb-6 font-medium leading-relaxed transition-colors duration-500 line-clamp-3'>{offer.detail}</p>
-                                            <div className='flex items-center justify-between pt-4 border-t border-gray-100 group-hover:border-white/10'>
+                                            <p className='text-sm sm:text-base text-gray-500 group-hover:text-white/60 mb-4 sm:mb-6 font-medium leading-relaxed transition-colors duration-500 line-clamp-3'>{offer.detail}</p>
+                                            <div className='flex items-center justify-between pt-3 sm:pt-4 border-t border-gray-100 group-hover:border-white/10'>
                                                 <div className='flex flex-col'>
                                                     <span className='text-[10px] font-black tracking-widest text-gray-400 group-hover:text-[#F2529D] uppercase mb-1'>Discount Code</span>
-                                                    <span className='text-xl font-black text-black group-hover:text-white transition-colors duration-500'>{offer.code}</span>
+                                                    <span className='text-lg sm:text-xl font-black text-black group-hover:text-white transition-colors duration-500'>{offer.code}</span>
                                                 </div>
-                                                <div className='w-12 h-12 rounded-2xl bg-white group-hover:bg-[#F2529D] flex items-center justify-center transition-all duration-500 shadow-sm'>
+                                                <div className='w-10 h-10 sm:w-12 sm:h-12 rounded-2xl bg-white group-hover:bg-[#F2529D] flex items-center justify-center transition-all duration-500 shadow-sm'>
                                                     <div className='w-2 h-2 rounded-full bg-[#F2529D] group-hover:bg-white' />
                                                 </div>
                                             </div>
@@ -245,7 +245,7 @@ const OffersPage = () => {
                             </div>
                         </div>
                         
-                        <div className='px-8 md:px-12 py-8 md:py-10 bg-white border-t border-gray-100 text-center z-[110] relative'>
+                        <div className='px-5 sm:px-8 md:px-12 py-4 sm:py-8 md:py-10 bg-white border-t border-gray-100 text-center z-[110] relative'>
                             {/* The footer CTA keeps the modal focused on booking rather than just browsing. */}
                             <div className="absolute inset-x-0 -top-8 h-8 bg-gradient-to-t from-white to-transparent pointer-events-none"></div>
                             <Link 
@@ -255,7 +255,7 @@ const OffersPage = () => {
                                     tl.to('.selection-panel', { y: 100, opacity: 0, duration: 0.5, ease: 'power3.in' })
                                       .to('.panel-overlay', { opacity: 0, duration: 0.5, onComplete: () => setIsPanelOpen(false) }, '-=0.3');
                                 }} 
-                                className='inline-block bg-[#F2529D] text-white px-12 md:px-24 py-5 md:py-6 rounded-2xl text-[12px] font-black uppercase tracking-[0.5em] hover:bg-black hover:scale-105 transition-all duration-500 shadow-2xl transform active:scale-95'
+                                className='inline-block bg-[#F2529D] text-white px-8 sm:px-12 md:px-24 py-4 sm:py-5 md:py-6 rounded-2xl text-[10px] sm:text-[12px] font-black uppercase tracking-[0.35em] sm:tracking-[0.5em] hover:bg-black hover:scale-105 transition-all duration-500 shadow-2xl transform active:scale-95'
                             >
                                 Secure Your Selection
                             </Link>
