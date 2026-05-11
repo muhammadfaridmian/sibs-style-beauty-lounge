@@ -8,6 +8,7 @@ import {
   register,
 } from './api/convex-api';
 
+// The registration form stores comma-separated notes, so this turns them into arrays.
 const splitList = (value: string) =>
   value
     .split(',')
@@ -21,6 +22,7 @@ const AuthPage: React.FC = () => {
   const redirectParam = new URLSearchParams(location.search).get('redirect') ?? '/booking';
   const safeRedirect = redirectParam.startsWith('/') ? redirectParam : '/booking';
   const resolveRedirect = (role: 'customer' | 'admin') => {
+    // Admins always go to the dashboard; customers go back to the safe redirect target.
     if (role === 'admin') {
       return '/admin';
     }
@@ -57,6 +59,7 @@ const AuthPage: React.FC = () => {
         return;
       }
 
+      // A live session means the auth page can quietly hand the user back to the app.
       const currentUser = await getCurrentAuthUser(authToken);
       if (currentUser) {
         navigate(resolveRedirect(currentUser.role), { replace: true });
@@ -250,6 +253,7 @@ const AuthPage: React.FC = () => {
                   </div>
                 )}
 
+                {/* These extra fields are stored with the account so future visits can feel more personal. */}
                 <div className="grid gap-4 sm:gap-5">
                   <label className="block space-y-2">
                     <span className="text-[10px] font-black uppercase tracking-[0.35em] text-gray-400">Full name</span>

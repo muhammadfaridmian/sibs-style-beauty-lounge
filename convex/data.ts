@@ -115,6 +115,7 @@ function asStylistCard(doc: {
   featured: boolean;
   sortOrder: number;
 }) {
+  // Staff cards stay small because the public pages only need the friendly summary.
   return {
     id: doc._id,
     name: doc.name,
@@ -140,6 +141,7 @@ function asPromotionCard(doc: {
   startDate: string;
   endDate: string;
 }) {
+  // Promotions are reshaped into a compact card for the offers page and homepage blocks.
   return {
     id: doc._id,
     title: doc.title,
@@ -168,6 +170,7 @@ function asReviewCard(doc: {
   featured: boolean;
   sortOrder: number;
 }) {
+  // The testimonial page never sees the raw row, only this public-friendly review shape.
   return {
     id: doc._id,
     name: doc.name,
@@ -194,6 +197,7 @@ function asGalleryCard(doc: {
   featured: boolean;
   sortOrder: number;
 }) {
+  // Gallery cards keep the uploaded media and the metadata together in one neat package.
   return {
     id: doc._id,
     title: doc.title,
@@ -234,6 +238,7 @@ function asBusinessProfile(doc: {
   bookingLeadMinutes: number;
   bookingIntervalMinutes: number;
 }) {
+  // The frontend wants one clean business profile object, not a mix of raw database fields.
   return {
     id: doc._id,
     name: doc.name,
@@ -321,6 +326,7 @@ function intervalsOverlap(
   startB: number,
   endB: number,
 ): boolean {
+  // Two ranges overlap when each one starts before the other ends.
   return startA < endB && endA > startB;
 }
 
@@ -352,6 +358,7 @@ export const listServices = internalQuery({
 export const getServiceById = internalQuery({
   args: { serviceId: v.id("services") },
   handler: async (ctx, args) => {
+    // Detail views call this when they already know the exact service id.
     const service = await ctx.db.get(args.serviceId);
     return service ? asServiceCard(service) : null;
   },
@@ -360,6 +367,7 @@ export const getServiceById = internalQuery({
 export const getServiceBySlug = internalQuery({
   args: { slug: v.string() },
   handler: async (ctx, args) => {
+    // Slugs make the service cards shareable in a URL-friendly way.
     const service = await ctx.db
       .query("services")
       .withIndex("by_slug", (q) => q.eq("slug", args.slug))
@@ -441,6 +449,7 @@ export const listPromotions = internalQuery({
 export const findUserByEmail = internalQuery({
   args: { email: v.string() },
   handler: async (ctx, args) => {
+    // Login and registration both need this exact email lookup.
     const user = await ctx.db
       .query("users")
       .withIndex("by_email", (q) => q.eq("email", args.email))
@@ -452,6 +461,7 @@ export const findUserByEmail = internalQuery({
 export const getUserById = internalQuery({
   args: { userId: v.id("users") },
   handler: async (ctx, args) => {
+    // The auth routes use this to refresh the public user profile after a mutation.
     return await ctx.db.get(args.userId);
   },
 });
@@ -459,6 +469,7 @@ export const getUserById = internalQuery({
 export const findSessionByTokenHash = internalQuery({
   args: { tokenHash: v.string() },
   handler: async (ctx, args) => {
+    // The raw token never leaves the browser; this query only sees the hashed version.
     const session = await ctx.db
       .query("sessions")
       .withIndex("by_tokenHash", (q) => q.eq("tokenHash", args.tokenHash))
@@ -492,6 +503,7 @@ export const listAppointmentsForAdmin = internalQuery({
 export const getAppointmentById = internalQuery({
   args: { appointmentId: v.id("appointments") },
   handler: async (ctx, args) => {
+    // After a booking or admin edit, the UI reads the reshaped card from here.
     const appointment = await ctx.db.get(args.appointmentId);
     return appointment ? asAppointmentCard(appointment) : null;
   },
@@ -531,6 +543,7 @@ export const getAvailability = internalQuery({
       .order("asc")
       .take(100);
 
+    // Each standard slot becomes either open or blocked once we compare it to the existing bookings.
     const slots = standardSlots.map((timeLabel) => {
       const startMinutes = parseTimeLabel(timeLabel);
       const endMinutes = startMinutes + durationMinutes;
@@ -577,6 +590,7 @@ export const createUser = internalMutation({
   },
   handler: async (ctx, args) => {
     // Registration lands here after the frontend hashes the password.
+    // This duplicate check protects the email index from creating two accounts with the same address.
     const existing = await ctx.db
       .query("users")
       .withIndex("by_email", (q) => q.eq("email", args.email))
@@ -745,6 +759,7 @@ export const updateAppointmentStatus = internalMutation({
       throw new Error("Appointment not found.");
     }
 
+    // The assigned stylist can change at the same time as the booking status.
     let assignedStylistName = appointment.assignedStylistName;
     let assignedStylistId = appointment.assignedStylistId;
 
@@ -857,6 +872,7 @@ export const createGalleryItem = internalMutation({
   },
   handler: async (ctx, args) => {
     // Admin uploads end up here, either with a file upload or a saved image URL.
+    // At least one image source has to exist or the gallery tile would be empty.
     if (!args.imageUrl && !args.storageId) {
       throw new Error("Gallery items require either an image URL or an uploaded file.");
     }

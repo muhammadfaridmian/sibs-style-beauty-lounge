@@ -25,6 +25,7 @@ const BookingPage: React.FC = () => {
     info: ''
   });
   const containerRef = React.useRef<HTMLDivElement>(null);
+  // The calendar header uses the current month as the visual anchor for the booking flow.
   const currentMonth = new Date();
   const authToken = getStoredAuthToken();
 
@@ -162,6 +163,7 @@ const BookingPage: React.FC = () => {
     <div ref={containerRef} className="bg-[#FAF9F6] min-h-screen text-[#333] font-serif overflow-x-hidden opacity-100">
       {/* Service Detail Overlay Panel */}
       {viewingService && activeServiceData && (
+        // The overlay lets a visitor inspect a treatment before they commit to booking it.
         <div className="fixed inset-0 z-[100] flex items-start md:items-center justify-center px-2 sm:px-4 py-4 overflow-y-auto">
           <div 
             className="absolute inset-0 bg-black/60 backdrop-blur-xl transition-opacity animate-in fade-in duration-500" 
@@ -271,6 +273,7 @@ const BookingPage: React.FC = () => {
         <div className="flex flex-col gap-24">
           
           {!authToken && (
+            // Signed-out visitors can browse everything, but the final booking still needs a session.
             <div className="rounded-[2rem] sm:rounded-[3rem] border border-[#F2529D]/10 bg-white/85 p-6 sm:p-8 shadow-xl flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
               <div className="space-y-2">
                 <p className="text-[0.65rem] sm:text-xs font-black uppercase tracking-[0.35em] text-[#F2529D]">Protected booking</p>
@@ -312,6 +315,7 @@ const BookingPage: React.FC = () => {
                   <div 
                     key={service.id} 
                     onClick={() => {
+                      // Clicking a card both highlights it and opens the service detail overlay.
                       setSelectedService(service.id);
                       setViewingService(service.id);
                     }}
@@ -499,6 +503,7 @@ const BookingPage: React.FC = () => {
                             </button>
                           ))
                         ) : (
+                          // When there are no open times, the UI explains why instead of leaving the grid empty.
                           <div className="col-span-full py-16 sm:py-32 text-center bg-gray-50/50 rounded-[2rem] sm:rounded-[5rem] border-8 border-white border-dashed">
                             <p className="text-gray-300 text-base sm:text-3xl font-black italic tracking-[0.2em] sm:tracking-widest uppercase px-4">No available ritual slots</p>
                           </div>
@@ -639,6 +644,7 @@ const BookingPage: React.FC = () => {
                   <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-b from-[#F2529D]/5 to-transparent"></div>
                   
                   <div className="flex flex-col items-center space-y-2 relative z-10">
+                    {/* The summary restates the chosen ritual so the final confirmation is obvious. */}
                     <span className="text-[0.55rem] sm:text-[0.65rem] font-black text-gray-400 tracking-[0.5em] sm:tracking-[0.8em] uppercase">RITUAL INVESTMENT</span>
                     <p className="text-[#333] font-black text-lg sm:text-xl md:text-2xl italic tracking-tighter text-center px-4">
                       {selectedService ? services.find(s => s.id === selectedService)?.name : 'Awaiting Selection'}

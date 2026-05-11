@@ -98,12 +98,14 @@ const Navigation = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [showCurtain, setShowCurtain] = useState(false);
   const [pendingRoute, setPendingRoute] = useState<string | null>(null);
+  // Boot from localStorage so the header knows the user state before any network calls finish.
   const [currentUser, setCurrentUser] = useState<AuthUser | null>(() => getStoredAuthUser());
   const location = useLocation();
   const navigate = useNavigate();
 
   useEffect(() => {
     const handleTrigger = (e: any) => {
+      // The curtain event carries the next route path from whichever button fired it.
       setPendingRoute(e.detail.path);
       setShowCurtain(true);
     };
@@ -181,6 +183,7 @@ const Navigation = () => {
               </Link>
             )}
 
+            {/* Reserve uses the curtain transition so booking feels like an intentional reveal. */}
             <button
               onClick={() => {
                 const event = new CustomEvent('trigger-curtain', { detail: { path: '/booking' } });
@@ -208,6 +211,7 @@ const Navigation = () => {
       </nav>
 
       {showCurtain && (
+        // The transition overlay only appears while the route handoff is happening.
         <CurtainTransition 
           onMidpoint={() => {
             if (pendingRoute) navigate(pendingRoute);
@@ -384,6 +388,7 @@ function App() {
       <div className="relative bg-[#FAF9F6] min-h-screen">
         <ScrollToTop />
         <Navigation />
+        {/* The route switch below is the single-page app handoff point. */}
         <main>
           <Routes>
             <Route path="/" element={<HomeScreen />} />

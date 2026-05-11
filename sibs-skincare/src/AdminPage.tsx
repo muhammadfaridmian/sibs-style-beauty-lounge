@@ -39,6 +39,7 @@ const statusTone: Record<AdminAppointment['status'], string> = {
 
 const AdminPage: React.FC = () => {
   const navigate = useNavigate();
+  // The dashboard starts by reading the stored token so it can decide what to show.
   const authToken = getStoredAuthToken();
 
   const [currentUser, setCurrentUser] = useState<AuthUser | null>(null);
@@ -72,6 +73,7 @@ const AdminPage: React.FC = () => {
       setCurrentUser(user);
 
       if (!user || user.role !== 'admin') {
+        // A valid customer session still should not reveal the admin queues.
         setAppointments([]);
         setReviews([]);
         return;
@@ -100,7 +102,7 @@ const AdminPage: React.FC = () => {
   }, []);
 
   const refreshDashboard = async () => {
-    // Manual refresh just re-runs the same checks and fetches fresh admin data.
+    // Manual refresh just repeats the same secure load flow.
     setIsRefreshing(true);
     await loadDashboard();
   };

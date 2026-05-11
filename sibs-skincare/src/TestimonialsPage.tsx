@@ -31,6 +31,7 @@ const TestimonialsPage: React.FC = () => {
     try {
       setIsLoading(true);
       // The review carousel and the submit form both need the latest service list.
+      // We fetch both together so the page does not show mismatched testimonial data.
       const [fetchedReviews, fetchedServices] = await Promise.all([
         getReviews(),
         getServices()
@@ -64,6 +65,7 @@ const TestimonialsPage: React.FC = () => {
   const changeTestimonial = (newIndex: number) => {
     if (reviews.length === 0) return;
     // The card animates out before the next review slides into the same spot.
+    // The direction tells the animation which side to leave from.
     const direction = newIndex > currentIndex ? 1 : -1;
     
     gsap.to(testimonialRef.current, {
@@ -95,6 +97,7 @@ const TestimonialsPage: React.FC = () => {
 
     setIsSubmitting(true);
     try {
+      // The selected service name helps moderation staff understand which ritual the story refers to.
       const selectedService = services.find(s => s.id === formData.serviceId);
       await submitReview({
         name: formData.name,
@@ -105,6 +108,7 @@ const TestimonialsPage: React.FC = () => {
         serviceId: formData.serviceId,
         serviceName: selectedService?.name || 'General Inquiry'
       }, sessionToken);
+      // A successful post swaps the form for a short thank-you state.
       setSubmitSuccess(true);
       setSubmitError(null);
       setFormData({ name: '', email: '', rating: 5, serviceId: '', mainQuote: '', subQuote1: '' });
@@ -141,6 +145,7 @@ const TestimonialsPage: React.FC = () => {
         {reviews.length > 0 && (
           <div className='relative w-full flex items-center justify-center mb-24'>
             {/* Navigation Arrows */}
+            {/* These arrows let the carousel move without losing the current review's focus. */}
             <button 
               onClick={prev}
               className='absolute -left-4 sm:left-0 lg:left-20 z-10 w-10 h-10 md:w-16 md:h-16 bg-white rounded-full shadow-lg flex items-center justify-center text-[#F2529D] hover:bg-[#F2529D] hover:text-white transition-all hover:scale-110 active:scale-95 group'
@@ -203,6 +208,7 @@ const TestimonialsPage: React.FC = () => {
         )}
 
         {/* Share Your Story Form Section */}
+          {/* The sign-in gate keeps the story tied to a verified customer account. */}
             <div className='w-full max-w-6xl bg-[#0D0D0D] rounded-[2rem] sm:rounded-[4rem] p-4 sm:p-8 md:p-12 lg:p-20 text-white relative overflow-hidden mt-32 border border-white/5 shadow-2xl mx-auto'>
           {/* Ambient Background Elements */}
           <div className='absolute top-0 right-0 w-[40rem] h-[40rem] bg-[#F2529D] opacity-[0.03] blur-[120px] -mr-80 -mt-80'></div>

@@ -213,6 +213,7 @@ export function getStoredAuthToken(): string | null {
     return null;
   }
 
+  // The token itself stays in browser storage so every protected request can reuse it.
   return window.localStorage.getItem(AUTH_TOKEN_KEY);
 }
 
@@ -221,6 +222,7 @@ export function setStoredAuthSession(session: AuthSession) {
   writeStoredJson(AUTH_USER_KEY, session.user);
   if (typeof window !== "undefined") {
     window.localStorage.setItem(AUTH_TOKEN_KEY, session.token);
+    // The custom event tells the navigation bar and pages that auth state changed.
     window.dispatchEvent(new Event("sibs-style-auth-change"));
   }
 }
@@ -233,6 +235,7 @@ export function clearStoredAuthSession() {
 
   window.localStorage.removeItem(AUTH_TOKEN_KEY);
   window.localStorage.removeItem(AUTH_USER_KEY);
+  // Clearing the session also notifies any components that depend on auth state.
   window.dispatchEvent(new Event("sibs-style-auth-change"));
 }
 
@@ -256,6 +259,7 @@ async function requestJson<T>(path: string, init: RequestInit = {}, token?: stri
     headers,
   });
 
+  // Convex sends a small { ok, data, error } envelope, so we unwrap that here.
   const payload = await response.json().catch(() => null) as { ok?: boolean; data?: T; error?: string } | null;
   if (!response.ok || payload?.ok === false) {
     throw new Error(payload?.error || "Request failed");
@@ -289,6 +293,7 @@ export async function getServices(): Promise<Service[]> {
  */
 export async function getServiceById(serviceId: string): Promise<Service | null> {
   try {
+    // This helper is a convenience for places that only know the id, not the slug.
     const services = await getServices();
     return services.find(s => s.id === serviceId) || null;
   } catch (error) {
@@ -561,6 +566,7 @@ export async function submitReview(reviewData: {
  */
 export async function getPromotions(): Promise<Promotion[]> {
   try {
+    // The homepage and offers page both pull their promo cards from the same endpoint.
     const response = await fetch(`${API_BASE}/api/promotions`);
     if (!response.ok) throw new Error("Failed to fetch promotions");
     const data = await response.json();
@@ -579,6 +585,7 @@ export async function getPromotions(): Promise<Promotion[]> {
  */
 export async function getStylists(): Promise<Stylist[]> {
   try {
+    // Staff cards are public, so this request does not need a login token.
     const response = await fetch(`${API_BASE}/api/staff`);
     if (!response.ok) throw new Error("Failed to fetch stylists");
     const data = await response.json();
@@ -595,6 +602,7 @@ export async function getStylists(): Promise<Stylist[]> {
  * Format price from cents to currency string (AED)
  */
 export function formatPrice(priceCents: number): string {
+  // Currency formatting stays simple because the app always displays AED.
   const amount = (priceCents / 100).toLocaleString('en-AE', {
     minimumFractionDigits: 0,
     maximumFractionDigits: 0,
@@ -606,6 +614,7 @@ export function formatPrice(priceCents: number): string {
  * Convert duration in minutes to readable format (e.g., "75 MINS")
  */
 export function formatDuration(minutes: number): string {
+  // Durations are shown as short labels so the cards stay easy to scan.
   return `${minutes} MINS`;
 }
 
@@ -613,6 +622,7 @@ export function formatDuration(minutes: number): string {
  * Format date string (YYYY-MM-DD to readable format)
  */
 export function formatDate(dateString: string): string {
+  // This converts the raw ISO date into the friendlier label used in the UI.
   return new Date(dateString).toLocaleDateString("en-US", {
     weekday: "short",
     month: "short",

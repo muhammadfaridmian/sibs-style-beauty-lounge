@@ -20,8 +20,10 @@ const HomePage = () => {
     if (isCollectionOpen) {
       // The modal feels like a little product gallery, so the body stops scrolling behind it.
       const isMobile = isMobileViewport();
+      // Locking scroll keeps the modal centered and prevents the page from drifting underneath it.
       document.body.style.overflow = 'hidden';
       
+      // The open animation starts with the dark veil, then lifts the panel forward.
       tl = gsap.timeline();
       tl.fromTo('.collection-overlay', 
           { opacity: 0 }, 
@@ -56,6 +58,7 @@ const HomePage = () => {
     window.scrollTo(0, 0);
     
     // Page Entry Transition
+    // This is the first impression animation when the home page mounts.
     gsap.fromTo(containerRef.current, 
       { opacity: 0 }, 
       { opacity: 1, duration: 1.2, ease: 'power2.inOut' }
@@ -161,6 +164,7 @@ const HomePage = () => {
 
   useEffect(() => {
     let cancelled = false;
+    // Image preloading happens only when the browser has spare time.
     const supportsIdleCallback = typeof window.requestIdleCallback === 'function';
 
     const preloadImages = () => {
@@ -392,6 +396,7 @@ const HomePage = () => {
             <p className="text-gray-400 text-base md:text-xl max-w-2xl font-light px-4">Experience the synergy of botanical science and artistic beauty at Sibs Style.</p>
             <button 
                 onClick={() => {
+                    // This CTA uses the same curtain event as the nav so the handoff feels consistent.
                   const event = new CustomEvent('trigger-curtain', { detail: { path: '/booking' } });
                   window.dispatchEvent(event);
                 }}

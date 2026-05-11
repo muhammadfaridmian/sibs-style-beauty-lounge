@@ -211,6 +211,7 @@ http.route({
       return jsonResponse({ ok: false, error: "Authentication required." }, 401);
     }
 
+    // The frontend only gets the sanitized public user object, never the session internals.
     return jsonResponse({ ok: true, data: session.user });
   }),
 });
@@ -331,6 +332,7 @@ http.route({
       const appointmentDate = url.searchParams.get("date") ?? new Date().toISOString().slice(0, 10);
       const serviceIdParam = url.searchParams.get("serviceId");
       const serviceId = serviceIdParam && serviceIdParam !== "null" ? serviceIdParam : null;
+      // If no service is selected, Convex still answers with the day-based opening pattern.
       const availability = await ctx.runQuery(internal.data.getAvailability, {
         appointmentDate,
         serviceId: serviceId as Id<"services"> | null,
@@ -370,6 +372,7 @@ http.route({
       }
 
       const { salt, passwordHash } = await hashPassword(body.password);
+      // Optional lists are normalized here so textarea input behaves like structured data.
       const skinPreferences = normalizeStringList(body.skinPreferences);
       const allergies = normalizeStringList(body.allergies);
       const now = Date.now();
@@ -432,6 +435,7 @@ http.route({
         return jsonResponse({ ok: false, error: "This account is disabled." }, 403);
       }
 
+      // Password verification happens against the stored salt and hash pair.
       const validPassword = await verifyPassword(body.password, user.passwordSalt, user.passwordHash);
       if (!validPassword) {
         return jsonResponse({ ok: false, error: "Invalid email or password." }, 401);
@@ -486,6 +490,7 @@ http.route({  path: "/api/appointments",
 
       const userId = auth.user.id as Id<"users">;
       const user = await (ctx as any).runQuery(internal.data.getUserById, { userId });
+      // The signed-in profile wins, but the form still supplies a fallback for display.
       const finalName = user?.fullName || body.guestName || "";
       const finalEmail = user?.email || body.guestEmail || "";
       const finalPhone = user?.phone || body.guestPhone || "";
@@ -564,6 +569,7 @@ http.route({
         return jsonResponse({ ok: false, error: "Status is required." }, 400);
       }
 
+      // Admins can update the state and optionally attach a stylist in the same request.
       const updatedAppointmentId = await (ctx as any).runMutation(internal.data.updateAppointmentStatus, {
         appointmentId: appointmentId as Id<"appointments">,
         status: body.status,
@@ -600,6 +606,7 @@ http.route({
       }
 
       const body = await readJson<Record<string, unknown>>(request);
+      // These fallback values let the form stay usable even when some optional fields are blank.
       const name = String(auth.user.fullName ?? body.name ?? body.fullName ?? "").trim();
       const email = String(auth.user.email ?? body.email ?? "").trim();
       const role = String(body.role ?? body.serviceRole ?? "Client").trim();
@@ -671,6 +678,7 @@ http.route({
         sortOrder?: number;
       }>(request);
 
+      // Approval defaults to true so the admin can publish a review with a single click.
       const updatedReviewId = await (ctx as any).runMutation(internal.data.updateReviewModeration, {
         reviewId: reviewId as Id<"reviews">,
         isApproved: body.isApproved ?? true,
@@ -742,6 +750,7 @@ http.route({
       let storageId: string | null = null;
 
       if (contentType.includes("application/json")) {
+        // JSON uploads are usually plain image links pasted from the dashboard.
         const body = await readJson<Record<string, unknown>>(request);
         title = String(body.title ?? title).trim();
         category = String(body.category ?? category).trim();
@@ -749,6 +758,7 @@ http.route({
         altText = String(body.altText ?? altText).trim();
         imageUrl = typeof body.imageUrl === "string" && body.imageUrl.trim() ? body.imageUrl.trim() : imageUrl;
       } else if (contentType.includes("image/") || contentType.includes("application/octet-stream") || !contentType) {
+        // Binary uploads are stored directly in Convex storage and linked from the gallery row.
         const blob = await request.blob();
         if (blob.size > 0) {
           storageId = await (ctx as any).storage.store(blob);

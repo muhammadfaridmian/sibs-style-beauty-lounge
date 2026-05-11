@@ -81,6 +81,7 @@ const images = [
   }
 ];
 
+// Mobile gets a lighter narrative stack so the story stays readable on smaller screens.
 const behindCanvasMobileFrames = [
   {
     kind: 'text',
@@ -216,6 +217,7 @@ const GalleryPage = () => {
 
       // Lateral Scroll Animation for the "Extended Curation"
       mm.add('(min-width: 768px)', () => {
+        // Desktop gets the full horizontal storyboard; mobile keeps the layout vertical.
         // On desktop, each panel becomes one slice of a long horizontal storyboard.
         const sections = gsap.utils.toArray(".lateral-item");
         if (sections.length > 0) {
@@ -245,6 +247,7 @@ const GalleryPage = () => {
     });
 
     return () => {
+      // Reverting the GSAP context matters because the page pins content while scrolling.
       mm.revert();
       ctx.revert();
       ScrollTrigger.getAll().forEach(t => t.kill());
@@ -292,6 +295,7 @@ const GalleryPage = () => {
 
       {/* Lateral / Unique Sideways Scroll Section */}
       <section className="md:hidden mt-20 px-4 sm:px-6 pb-12 bg-[#FAF9F6]">
+        {/* The mobile version keeps the story compact so the images do not feel cramped. */}
         <div className="rounded-[2rem] bg-[#0A0E1A] p-6 sm:p-8 shadow-2xl border border-white/10">
           <p className="text-[#F2529D] uppercase tracking-[0.35em] text-[10px] sm:text-xs font-black mb-3">Extended Curation</p>
           <h2 className="text-3xl sm:text-5xl font-display italic text-white leading-tight">Behind The Canvas</h2>
@@ -327,6 +331,7 @@ const GalleryPage = () => {
       </section>
 
       <section className="hidden md:block mt-20 sm:mt-40 overflow-hidden lateral-container relative w-full h-auto md:h-screen">
+        {/* Desktop gets the full sideways gallery because the wider screen can support it. */}
         <div className="flex w-[1200vw] h-auto md:h-screen bg-[#0A0E1A] absolute top-0 left-0" ref={scrollRef}>
           <div className="lateral-item w-screen min-h-[80vh] md:h-full flex items-center justify-center p-4 sm:p-8 md:p-20 shrink-0">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8 md:gap-20 w-full max-w-7xl px-4 sm:px-6 md:px-0">
