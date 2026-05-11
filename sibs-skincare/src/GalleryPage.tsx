@@ -5,6 +5,7 @@ import { Link } from 'react-router-dom';
 
 gsap.registerPlugin(ScrollTrigger);
 
+// The gallery is mostly a visual story page, so the motion work does most of the talking.
 const images = [
   {
     url: 'https://i.pinimg.com/1200x/a3/43/df/a343dfb6e615e0e65a48411ab0ab833a.jpg', // Luxury Serum Bottle
@@ -171,6 +172,7 @@ const GalleryPage = () => {
 
     const mm = gsap.matchMedia();
     const ctx = gsap.context(() => {
+      // The title and cards fade in first, then the wide gallery section starts its scroll trick.
       // Delay to ensure previous page has unmounted and layout is settled
       gsap.to(pageWrapperRef.current, {
         visibility: 'visible',
@@ -214,6 +216,7 @@ const GalleryPage = () => {
       mm.add('(min-width: 768px)', () => {
         const sections = gsap.utils.toArray(".lateral-item");
         if (sections.length > 0) {
+          // This is the sideways scroll bit. It makes the gallery feel more like a magazine spread.
           gsap.to(sections, {
             xPercent: -100 * (sections.length - 1),
             ease: "none",

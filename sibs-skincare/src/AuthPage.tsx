@@ -17,6 +17,7 @@ const splitList = (value: string) =>
 const AuthPage: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  // If the page came from booking or testimonials, we bounce back there after sign in.
   const redirectParam = new URLSearchParams(location.search).get('redirect') ?? '/booking';
   const safeRedirect = redirectParam.startsWith('/') ? redirectParam : '/booking';
   const resolveRedirect = (role: 'customer' | 'admin') => {
@@ -49,6 +50,7 @@ const AuthPage: React.FC = () => {
     window.scrollTo(0, 0);
 
     const checkSession = async () => {
+      // If a valid token already exists, skip the form and go straight in.
       const authToken = getStoredAuthToken();
       if (!authToken) {
         setIsLoadingSession(false);

@@ -66,6 +66,7 @@ const AdminPage: React.FC = () => {
 
     setError(null);
     try {
+      // First we confirm the current user, then we ask Convex for the admin lists.
       const user = await getCurrentAuthUser(authToken);
       setCurrentUser(user);
 
@@ -103,6 +104,7 @@ const AdminPage: React.FC = () => {
   };
 
   const handleLogout = () => {
+    // Sign out clears the session and sends the admin back to the auth page.
     clearStoredAuthSession();
     navigate('/auth', { replace: true });
   };

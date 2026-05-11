@@ -6,6 +6,7 @@ export default {
   ],
   theme: {
     extend: {
+      // These are the brand colors and fonts the whole site keeps using.
       colors: {
         primary: "#ed64a6",
         gold: "#c5a059",

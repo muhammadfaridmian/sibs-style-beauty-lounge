@@ -10,7 +10,7 @@ const OffersPage = () => {
     useEffect(() => {
         window.scrollTo(0, 0);
         
-        // Page entry transition
+        // This page is really a promo showcase, so the opening motion stays soft and clean.
         gsap.fromTo(containerRef.current, 
             { opacity: 0, y: 30 }, 
             { opacity: 1, y: 0, duration: 1.2, ease: 'power3.out' }
@@ -27,7 +27,7 @@ const OffersPage = () => {
         if (isPanelOpen) {
             document.body.style.overflow = 'hidden';
             
-            // Refined Panel Entrance
+            // The panel opens like a little shop window over the page.
             const tl = gsap.timeline();
             tl.fromTo('.panel-overlay', 
                 { opacity: 0 }, 

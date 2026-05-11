@@ -6,6 +6,7 @@ import { getReviews, submitReview, getServices, getStoredAuthToken } from './api
 import type { Review, Service } from './api/convex-api';
 
 const TestimonialsPage: React.FC = () => {
+  // This page has two jobs: show reviews and let signed-in clients share a new one.
   const [currentIndex, setCurrentIndex] = useState(0);
   const [reviews, setReviews] = useState<Review[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -29,6 +30,7 @@ const TestimonialsPage: React.FC = () => {
   const loadData = async () => {
     try {
       setIsLoading(true);
+      // The review carousel and the submit form both need the latest service list.
       const [fetchedReviews, fetchedServices] = await Promise.all([
         getReviews(),
         getServices()
@@ -82,6 +84,7 @@ const TestimonialsPage: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    // Review submission is protected so the stored client account stays tied to the post.
     const sessionToken = getStoredAuthToken();
     if (!sessionToken) {
       setSubmitError('Please sign in to share a chronicle first.');

@@ -3,6 +3,7 @@ import { v } from "convex/values";
 import { formatMoney, formatTimeLabel, parseTimeLabel } from "./utils";
 import { defaultAppointmentLocation, defaultBusinessProfile } from "./seedData";
 
+// These helpers turn raw Convex documents into the friendlier shapes the frontend wants.
 type WeeklyHours = {
   monday: string;
   tuesday: string;
@@ -321,6 +322,7 @@ function intervalsOverlap(
 export const getBusinessProfile = internalQuery({
   args: {},
   handler: async (ctx) => {
+    // The site uses this for the public contact, hours, and branding pieces.
     const profile = await ctx.db.query("businessProfile").take(1);
     if (profile.length === 0) {
       return null;
@@ -332,6 +334,7 @@ export const getBusinessProfile = internalQuery({
 export const listServices = internalQuery({
   args: {},
   handler: async (ctx) => {
+    // Booking and homepage cards both read from this same service list.
     const services = await ctx.db
       .query("services")
       .withIndex("by_active_and_sortOrder", (q) => q.eq("active", true))
@@ -363,6 +366,7 @@ export const getServiceBySlug = internalQuery({
 export const listStaff = internalQuery({
   args: {},
   handler: async (ctx) => {
+    // These cards back the artisans page and the staff choices in booking.
     const staff = await ctx.db
       .query("stylists")
       .withIndex("by_active_and_sortOrder", (q) => q.eq("active", true))
@@ -375,6 +379,7 @@ export const listStaff = internalQuery({
 export const listGallery = internalQuery({
   args: {},
   handler: async (ctx) => {
+    // Gallery items can come from storage or from a simple image URL.
     const items = await ctx.db
       .query("galleryItems")
       .withIndex("by_active_and_sortOrder", (q) => q.eq("active", true))
@@ -396,6 +401,7 @@ export const listGallery = internalQuery({
 export const listApprovedReviews = internalQuery({
   args: {},
   handler: async (ctx) => {
+    // Only approved reviews leave the moderation queue and reach the public site.
     const reviews = await ctx.db
       .query("reviews")
       .withIndex("by_isApproved_and_sortOrder", (q) => q.eq("isApproved", true))
@@ -417,6 +423,7 @@ export const listReviewsForAdmin = internalQuery({
 export const listPromotions = internalQuery({
   args: {},
   handler: async (ctx) => {
+    // This is the data source for the offers and promotions page.
     const promotions = await ctx.db
       .query("promotions")
       .withIndex("by_active_and_sortOrder", (q) => q.eq("active", true))
@@ -490,6 +497,7 @@ export const getAvailability = internalQuery({
     serviceId: v.union(v.id("services"), v.null()),
   },
   handler: async (ctx, args) => {
+    // Availability is built from salon hours plus any already booked appointments.
     const profileDoc = await ctx.db.query("businessProfile").take(1);
     const profile = profileDoc.length > 0 ? profileDoc[0] : defaultBusinessProfile;
     const standardSlots = profile.standardSlots;
@@ -562,6 +570,7 @@ export const createUser = internalMutation({
     updatedAt: v.number(),
   },
   handler: async (ctx, args) => {
+    // Registration lands here after the frontend hashes the password.
     const existing = await ctx.db
       .query("users")
       .withIndex("by_email", (q) => q.eq("email", args.email))
@@ -635,6 +644,7 @@ export const createAppointment = internalMutation({
     updatedAt: v.number(),
   },
   handler: async (ctx, args) => {
+    // The booking form calls this, and Convex checks the slot before saving it.
     const service = await ctx.db.get(args.serviceId);
     if (!service) {
       throw new Error("Service not found.");
@@ -805,6 +815,7 @@ export const updateReviewModeration = internalMutation({
     updatedAt: v.number(),
   },
   handler: async (ctx, args) => {
+    // The admin dashboard uses this when it approves or hides a review.
     const review = await ctx.db.get(args.reviewId);
     if (!review) {
       throw new Error("Review not found.");
@@ -835,6 +846,7 @@ export const createGalleryItem = internalMutation({
     updatedAt: v.number(),
   },
   handler: async (ctx, args) => {
+    // Admin uploads end up here, either with a file upload or a saved image URL.
     if (!args.imageUrl && !args.storageId) {
       throw new Error("Gallery items require either an image URL or an uploaded file.");
     }

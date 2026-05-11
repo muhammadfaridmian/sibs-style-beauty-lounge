@@ -6,6 +6,7 @@ import { getServices, getAvailability, createAppointment, formatPrice, formatDur
 
 const BookingPage: React.FC = () => {
   // ==================== STATE ====================
+  // These state values keep the booking flow step by step and easy to follow.
   const [services, setServices] = useState<Service[]>([]);
   const [selectedService, setSelectedService] = useState<string | null>(null);
   const [viewingService, setViewingService] = useState<string | null>(null);
@@ -48,6 +49,7 @@ const BookingPage: React.FC = () => {
     if (!selectedService) return;
 
     const loadAvailability = async () => {
+      // We ask Convex for open slots after the service and date are chosen.
       try {
         setIsLoadingAvailability(true);
         const dateStr = selectedDate.toISOString().split('T')[0];
@@ -101,6 +103,7 @@ const BookingPage: React.FC = () => {
 
   const handleBooking = async (e: React.FormEvent) => {
     e.preventDefault();
+    // Booking is protected so every appointment stays tied to a real account.
     const sessionToken = getStoredAuthToken();
     if (!sessionToken) {
       setSubmitError("Please sign in to book a ritual first.");

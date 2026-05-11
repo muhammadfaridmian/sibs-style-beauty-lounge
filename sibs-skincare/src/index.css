@@ -1,6 +1,7 @@
 /* css-ignore-unknown-at-rules */
 @import 'tailwindcss';
 
+/* This file keeps the global look steady so every page feels like the same lounge. */
 @theme {
   --font-display: 'Playball', cursive;
   --font-cursive: 'Great Vibes', cursive;
@@ -12,10 +13,12 @@
 
 @layer base {
   body {
+    /* Base page style before any page-specific section kicks in. */
     @apply font-body bg-[#FAFAFA] text-[#333] overflow-x-hidden;
   }
 }
 
+/* These helpers keep animation targets visible after GSAP finishes. */
 .reveal {
   opacity: 1 !important;
   visibility: visible !important;
@@ -28,6 +31,7 @@
 }
 
 .parallax-wrap {
+  /* This keeps image frames from spilling outside the rounded corners. */
   overflow: hidden;
   border-radius: 2rem;
 }

@@ -1,4 +1,5 @@
 {
+  "_comment": "Root workspace manifest. The real app lives in sibs-skincare and the backend lives in convex.",
   "dependencies": {
     "convex": "^1.35.1",
     "firebase": "^12.12.1"

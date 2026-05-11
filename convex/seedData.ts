@@ -1,4 +1,5 @@
 export const defaultBusinessProfile = {
+  // This is the public salon card the site reads for contact and branding.
   name: "Sibs Style Beauty Lounge",
   tagline: "Bespoke beauty services tailored for you",
   description:
@@ -20,6 +21,7 @@ export const defaultBusinessProfile = {
     saturday: "Saturday 10:00 AM - 10:00 PM",
     sunday: "Sunday 10:00 AM - 10:00 PM",
   },
+  // The booking page uses this same address when it creates a new appointment.
   weeklyHours: {
     monday: "OFF",
     tuesday: "10:00 AM - 9:00 PM",
@@ -45,6 +47,7 @@ export const defaultBusinessProfile = {
   ],
   bookingLeadMinutes: 0,
   bookingIntervalMinutes: 60,
+// These are the service cards shown to customers before they book.
 };
 
 export const defaultAppointmentLocation =
@@ -149,6 +152,7 @@ export const defaultServices = [
   },
 ];
 
+// These are the staff cards shown on the artisans page and in admin tools.
 export const defaultStylists = [
   {
     name: "Elena Vance",
@@ -185,6 +189,7 @@ export const defaultStylists = [
   },
 ];
 
+// These promotions power the offers page and the seasonal specials section.
 export const defaultPromotions = [
   {
     title: "Glow Membership",
@@ -230,6 +235,7 @@ export const defaultPromotions = [
   },
 ];
 
+// These gallery items are the visual catalogue for the lounge.
 export const defaultGalleryItems = [
   {
     title: "Radiance Elixir",
@@ -353,6 +359,7 @@ export const defaultGalleryItems = [
   },
 ];
 
+// These reviews are starter testimonials so the homepage does not look empty.
 export const defaultReviews = [
   {
     name: "Gerardine Alcala",
@@ -408,6 +415,7 @@ export const defaultReviews = [
 ];
 
 export const defaultAdminCredentials = {
+  // The real values should come from env vars on your machine, not from GitHub.
   fullName: process.env.DEFAULT_ADMIN_FULLNAME || "Sibs Style Admin",
   email: process.env.DEFAULT_ADMIN_EMAIL || "admin@example.com",
   phone: process.env.DEFAULT_ADMIN_PHONE || "000-000-0000",

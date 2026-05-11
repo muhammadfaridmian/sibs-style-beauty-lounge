@@ -4,6 +4,8 @@
  * Base URL: https://proficient-akita-599.convex.site
  */
 
+// This file is the bridge between React and Convex.
+// It keeps the login token in localStorage and sends it when the route needs protection.
 const API_BASE = "https://proficient-akita-599.convex.site";
 const AUTH_TOKEN_KEY = "sibs-style-auth-token";
 const AUTH_USER_KEY = "sibs-style-auth-user";
@@ -213,6 +215,7 @@ export function getStoredAuthToken(): string | null {
 }
 
 export function setStoredAuthSession(session: AuthSession) {
+  // Save the safe user object and the token together so refreshes keep the session alive.
   writeStoredJson(AUTH_USER_KEY, session.user);
   if (typeof window !== "undefined") {
     window.localStorage.setItem(AUTH_TOKEN_KEY, session.token);
@@ -221,6 +224,7 @@ export function setStoredAuthSession(session: AuthSession) {
 }
 
 export function clearStoredAuthSession() {
+  // Logging out just clears the browser copy of the session.
   if (typeof window === "undefined") {
     return;
   }
@@ -235,6 +239,7 @@ export function getStoredAuthUser(): AuthUser | null {
 }
 
 async function requestJson<T>(path: string, init: RequestInit = {}, token?: string): Promise<T> {
+  // This helper adds JSON headers and the Bearer token when the route needs it.
   const headers = new Headers(init.headers ?? {});
   if (init.body && !headers.has("Content-Type")) {
     headers.set("Content-Type", "application/json");
@@ -342,6 +347,7 @@ export async function createAppointment(appointmentData: {
 }
 
 export async function login(credentials: { email: string; password: string }): Promise<AuthSession> {
+  // Login returns the token plus the public user shape, then we store both.
   const session = await requestJson<AuthSession>("/api/auth/login", {
     method: "POST",
     body: JSON.stringify(credentials),
@@ -359,6 +365,7 @@ export async function register(accountData: {
   skinPreferences?: string[];
   allergies?: string[];
 }): Promise<AuthSession> {
+  // Register does the same thing, but the backend also creates the customer record.
   const session = await requestJson<AuthSession>("/api/auth/register", {
     method: "POST",
     body: JSON.stringify(accountData),
@@ -373,6 +380,7 @@ export async function getCurrentAuthUser(authToken: string | null = getStoredAut
   }
 
   try {
+    // If Convex says the session is still valid, we trust that and keep the user signed in.
     return await requestJson<AuthUser>("/api/auth/me", { method: "GET" }, authToken);
   } catch (error) {
     console.error("Error loading auth session:", error);

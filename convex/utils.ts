@@ -5,6 +5,7 @@ export const corsHeaders: Record<string, string> = {
   "Access-Control-Max-Age": "86400",
 };
 
+// These helpers keep the route file readable and stop the same code from being repeated everywhere.
 export function jsonResponse(data: unknown, status = 200): Response {
   return new Response(JSON.stringify(data), {
     status,
@@ -27,6 +28,7 @@ export async function readJson<T>(request: Request): Promise<T> {
 }
 
 export function getBearerToken(request: Request): string | null {
+  // The frontend sends the session token in the Authorization header.
   const header = request.headers.get("Authorization");
   if (!header) {
     return null;
@@ -40,6 +42,7 @@ export function normalizeEmail(email: string): string {
 }
 
 export function formatMoney(cents: number): string {
+  // Money is shown in AED because that is the salon currency on the site.
   const amount = (cents / 100).toLocaleString("en-AE", {
     minimumFractionDigits: 0,
     maximumFractionDigits: 0,
@@ -48,6 +51,7 @@ export function formatMoney(cents: number): string {
 }
 
 export function parseTimeLabel(label: string): number {
+  // Time slots are stored as minutes so overlap checks stay simple.
   const match = label.trim().match(/^(\d{1,2}):(\d{2})\s*(AM|PM)$/i);
   if (!match) {
     throw new Error(`Invalid time label: ${label}`);
@@ -93,6 +97,7 @@ export function randomToken(): string {
 }
 
 export async function hashPassword(password: string, salt?: string): Promise<{ salt: string; passwordHash: string }> {
+  // Passwords are never stored raw. The salt changes the hash each time.
   const finalSalt = salt ?? randomToken();
   const passwordHash = await sha256Hex(`${finalSalt}:${password}`);
   return { salt: finalSalt, passwordHash };
@@ -103,6 +108,7 @@ export async function verifyPassword(password: string, salt: string, passwordHas
   return candidate === passwordHash;
 }
 
+// Random session tokens use base64url so they are safe in headers and URLs.
 export function bytesToBase64Url(bytes: Uint8Array): string {
   let binary = "";
   for (const byte of bytes) {

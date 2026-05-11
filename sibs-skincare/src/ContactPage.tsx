@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import gsap from 'gsap';
 
 const ContactPage = () => {
+    // This screen is mostly a contact card and directions page, not a data-heavy flow.
     useEffect(() => {
         window.scrollTo(0, 0);
         const tl = gsap.timeline({ defaults: { ease: 'power3.out' } });
@@ -63,6 +64,7 @@ const ContactPage = () => {
                         {/* Form Section */}
                         <div className="space-y-10">
                             <h3 className="text-3xl font-display text-[#BF9C34] italic font-black">Send us a Message</h3>
+                            {/* The form is here for layout and feel. The real contact details are below it. */}
                             <form className="space-y-8" onClick={(e) => e.preventDefault()}>
                                 <div className="space-y-2">
                                     <label className="text-xs font-black uppercase tracking-widest text-gray-400">Full Name</label>

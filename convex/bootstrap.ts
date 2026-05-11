@@ -12,6 +12,7 @@ import {
 } from "./seedData";
 import { hashPassword, normalizeEmail } from "./utils";
 
+// This file fills a fresh database with the first set of salon content.
 export const seedDefaults = mutation({
   args: {
     overwriteBusinessProfile: v.optional(v.boolean()),

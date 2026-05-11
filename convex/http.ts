@@ -15,6 +15,8 @@ import {
 } from "./utils";
 import { defaultAppointmentLocation } from "./seedData";
 
+// This file is the public door into Convex.
+// The React app calls these routes, and these routes call the Convex database.
 type PublicUser = {
   id: string;
   fullName: string;
@@ -53,6 +55,7 @@ function sanitizeUser(user: {
   createdAt: number;
   updatedAt: number;
 }): PublicUser {
+  // This trims the private fields away before the frontend sees the user.
   return {
     id: user._id,
     fullName: user.fullName,
@@ -132,6 +135,7 @@ function getPathSuffix(pathname: string, prefix: string): string | null {
 }
 
 async function getSessionContext(ctx: any, request: Request): Promise<SessionContext | null> {
+  // The app sends a Bearer token here. We hash it and look up the matching session.
   const token = getBearerToken(request);
   if (!token) {
     return null;
@@ -155,6 +159,7 @@ async function getSessionContext(ctx: any, request: Request): Promise<SessionCon
 }
 
 async function requireAdmin(ctx: any, request: Request): Promise<SessionContext | null> {
+  // Admin routes reuse the same session check, then add a role check on top.
   const session = await getSessionContext(ctx, request);
   if (!session || session.user.role !== "admin") {
     return null;
@@ -207,12 +212,14 @@ http.route({
   }),
 });
 
+// Browsers send a preflight OPTIONS request first, so this keeps cross-origin calls working.
 http.route({
   pathPrefix: "/api/",
   method: "OPTIONS",
   handler: httpAction(async () => emptyResponse(204)),
 });
 
+// Public salon data and auth routes start here.
 http.route({
   path: "/api/business",
   method: "GET",
@@ -495,6 +502,7 @@ http.route({  path: "/api/appointments",
   }),
 });
 
+// This gives the signed-in customer their own appointment list.
 http.route({
   path: "/api/appointments/me",
   method: "GET",

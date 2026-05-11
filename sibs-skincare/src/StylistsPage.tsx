@@ -9,7 +9,7 @@ const StylistsPage: React.FC = () => {
     window.scrollTo(0, 0);
     const tl = gsap.timeline();
     
-    // Initial state: hidden
+    // This page is mostly a clean showcase, so the intro just fades the cards in nicely.
     gsap.set(containerRef.current, { opacity: 0 });
 
     tl.to(containerRef.current, { 

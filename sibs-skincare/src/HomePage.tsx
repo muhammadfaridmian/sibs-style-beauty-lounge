@@ -6,6 +6,7 @@ import { Sparkles, Flower2, Droplets, Eye, ArrowRight, X, Heart, Star, ShoppingB
 gsap.registerPlugin(ScrollTrigger);
 
 const HomePage = () => {
+  // This page is the front window of the site, so most of it is about mood and first impressions.
   const revealRefs = useRef<(HTMLDivElement | null)[]>([]);
   const containerRef = useRef<HTMLDivElement>(null);
   const [isCollectionOpen, setIsCollectionOpen] = useState(false);
@@ -16,6 +17,7 @@ const HomePage = () => {
     let tl: gsap.core.Timeline | undefined;
 
     if (isCollectionOpen) {
+      // The modal feels like a little product gallery, so the body stops scrolling behind it.
       const isMobile = isMobileViewport();
       document.body.style.overflow = 'hidden';
       
@@ -95,6 +97,7 @@ const HomePage = () => {
     });
 
     const handleMouseMove = (e: MouseEvent) => {
+      // The image gets a tiny parallax shift so the hero feels more alive.
       gsap.to('.parallax-img', {
         x: (e.clientX - window.innerWidth / 2) / 60,
         y: (e.clientY - window.innerHeight / 2) / 60,
@@ -157,6 +160,7 @@ const HomePage = () => {
     const supportsIdleCallback = typeof window.requestIdleCallback === 'function';
 
     const preloadImages = () => {
+      // These images get loaded in the background so the collection opens faster.
       if (cancelled) return;
 
       products.forEach((product) => {

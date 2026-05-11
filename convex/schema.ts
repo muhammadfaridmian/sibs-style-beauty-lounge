@@ -1,7 +1,10 @@
 import { defineSchema, defineTable } from "convex/server";
 import { v } from "convex/values";
 
+// This file is the database blueprint.
+// Convex reads it first so the app knows what every table should look like.
 export default defineSchema({
+  // Public salon details like address, hours, and logo live here.
   businessProfile: defineTable({
     name: v.string(),
     tagline: v.string(),
@@ -39,6 +42,7 @@ export default defineSchema({
     updatedAt: v.number(),
   }),
 
+  // Users hold login info plus the small care notes the salon wants to remember.
   users: defineTable({
     fullName: v.string(),
     email: v.string(),
@@ -57,6 +61,7 @@ export default defineSchema({
     updatedAt: v.number(),
   }).index("by_email", ["email"]),
 
+  // Sessions let the app remember a signed-in user without storing raw passwords.
   sessions: defineTable({
     userId: v.id("users"),
     tokenHash: v.string(),
@@ -68,6 +73,7 @@ export default defineSchema({
     .index("by_tokenHash", ["tokenHash"])
     .index("by_userId", ["userId"]),
 
+  // Services are the bookable treatment cards the customer sees first.
   services: defineTable({
     slug: v.string(),
     name: v.string(),
@@ -89,6 +95,7 @@ export default defineSchema({
     .index("by_category", ["category"])
     .index("by_featured_and_sortOrder", ["featured", "sortOrder"]),
 
+  // Stylists are the team members shown in the artisans page and booking flow.
   stylists: defineTable({
     name: v.string(),
     role: v.string(),
@@ -104,6 +111,7 @@ export default defineSchema({
     .index("by_active_and_sortOrder", ["active", "sortOrder"])
     .index("by_featured_and_sortOrder", ["featured", "sortOrder"]),
 
+  // Gallery items can be a URL or an uploaded image.
   galleryItems: defineTable({
     title: v.string(),
     category: v.string(),
@@ -121,6 +129,7 @@ export default defineSchema({
     .index("by_featured_and_sortOrder", ["featured", "sortOrder"])
     .index("by_category", ["category"]),
 
+  // Reviews are the client stories shown as testimonials.
   reviews: defineTable({
     userId: v.union(v.id("users"), v.null()),
     name: v.string(),
@@ -143,6 +152,7 @@ export default defineSchema({
     .index("by_isApproved_and_createdAt", ["isApproved", "createdAt"])
     .index("by_serviceId", ["serviceId"]),
 
+  // Promotions power the offers and seasonal specials pages.
   promotions: defineTable({
     title: v.string(),
     description: v.string(),
@@ -162,6 +172,7 @@ export default defineSchema({
     .index("by_featured_and_sortOrder", ["featured", "sortOrder"])
     .index("by_code", ["code"]),
 
+  // Appointments are the booked time slots that drive the whole booking flow.
   appointments: defineTable({
     userId: v.union(v.id("users"), v.null()),
     guestName: v.string(),

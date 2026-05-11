@@ -50,7 +50,7 @@ const CurtainTransition = ({ onMidpoint, onComplete }: { onMidpoint: () => void,
       }
     });
 
-    // Reset visibility and text scale
+    // The curtain closes first, then the page changes, then it opens again.
     gsap.set(containerRef.current, { visibility: 'visible' });
     gsap.set(textRef.current, { scale: 0.98, opacity: 0, y: 12 });
     
@@ -113,6 +113,7 @@ const Navigation = () => {
 
   useEffect(() => {
     const syncAuthState = () => {
+      // This keeps the header and mobile menu in sync with localStorage.
       setCurrentUser(getStoredAuthUser());
     };
 
@@ -123,6 +124,7 @@ const Navigation = () => {
   }, []);
 
   const handleSignOut = () => {
+    // Sign out clears the stored session and drops the user back home.
     clearStoredAuthSession();
     setCurrentUser(null);
     setIsMenuOpen(false);
