@@ -63,6 +63,7 @@ const TestimonialsPage: React.FC = () => {
 
   const changeTestimonial = (newIndex: number) => {
     if (reviews.length === 0) return;
+    // The card animates out before the next review slides into the same spot.
     const direction = newIndex > currentIndex ? 1 : -1;
     
     gsap.to(testimonialRef.current, {
@@ -79,6 +80,7 @@ const TestimonialsPage: React.FC = () => {
     });
   };
 
+  // These helpers keep the review carousel looping in both directions.
   const next = () => changeTestimonial((currentIndex + 1) % reviews.length);
   const prev = () => changeTestimonial((currentIndex - 1 + reviews.length) % reviews.length);
 

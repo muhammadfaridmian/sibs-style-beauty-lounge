@@ -186,6 +186,7 @@ function readStoredJson<T>(key: string): T | null {
     return null;
   }
 
+  // The app uses this for restoring session data after refreshes.
   const rawValue = window.localStorage.getItem(key);
   if (!rawValue) {
     return null;
@@ -203,6 +204,7 @@ function writeStoredJson(key: string, value: unknown) {
     return;
   }
 
+  // This keeps the client-side cache in sync with the latest auth state.
   window.localStorage.setItem(key, JSON.stringify(value));
 }
 
@@ -235,6 +237,7 @@ export function clearStoredAuthSession() {
 }
 
 export function getStoredAuthUser(): AuthUser | null {
+  // This is the safe public user shape stored for quick UI startup.
   return readStoredJson<AuthUser>(AUTH_USER_KEY);
 }
 
@@ -269,6 +272,7 @@ async function requestJson<T>(path: string, init: RequestInit = {}, token?: stri
  */
 export async function getServices(): Promise<Service[]> {
   try {
+    // Booking and home views both depend on the live service list.
     const response = await fetch(`${API_BASE}/api/services`);
     if (!response.ok) throw new Error("Failed to fetch services");
     const data = await response.json();
@@ -301,6 +305,7 @@ export async function getServiceById(serviceId: string): Promise<Service | null>
  */
 export async function getAvailability(date: string, serviceId?: string): Promise<Availability | null> {
   try {
+    // The booking calendar needs the open slots for the selected day.
     const url = new URL(`${API_BASE}/api/availability`);
     url.searchParams.append("date", date);
     if (serviceId) url.searchParams.append("serviceId", serviceId);
@@ -336,6 +341,7 @@ export async function createAppointment(appointmentData: {
       throw new Error("Please sign in before booking a ritual.");
     }
 
+    // This sends the booking form to the protected Convex route.
     return await requestJson<Appointment>("/api/appointments", {
       method: "POST",
       body: JSON.stringify(appointmentData),
@@ -393,6 +399,7 @@ export async function getAdminAppointments(authToken: string | null = getStoredA
     throw new Error("Please sign in before opening the admin dashboard.");
   }
 
+  // The admin screen loads the current booking queue through this helper.
   return await requestJson<AdminAppointment[]>("/api/admin/appointments", { method: "GET" }, authToken);
 }
 
@@ -401,6 +408,7 @@ export async function getAdminReviews(authToken: string | null = getStoredAuthTo
     throw new Error("Please sign in before opening the admin dashboard.");
   }
 
+  // The admin screen uses this to review pending testimonials.
   return await requestJson<AdminReview[]>("/api/admin/reviews", { method: "GET" }, authToken);
 }
 
@@ -415,6 +423,7 @@ export async function updateAppointmentStatus(params: {
     throw new Error("Please sign in before updating bookings.");
   }
 
+  // Status changes must go back to Convex so every page sees the same state.
   return await requestJson<{ appointmentId: string }>(`/api/appointments/${params.appointmentId}`, {
     method: "PUT",
     body: JSON.stringify({
@@ -436,6 +445,7 @@ export async function moderateReview(params: {
     throw new Error("Please sign in before moderating reviews.");
   }
 
+  // This updates approval and feature flags for a testimonial.
   return await requestJson<{ reviewId: string }>(`/api/reviews/${params.reviewId}`, {
     method: "PUT",
     body: JSON.stringify({
@@ -461,6 +471,7 @@ export async function uploadGalleryItem(params: {
     throw new Error("Please sign in before uploading gallery content.");
   }
 
+  // Gallery uploads are restricted because they change the public showcase.
   return await requestJson<GalleryItem>("/api/gallery/upload", {
     method: "POST",
     body: JSON.stringify({
@@ -483,6 +494,7 @@ export async function uploadGalleryItem(params: {
  */
 export async function getGallery(): Promise<GalleryItem[]> {
   try {
+    // The gallery page can render directly from the public endpoint.
     const response = await fetch(`${API_BASE}/api/gallery`);
     if (!response.ok) throw new Error("Failed to fetch gallery");
     const data = await response.json();
@@ -501,6 +513,7 @@ export async function getGallery(): Promise<GalleryItem[]> {
  */
 export async function getReviews(): Promise<Review[]> {
   try {
+    // Only approved testimonials are returned here.
     const response = await fetch(`${API_BASE}/api/reviews`);
     if (!response.ok) throw new Error("Failed to fetch reviews");
     const data = await response.json();
@@ -529,6 +542,7 @@ export async function submitReview(reviewData: {
       throw new Error("Please sign in before sharing a chronicle.");
     }
 
+    // The testimonial form sends the signed-in user's story for moderation.
     return await requestJson<{ reviewId: string }>("/api/reviews", {
       method: "POST",
       body: JSON.stringify(reviewData),

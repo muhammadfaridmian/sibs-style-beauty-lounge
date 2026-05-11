@@ -67,6 +67,7 @@ const AdminPage: React.FC = () => {
     setError(null);
     try {
       // First we confirm the current user, then we ask Convex for the admin lists.
+      // That avoids loading the dashboard data for someone who only has a normal account.
       const user = await getCurrentAuthUser(authToken);
       setCurrentUser(user);
 
@@ -99,6 +100,7 @@ const AdminPage: React.FC = () => {
   }, []);
 
   const refreshDashboard = async () => {
+    // Manual refresh just re-runs the same checks and fetches fresh admin data.
     setIsRefreshing(true);
     await loadDashboard();
   };
@@ -116,6 +118,7 @@ const AdminPage: React.FC = () => {
 
     setActionMessage(null);
     try {
+      // Appointment edits flow back through Convex so the public and admin views stay aligned.
       await updateAppointmentStatus({ appointmentId, status, authToken });
       setActionMessage(`Updated booking ${appointmentId.slice(0, 6).toUpperCase()}`);
       await refreshDashboard();
@@ -131,6 +134,7 @@ const AdminPage: React.FC = () => {
 
     setActionMessage(null);
     try {
+      // Review moderation controls whether a testimonial is visible to visitors.
       await moderateReview({
         reviewId: review.id,
         isApproved,
@@ -154,6 +158,7 @@ const AdminPage: React.FC = () => {
     setIsUploading(true);
     setActionMessage(null);
     try {
+      // New gallery items are created from the form fields above.
       await uploadGalleryItem({
         title: galleryForm.title,
         category: galleryForm.category,

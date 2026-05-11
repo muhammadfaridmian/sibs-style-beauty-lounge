@@ -47,9 +47,11 @@ export default defineSchema({
     fullName: v.string(),
     email: v.string(),
     phone: v.string(),
+    // Passwords are stored as hashes, not as plain text.
     passwordHash: v.string(),
     passwordSalt: v.string(),
     role: v.union(v.literal("customer"), v.literal("admin")),
+    // The frontend can prefill booking and contact details from this value.
     preferredLocation: v.optional(v.string()),
     // This keeps customer care notes with the user record.
     skinPreferences: v.optional(v.array(v.string())),
@@ -64,7 +66,9 @@ export default defineSchema({
   // Sessions let the app remember a signed-in user without storing raw passwords.
   sessions: defineTable({
     userId: v.id("users"),
+    // The real token never gets stored, only a hash of it.
     tokenHash: v.string(),
+    // Expiration keeps old tokens from living forever.
     expiresAt: v.number(),
     createdAt: v.number(),
     lastUsedAt: v.number(),
@@ -189,6 +193,7 @@ export default defineSchema({
     endMinutes: v.number(),
     location: v.string(),
     notes: v.string(),
+    // This tells the dashboard if the booking is still waiting or already handled.
     status: v.union(
       v.literal("pending"),
       v.literal("confirmed"),
@@ -197,6 +202,7 @@ export default defineSchema({
     ),
     assignedStylistId: v.union(v.id("stylists"), v.null()),
     assignedStylistName: v.union(v.string(), v.null()),
+    // Source tells us where the booking came from, like the website.
     source: v.string(),
     createdAt: v.number(),
     updatedAt: v.number(),

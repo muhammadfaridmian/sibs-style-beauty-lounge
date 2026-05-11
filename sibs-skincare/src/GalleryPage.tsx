@@ -161,7 +161,9 @@ const behindCanvasMobileFrames = [
 ];
 
 const GalleryPage = () => {
+  // The horizontal section uses this ref to pin and move the gallery track.
   const scrollRef = useRef(null);
+  // This wrapper starts hidden so the initial route swap does not flash.
   const pageWrapperRef = useRef(null);
 
   useEffect(() => {
@@ -214,6 +216,7 @@ const GalleryPage = () => {
 
       // Lateral Scroll Animation for the "Extended Curation"
       mm.add('(min-width: 768px)', () => {
+        // On desktop, each panel becomes one slice of a long horizontal storyboard.
         const sections = gsap.utils.toArray(".lateral-item");
         if (sections.length > 0) {
           // This is the sideways scroll bit. It makes the gallery feel more like a magazine spread.

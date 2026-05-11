@@ -17,7 +17,7 @@ const splitList = (value: string) =>
 const AuthPage: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  // If the page came from booking or testimonials, we bounce back there after sign in.
+  // This keeps the user on the page they originally wanted after they sign in.
   const redirectParam = new URLSearchParams(location.search).get('redirect') ?? '/booking';
   const safeRedirect = redirectParam.startsWith('/') ? redirectParam : '/booking';
   const resolveRedirect = (role: 'customer' | 'admin') => {
@@ -75,6 +75,7 @@ const AuthPage: React.FC = () => {
     setSubmitError(null);
 
     try {
+      // Login returns a token plus the safe public user profile.
       const session = await login(loginData);
       navigate(resolveRedirect(session.user.role), { replace: true });
     } catch (error) {
@@ -90,6 +91,7 @@ const AuthPage: React.FC = () => {
     setSubmitError(null);
 
     try {
+      // Registration creates the account and signs the visitor in immediately.
       const session = await register({
         fullName: registerData.fullName,
         email: registerData.email,

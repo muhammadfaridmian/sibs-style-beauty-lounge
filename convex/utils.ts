@@ -17,6 +17,7 @@ export function jsonResponse(data: unknown, status = 200): Response {
 }
 
 export function emptyResponse(status = 204): Response {
+  // OPTIONS requests only need a blank response with the CORS headers.
   return new Response(null, {
     status,
     headers: corsHeaders,
@@ -24,6 +25,7 @@ export function emptyResponse(status = 204): Response {
 }
 
 export async function readJson<T>(request: Request): Promise<T> {
+  // This is the tiny parser for JSON bodies coming in from the site.
   return (await request.json()) as T;
 }
 
@@ -38,6 +40,7 @@ export function getBearerToken(request: Request): string | null {
 }
 
 export function normalizeEmail(email: string): string {
+  // Email matching stays easier when everything is trimmed and lowercase.
   return email.trim().toLowerCase();
 }
 
@@ -85,6 +88,7 @@ export function formatTimeLabel(totalMinutes: number): string {
 }
 
 export async function sha256Hex(value: string): Promise<string> {
+  // Hashing keeps passwords and token checks safe without storing the raw value.
   const bytes = new TextEncoder().encode(value);
   const hashBuffer = await crypto.subtle.digest("SHA-256", bytes);
   const hashArray = Array.from(new Uint8Array(hashBuffer));
@@ -104,6 +108,7 @@ export async function hashPassword(password: string, salt?: string): Promise<{ s
 }
 
 export async function verifyPassword(password: string, salt: string, passwordHash: string): Promise<boolean> {
+  // We hash the candidate password again and compare hashes instead of raw text.
   const candidate = await sha256Hex(`${salt}:${password}`);
   return candidate === passwordHash;
 }

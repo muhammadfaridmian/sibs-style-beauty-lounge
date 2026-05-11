@@ -74,6 +74,7 @@ function sanitizeUser(user: {
 }
 
 function statusFromError(message: string): number {
+  // Convert common backend failures into the right HTTP response code.
   if (message.includes("Authentication required")) {
     return 401;
   }
@@ -105,6 +106,7 @@ function statusFromError(message: string): number {
 }
 
 function normalizeStringList(value: unknown): string[] | undefined {
+  // The forms sometimes send arrays and sometimes plain text, so both are accepted.
   if (Array.isArray(value)) {
     const cleaned = value
       .map((item) => String(item).trim())
@@ -124,6 +126,7 @@ function normalizeStringList(value: unknown): string[] | undefined {
 }
 
 function getPathSuffix(pathname: string, prefix: string): string | null {
+  // This pulls the id out of a URL like /api/reviews/<id>.
   if (!pathname.startsWith(prefix)) {
     return null;
   }
@@ -224,6 +227,7 @@ http.route({
   path: "/api/business",
   method: "GET",
   handler: httpAction(async (ctx) => {
+    // The public site reads the salon profile from here.
     const profile = await ctx.runQuery(internal.data.getBusinessProfile, {});
     if (!profile) {
       return jsonResponse({ ok: false, error: "Business profile not initialized." }, 404);
@@ -237,6 +241,7 @@ http.route({
   method: "GET",
   handler: httpAction(async (ctx, request) => {
     try {
+      // When a slug is present, this route returns one service instead of the full list.
       const url = new URL(request.url);
       const slug = url.searchParams.get("slug");
       if (slug) {
@@ -261,6 +266,7 @@ http.route({
   method: "GET",
   handler: httpAction(async (ctx) => {
     try {
+      // The stylists page only needs the public staff cards.
       const staff = await ctx.runQuery(internal.data.listStaff, {});
       return jsonResponse({ ok: true, data: staff });
     } catch (error) {
@@ -275,6 +281,7 @@ http.route({
   method: "GET",
   handler: httpAction(async (ctx) => {
     try {
+      // Gallery content is public, so no session is required here.
       const gallery = await ctx.runQuery(internal.data.listGallery, {});
       return jsonResponse({ ok: true, data: gallery });
     } catch (error) {
@@ -289,6 +296,7 @@ http.route({
   method: "GET",
   handler: httpAction(async (ctx) => {
     try {
+      // Only approved testimonials are exposed to the frontend.
       const reviews = await ctx.runQuery(internal.data.listApprovedReviews, {});
       return jsonResponse({ ok: true, data: reviews });
     } catch (error) {
@@ -303,6 +311,7 @@ http.route({
   method: "GET",
   handler: httpAction(async (ctx) => {
     try {
+      // The offers page and homepage both read from this promotion list.
       const promotions = await ctx.runQuery(internal.data.listPromotions, {});
       return jsonResponse({ ok: true, data: promotions });
     } catch (error) {
@@ -317,6 +326,7 @@ http.route({
   method: "GET",
   handler: httpAction(async (ctx, request) => {
     try {
+      // The booking page asks for open slots on a specific date.
       const url = new URL(request.url);
       const appointmentDate = url.searchParams.get("date") ?? new Date().toISOString().slice(0, 10);
       const serviceIdParam = url.searchParams.get("serviceId");
@@ -338,6 +348,7 @@ http.route({
   method: "POST",
   handler: httpAction(async (ctx, request) => {
     try {
+      // Registration creates the customer record and the first session token.
       const body = await readJson<{
         fullName?: string;
         email?: string;
@@ -406,6 +417,7 @@ http.route({
   method: "POST",
   handler: httpAction(async (ctx, request) => {
     try {
+      // Login checks the password, then returns a fresh browser session.
       const body = await readJson<{ email?: string; password?: string }>(request);
       if (!body.email || !body.password) {
         return jsonResponse({ ok: false, error: "Email and password are required." }, 400);
@@ -458,6 +470,7 @@ http.route({  path: "/api/appointments",
   method: "POST",
   handler: httpAction(async (ctx, request) => {
     try {
+      // Appointments are protected so the booking always belongs to a signed-in user.
       const auth = await getSessionContext(ctx, request);
       if (!auth) {
         return jsonResponse({ ok: false, error: "Authentication required." }, 401);
@@ -513,6 +526,7 @@ http.route({
     }
 
     try {
+      // This gives the logged-in customer their own bookings.
       const appointments = await (ctx as any).runQuery(internal.data.listAppointmentsForUser, {
         userId: auth.user.id as Id<"users">,
       });
@@ -534,6 +548,7 @@ http.route({
     }
 
     try {
+      // The admin dashboard uses this route to change booking state.
       const pathname = new URL(request.url).pathname;
       const appointmentId = getPathSuffix(pathname, "/api/appointments/");
       if (!appointmentId) {
@@ -578,6 +593,7 @@ http.route({
   method: "POST",
   handler: httpAction(async (ctx, request) => {
     try {
+      // Review submissions stay attached to the signed-in account.
       const auth = await getSessionContext(ctx, request);
       if (!auth) {
         return jsonResponse({ ok: false, error: "Authentication required." }, 401);
@@ -642,6 +658,7 @@ http.route({
     }
 
     try {
+      // Moderation updates let admin staff approve or feature a review.
       const pathname = new URL(request.url).pathname;
       const reviewId = getPathSuffix(pathname, "/api/reviews/");
       if (!reviewId) {
@@ -680,6 +697,7 @@ http.route({
       return jsonResponse({ ok: false, error: "Admin access required." }, 403);
     }
 
+    // The dashboard pulls the full appointment list from this route.
     const appointments = await ctx.runQuery(internal.data.listAppointmentsForAdmin, { limit: 100 });
     return jsonResponse({ ok: true, data: appointments });
   }),
@@ -694,6 +712,7 @@ http.route({
       return jsonResponse({ ok: false, error: "Admin access required." }, 403);
     }
 
+    // The dashboard pulls the review moderation queue from here.
     const reviews = await ctx.runQuery(internal.data.listReviewsForAdmin, { limit: 100 });
     return jsonResponse({ ok: true, data: reviews });
   }),
@@ -709,6 +728,7 @@ http.route({
     }
 
     try {
+      // Uploads are admin-only because they change what visitors see publicly.
       const url = new URL(request.url);
       const contentType = request.headers.get("content-type") ?? "";
 

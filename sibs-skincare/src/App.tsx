@@ -13,7 +13,7 @@ import AuthPage from './AuthPage.tsx';
 import AdminPage from './AdminPage.tsx';
 import { clearStoredAuthSession, getStoredAuthUser, type AuthUser } from './api/convex-api.ts';
 
-// ScrollToTop component to handle page transitions globally
+// This keeps every route change feeling like a fresh page instead of a hard jump.
 const ScrollToTop = () => {
   const { pathname } = useLocation();
 
@@ -37,7 +37,7 @@ const CurtainTransition = ({ onMidpoint, onComplete }: { onMidpoint: () => void,
   const onMidpointRef = useRef(onMidpoint);
   const onCompleteRef = useRef(onComplete);
 
-  // Update refs to always hold the latest callbacks, avoiding re-triggering effects
+  // Keep the latest callbacks here so the animation does not restart on every render.
   useEffect(() => {
     onMidpointRef.current = onMidpoint;
     onCompleteRef.current = onComplete;
@@ -131,6 +131,7 @@ const Navigation = () => {
     navigate('/');
   };
 
+  // These are the main public sections shown in both desktop and mobile navigation.
   const navLinks = [
     { name: 'Home', path: '/' },
     { name: 'Treatments', path: '/booking' },

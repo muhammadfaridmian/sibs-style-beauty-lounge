@@ -33,6 +33,7 @@ const BookingPage: React.FC = () => {
     const loadServices = async () => {
       try {
         setIsLoading(true);
+        // The service cards come from Convex so the booking page always matches the live menu.
         const data = await getServices();
         setServices(data);
       } catch (error) {
@@ -119,6 +120,7 @@ const BookingPage: React.FC = () => {
       setIsSubmitting(true);
       setSubmitError(null);
 
+      // The selected service is used here to build the final appointment payload.
       const service = services.find(s => s.id === selectedService);
       if (!service) {
         throw new Error("Service not found");
@@ -152,6 +154,7 @@ const BookingPage: React.FC = () => {
 
   // ==================== DATA ====================
   const activeServiceData = services.find(s => s.id === viewingService);
+  // Availability only shows the slots that Convex marked as open for the selected day.
   const timeSlots = availability?.slots?.filter((slot: any) => slot.available) || [];
 
   // ==================== RENDER ====================

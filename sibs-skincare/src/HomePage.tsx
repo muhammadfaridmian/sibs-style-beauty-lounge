@@ -11,6 +11,7 @@ const HomePage = () => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [isCollectionOpen, setIsCollectionOpen] = useState(false);
 
+  // A couple of animation branches depend on whether the screen is small.
   const isMobileViewport = () => window.innerWidth < 768;
 
   useEffect(() => {
@@ -111,10 +112,12 @@ const HomePage = () => {
 
   const addToRefs = (el: HTMLDivElement | null) => {
     if (el && !revealRefs.current.includes(el)) {
+      // Each section gets added once so it can fade in as the user scrolls.
       revealRefs.current.push(el);
     }
   };
 
+  // These are the four headline product stories shown inside the collection modal.
   const collections = [
     {
       icon: <Sparkles className="w-6 h-6" />,
@@ -142,6 +145,7 @@ const HomePage = () => {
     }
   ];
 
+  // The larger product grid uses this data to build the shop-like display.
   const products = [
     { name: 'Aurora Serum', price: '$89', img: 'https://images.unsplash.com/photo-1596462502278-27ec8229babb?q=80&w=800', note: 'Hyaluronic Infusion', rating: '5.0' },
     { name: 'Orchid Cleanser', price: '$54', img: 'https://images.unsplash.com/photo-1556228578-0d85b1a4d571?q=80&w=800', note: 'Botanical Base', rating: '4.9' },

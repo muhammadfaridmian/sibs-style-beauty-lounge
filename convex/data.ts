@@ -21,6 +21,7 @@ function getPublicAddress(profile: {
   state: string;
   postalCode: string;
 }): string {
+  // The dashboard wants one readable address string, not separate fields.
   return [profile.addressLine1, profile.addressLine2, profile.city, profile.state, profile.postalCode]
     .map((part) => part?.trim())
     .filter((part): part is string => Boolean(part))
@@ -28,6 +29,7 @@ function getPublicAddress(profile: {
 }
 
 function getBusinessDayKey(appointmentDate: string, timezone: string): keyof WeeklyHours {
+  // This figures out the business weekday in the salon's timezone, not the browser's timezone.
   const weekday = new Intl.DateTimeFormat("en-US", {
     timeZone: timezone,
     weekday: "long",
@@ -48,6 +50,7 @@ function getBusinessDayKey(appointmentDate: string, timezone: string): keyof Wee
 }
 
 function parseOperatingWindow(label: string): { startMinutes: number; endMinutes: number } | null {
+  // A label like "10:00 AM - 9:00 PM" gets turned into a real time window here.
   const normalized = label.trim();
   if (!normalized || /^off$/i.test(normalized) || /^closed$/i.test(normalized)) {
     return null;
@@ -81,6 +84,7 @@ function asServiceCard(doc: {
   sortOrder: number;
   keyBenefits: string[];
 }) {
+  // The booking page only needs a friendly card, not the full database row.
   return {
     id: doc._id,
     slug: doc.slug,
@@ -280,6 +284,7 @@ function asAppointmentCard(doc: {
   createdAt: number;
   updatedAt: number;
 }) {
+  // Appointments are reshaped so the admin page can read them without extra work.
   return {
     id: doc._id,
     userId: doc.userId,
@@ -465,6 +470,7 @@ export const findSessionByTokenHash = internalQuery({
 export const listAppointmentsForUser = internalQuery({
   args: { userId: v.id("users") },
   handler: async (ctx, args) => {
+    // This is the signed-in customer's own booking history.
     const appointments = await ctx.db
       .query("appointments")
       .withIndex("by_userId_and_date", (q) => q.eq("userId", args.userId))
@@ -600,6 +606,7 @@ export const createUser = internalMutation({
 export const touchUserLogin = internalMutation({
   args: { userId: v.id("users"), lastLoginAt: v.number() },
   handler: async (ctx, args) => {
+    // Every successful login updates the last-login stamp.
     await ctx.db.patch(args.userId, {
       lastLoginAt: args.lastLoginAt,
       updatedAt: args.lastLoginAt,
@@ -616,6 +623,7 @@ export const createSession = internalMutation({
     lastUsedAt: v.number(),
   },
   handler: async (ctx, args) => {
+    // Sessions are just the server-side copy of a login token.
     return await ctx.db.insert("sessions", {
       userId: args.userId,
       tokenHash: args.tokenHash,
@@ -683,6 +691,7 @@ export const createAppointment = internalMutation({
       intervalsOverlap(startMinutes, endMinutes, appointment.startMinutes, appointment.endMinutes),
     );
     if (conflict) {
+      // If we found a clash, we stop here so the same slot cannot be booked twice.
       throw new Error("That time slot is already booked.");
     }
 
@@ -779,6 +788,7 @@ export const createReview = internalMutation({
     updatedAt: v.number(),
   },
   handler: async (ctx, args) => {
+    // New reviews always start hidden until the admin approves them.
     let serviceName = args.serviceName;
     if (!serviceName && args.serviceId) {
       const service = await ctx.db.get(args.serviceId);
