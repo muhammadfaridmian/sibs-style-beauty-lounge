@@ -198,7 +198,7 @@ const HomePage = () => {
   }, []);
 
   return (
-    <div ref={containerRef} className="bg-[#FAF9F6] selection:bg-[#F2529D] selection:text-white pb-16 md:pb-32 opacity-100">
+    <div ref={containerRef} className="bg-[#FAF9F6] selection:bg-[#F2529D] selection:text-white pb-16 md:pb-32 opacity-100 overflow-x-hidden">
       {/* Hero Section */}
       <header className="min-h-[50vh] md:min-h-screen flex items-center px-4 md:px-6 bg-[#FAF9F6] pt-36 sm:pt-40 md:pt-0">
         <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-10 md:gap-20 items-center w-full relative">
@@ -233,7 +233,7 @@ const HomePage = () => {
 
       {/* Collection Modal Panel */}
       {isCollectionOpen && (
-        <div className="fixed inset-0 z-[100] bg-black/85 md:bg-black/60 backdrop-blur-none md:backdrop-blur-3xl flex items-center justify-center p-2 md:p-4 collection-overlay" style={{ willChange: 'opacity, transform' }}>
+        <div className="fixed inset-0 z-[100] bg-black/85 md:bg-black/60 backdrop-blur-none md:backdrop-blur-3xl flex items-center justify-center p-2 md:p-4 collection-overlay overflow-x-hidden" style={{ willChange: 'opacity, transform' }}>
             {/* Animated background auras */}
             <div className="absolute inset-0 pointer-events-none overflow-hidden hidden md:block">
                 <div className="absolute top-1/4 -left-20 w-[600px] h-[600px] bg-[#F2529D]/10 rounded-full blur-[150px] animate-pulse"></div>
@@ -241,8 +241,8 @@ const HomePage = () => {
             </div>
 
             <div 
-              className="bg-[#FAF9F6] w-[calc(100vw-1rem)] md:w-full max-w-7xl h-[calc(100dvh-1rem)] md:h-[85vh] max-h-[calc(100dvh-1rem)] rounded-[1.5rem] sm:rounded-[2rem] md:rounded-[5rem] shadow-[0_0_60px_rgba(0,0,0,0.35)] md:shadow-[0_0_120px_rgba(0,0,0,0.6)] relative flex flex-col collection-panel overflow-hidden md:[transform:perspective(1000px)]"
-              style={{ willChange: 'transform, opacity' }}
+              className="bg-[#FAF9F6] w-[calc(100vw-1rem)] md:w-full max-w-7xl h-[calc(100dvh-1rem)] md:h-[85vh] rounded-[1.5rem] sm:rounded-[2rem] md:rounded-[5rem] shadow-[0_0_60px_rgba(0,0,0,0.35)] md:shadow-[0_0_120px_rgba(0,0,0,0.6)] relative flex flex-col collection-panel overflow-hidden overflow-x-hidden md:[transform:perspective(1000px)]"
+            style={{ position: 'fixed', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', willChange: 'transform, opacity' }}
             >
                 {/* Header */}
             <div className="flex-none p-4 sm:p-6 md:p-14 border-b border-gray-100 flex justify-between items-center bg-white/80 backdrop-blur-xl relative z-10">

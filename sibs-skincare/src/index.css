@@ -16,7 +16,16 @@
   body {
     /* Base page style before any page-specific section kicks in. */
     /* The default canvas stays warm and neutral so the pink and gold accents can stand out. */
-    @apply font-body bg-[#FAFAFA] text-[#333] overflow-x-hidden;
+    @apply font-body bg-[#FAFAFA] text-[#333];
+    overflow-x: hidden;
+  }
+
+  html,
+  body,
+  #root {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: hidden;
   }
 }
 

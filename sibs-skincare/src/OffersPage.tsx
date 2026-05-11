@@ -132,7 +132,7 @@ const OffersPage = () => {
     ];
 
     return (
-        <div ref={containerRef} className='bg-[#FAF9F6] min-h-screen pt-48 opacity-100'>
+        <div ref={containerRef} className='bg-[#FAF9F6] min-h-screen pt-48 opacity-100 overflow-x-hidden'>
             <div className='max-w-7xl mx-auto px-6'>
                 <div className='text-center mb-24 offers-header'>
                     <h1 className='text-7xl md:text-9xl font-display text-[#F2529D] italic font-black mb-16 leading-none tracking-tighter'>
@@ -184,7 +184,7 @@ const OffersPage = () => {
 
             {isPanelOpen && (
                 <div 
-                    className='fixed inset-0 z-[100] bg-black/40 backdrop-blur-3xl flex items-center justify-center p-2 sm:p-4 panel-overlay'
+                    className='fixed inset-0 z-[100] bg-black/40 backdrop-blur-3xl flex items-center justify-center p-2 sm:p-4 panel-overlay overflow-x-hidden'
                 >
                     {/* Animated background particles for luxury feel */}
                     {/* The background glow keeps the modal from feeling like a plain dialog box. */}
@@ -194,8 +194,8 @@ const OffersPage = () => {
                     </div>
 
                     <div 
-                        className='bg-white w-[calc(100vw-1rem)] sm:w-[95%] max-w-7xl h-[calc(100dvh-1rem)] sm:h-[85vh] max-h-[calc(100dvh-1rem)] rounded-[2rem] sm:rounded-[3rem] md:rounded-[4rem] overflow-hidden shadow-[0_0_100px_rgba(0,0,0,0.5)] relative flex flex-col selection-panel'
-                        style={{ willChange: 'transform, opacity' }}
+                        className='bg-white w-[calc(100vw-1rem)] sm:w-[95%] max-w-7xl h-[calc(100dvh-1rem)] sm:h-[85vh] rounded-[2rem] sm:rounded-[3rem] md:rounded-[4rem] overflow-hidden overflow-x-hidden shadow-[0_0_100px_rgba(0,0,0,0.5)] relative flex flex-col selection-panel'
+                        style={{ position: 'fixed', top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }}
                     >
                         <div className='flex-none flex justify-between items-center px-5 sm:px-8 md:px-12 py-4 sm:py-5 md:py-6 border-b border-gray-100 bg-white relative z-10'>
                             <div className="flex items-center gap-4">

@@ -390,7 +390,7 @@ const Navigation = () => {
 function App() {
   return (
     <Router>
-      <div className="relative bg-[#FAF9F6] min-h-screen">
+      <div className="relative bg-[#FAF9F6] min-h-screen overflow-x-hidden">
         <ScrollToTop />
         <Navigation />
         {/* The route switch below is the single-page app handoff point. */}
