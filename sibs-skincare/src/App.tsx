@@ -286,15 +286,15 @@ const Navigation = () => {
                     onClick={() => setIsMenuOpen(false)}
                     className={`group flex items-center justify-between gap-3 rounded-[1.6rem] border px-4 py-4 transition-all duration-300 sm:px-5 sm:py-5 ${
                       isActive
-                        ? 'border-[#F2529D] bg-[#1A1220] shadow-[0_18px_50px_-25px_rgba(242,82,157,0.45)]'
-                        : 'border-[#273147] bg-[#111827] hover:border-[#F2529D] hover:bg-[#141b2b]'
+                        ? 'border-[#F2529D]/80 bg-[linear-gradient(135deg,rgba(58,16,41,0.92)_0%,rgba(26,18,32,0.95)_100%)] shadow-[0_18px_50px_-25px_rgba(242,82,157,0.55)]'
+                        : 'border-[#273147] bg-[linear-gradient(145deg,rgba(17,24,39,0.96)_0%,rgba(8,12,22,0.96)_100%)] hover:border-[#F2529D]/70 hover:bg-[linear-gradient(145deg,rgba(20,27,43,0.98)_0%,rgba(36,16,34,0.96)_100%)]'
                     }`}
                   >
                     <div className="flex min-w-0 items-center gap-4">
                       <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full border text-[10px] font-black uppercase tracking-[0.35em] transition-colors ${
                         isActive
-                          ? 'border-[#F2529D] bg-[#3B1029] text-[#F2529D]'
-                          : 'border-[#273147] bg-[#0B0F1A] text-[#D1D5DB] group-hover:border-[#F2529D] group-hover:text-[#F2529D]'
+                          ? 'border-[#F2529D]/70 bg-[linear-gradient(145deg,rgba(59,16,41,0.98)_0%,rgba(92,24,62,0.92)_100%)] text-[#F2529D]'
+                          : 'border-[#273147] bg-[linear-gradient(145deg,rgba(11,15,26,0.95)_0%,rgba(20,26,39,0.95)_100%)] text-[#D1D5DB] group-hover:border-[#F2529D]/70 group-hover:text-[#F2529D]'
                       }`}>
                         {String(index + 1).padStart(2, '0')}
                       </div>
@@ -317,7 +317,7 @@ const Navigation = () => {
             </div>
           </div>
 
-          <div className="rounded-[1.5rem] border border-[#273147] bg-[#111827] p-4">
+          <div className="rounded-[1.5rem] border border-[#273147] bg-[linear-gradient(145deg,rgba(17,24,39,0.96)_0%,rgba(11,15,26,0.98)_100%)] p-4 shadow-[0_18px_50px_-28px_rgba(0,0,0,0.9)] backdrop-blur-sm">
             <p className="text-[10px] font-black uppercase tracking-[0.35em] text-[#F2529D]">
               Account
             </p>
@@ -338,7 +338,7 @@ const Navigation = () => {
               {currentUser ? (
                 <button
                   onClick={handleSignOut}
-                  className="shrink-0 rounded-full border border-[#273147] bg-[#0B0F1A] px-4 py-3 text-[10px] font-black uppercase tracking-[0.35em] text-white hover:border-[#F2529D] hover:text-[#F2529D] transition-colors"
+                  className="shrink-0 rounded-full border border-[#273147] bg-[linear-gradient(145deg,rgba(11,15,26,0.96)_0%,rgba(31,41,55,0.94)_100%)] px-4 py-3 text-[10px] font-black uppercase tracking-[0.35em] text-white hover:border-[#F2529D]/70 hover:text-[#F2529D] transition-colors"
                 >
                   Sign out
                 </button>
@@ -355,7 +355,7 @@ const Navigation = () => {
           </div>
 
           <div className="grid w-full gap-4 border-t border-[#273147] bg-[#0A0E1A] pt-4 pb-6 sm:grid-cols-2">
-            <div className="rounded-[1.5rem] border border-[#273147] bg-[#111827] p-4">
+            <div className="rounded-[1.5rem] border border-[#273147] bg-[linear-gradient(145deg,rgba(17,24,39,0.96)_0%,rgba(11,15,26,0.98)_100%)] p-4 shadow-[0_18px_50px_-28px_rgba(0,0,0,0.9)] backdrop-blur-sm">
               <p className="text-[10px] font-black uppercase tracking-[0.35em] text-[#F2529D]">
                 Specialty Beauty Lounge
               </p>
@@ -368,7 +368,7 @@ const Navigation = () => {
               </p>
             </div>
 
-            <div className="rounded-[1.5rem] border border-[#F2529D] bg-[#F2529D] px-4 py-4 text-white shadow-[0_16px_40px_-20px_rgba(242,82,157,0.75)] transition-transform hover:scale-[1.01]">
+            <div className="rounded-[1.5rem] border border-[#F2529D]/80 bg-[linear-gradient(135deg,#F2529D_0%,#FF6FB0_45%,#D36D2C_100%)] px-4 py-4 text-white shadow-[0_16px_40px_-20px_rgba(242,82,157,0.82)] transition-transform hover:scale-[1.01]">
               <Link to="/booking" onClick={() => setIsMenuOpen(false)} className="flex h-full items-center justify-between gap-4">
                 <div>
                   <p className="text-[10px] font-black uppercase tracking-[0.35em] text-white/70">Reserve</p>
@@ -378,17 +378,17 @@ const Navigation = () => {
               </Link>
             </div>
 
-            <div className="flex items-center justify-between rounded-[1.5rem] border border-[#273147] bg-[#111827] px-4 py-4 sm:col-span-2">
+            <div className="flex items-center justify-between rounded-[1.5rem] border border-[#273147] bg-[linear-gradient(145deg,rgba(17,24,39,0.96)_0%,rgba(11,15,26,0.98)_100%)] px-4 py-4 shadow-[0_18px_50px_-28px_rgba(0,0,0,0.9)] backdrop-blur-sm sm:col-span-2">
               <div>
                 <p className="text-[10px] font-black uppercase tracking-[0.35em] text-[#9CA3AF]">Stay connected</p>
                 <p className="mt-2 text-sm text-[#D1D5DB]">Follow the visual journal for new edits and offers.</p>
               </div>
 
               <div className="flex gap-3 text-[#D1D5DB]">
-                <a href="https://www.instagram.com/sibsstylebeauty?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw==" target="_blank" rel="noopener noreferrer" aria-label="Instagram" className="flex h-11 w-11 items-center justify-center rounded-full border border-[#273147] bg-[#111827] transition-all hover:border-[#F2529D] hover:text-[#F2529D]">
+                <a href="https://www.instagram.com/sibsstylebeauty?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw==" target="_blank" rel="noopener noreferrer" aria-label="Instagram" className="flex h-11 w-11 items-center justify-center rounded-full border border-[#273147] bg-[linear-gradient(145deg,rgba(17,24,39,0.96)_0%,rgba(11,15,26,0.98)_100%)] transition-all hover:border-[#F2529D]/70 hover:text-[#F2529D]">
                   <span className="text-[10px] font-black uppercase tracking-[0.35em]">ig</span>
                 </a>
-                <a href="https://www.facebook.com/profile.php?id=61584300861932" target="_blank" rel="noopener noreferrer" aria-label="Facebook" className="flex h-11 w-11 items-center justify-center rounded-full border border-[#273147] bg-[#111827] transition-all hover:border-[#4267B2] hover:text-[#4267B2]">
+                <a href="https://www.facebook.com/profile.php?id=61584300861932" target="_blank" rel="noopener noreferrer" aria-label="Facebook" className="flex h-11 w-11 items-center justify-center rounded-full border border-[#273147] bg-[linear-gradient(145deg,rgba(17,24,39,0.96)_0%,rgba(11,15,26,0.98)_100%)] transition-all hover:border-[#4267B2]/70 hover:text-[#4267B2]">
                   <span className="text-[10px] font-black uppercase tracking-[0.35em]">fb</span>
                 </a>
               </div>
