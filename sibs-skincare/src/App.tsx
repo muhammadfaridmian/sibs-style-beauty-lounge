@@ -242,16 +242,21 @@ const Navigation = () => {
 
       {/* Mobile Menu */}
       <div
-        className={`fixed inset-0 z-[100] h-[100dvh] overflow-y-auto overscroll-contain touch-pan-y bg-[#0A0E1A] text-white transition-all duration-700 ease-[cubic-bezier(0.19,1,0.22,1)] ${
+        className={`fixed inset-0 z-[100] h-[100dvh] overflow-y-auto overscroll-contain touch-pan-y bg-[#05070D] text-white transition-all duration-700 ease-[cubic-bezier(0.19,1,0.22,1)] ${
           isMenuOpen ? 'opacity-100 visible translate-y-0' : 'opacity-0 invisible -translate-y-full'
         }`}
         style={{ WebkitOverflowScrolling: 'touch' }}
       >
-        <div className="absolute inset-0 bg-[#0A0E1A]" />
-        <div className="absolute inset-x-6 top-5 h-px bg-[#273147]" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(242,82,157,0.26),transparent_28%),radial-gradient(circle_at_bottom_left,rgba(199,157,51,0.14),transparent_30%),radial-gradient(circle_at_center,rgba(255,255,255,0.04),transparent_42%),linear-gradient(180deg,#05070D_0%,#0A0E1A_45%,#04060B_100%)]" />
+        <div className="absolute inset-0 bg-[linear-gradient(135deg,transparent_18%,rgba(255,255,255,0.03)_36%,transparent_54%,rgba(255,255,255,0.02)_72%,transparent_86%)] opacity-70" />
+        <div className="absolute inset-x-6 top-5 h-px bg-gradient-to-r from-transparent via-[#F2529D]/45 to-[#C79D33]/25" />
+        <div className="absolute inset-y-0 left-0 w-px bg-gradient-to-b from-transparent via-[#F2529D]/20 to-transparent" />
+        <div className="absolute inset-y-0 right-0 w-px bg-gradient-to-b from-transparent via-[#C79D33]/16 to-transparent" />
+        <div className="absolute left-[-16%] top-[8%] h-60 w-60 rounded-full bg-[#F2529D]/10 blur-3xl" />
+        <div className="absolute right-[-14%] bottom-[8%] h-72 w-72 rounded-full bg-[#C79D33]/10 blur-3xl" />
 
-        <div className="relative flex min-h-[100dvh] w-full flex-col bg-[#0A0E1A] px-3 py-3 sm:px-6 sm:py-6">
-          <div className="rounded-[2rem] border border-[#273147] bg-[#111827] px-4 py-4 shadow-[0_30px_90px_-30px_rgba(0,0,0,0.85)]">
+        <div className="relative flex min-h-[100dvh] w-full flex-col bg-transparent px-3 py-3 sm:px-6 sm:py-6">
+          <div className="rounded-[2rem] border border-[#273147] bg-[linear-gradient(145deg,rgba(17,24,39,0.96)_0%,rgba(7,10,18,0.98)_100%)] px-4 py-4 shadow-[0_30px_90px_-35px_rgba(0,0,0,0.92)] backdrop-blur-md">
             <div className="flex items-start justify-between gap-4">
               <div className="min-w-0">
                 <span className="block text-3xl font-display italic text-[#F2529D] sm:text-4xl">Sibs Style</span>
@@ -259,7 +264,7 @@ const Navigation = () => {
               </div>
               <button
                 onClick={() => setIsMenuOpen(false)}
-                className="flex h-12 w-12 items-center justify-center rounded-full border border-[#273147] bg-[#0B0F1A] text-white transition-transform hover:rotate-90"
+                className="flex h-12 w-12 items-center justify-center rounded-full border border-[#273147] bg-[linear-gradient(145deg,rgba(11,15,26,0.96)_0%,rgba(31,41,55,0.92)_100%)] text-white transition-transform hover:rotate-90"
                 aria-label="Close navigation menu"
               >
                 <X size={30} />
@@ -267,14 +272,14 @@ const Navigation = () => {
             </div>
           </div>
 
-          <div className="mt-4 rounded-[2rem] border border-[#273147] bg-[#111827] p-4 shadow-[0_20px_50px_-25px_rgba(0,0,0,0.85)]">
+          <div className="mt-4 rounded-[2rem] border border-[#273147] bg-[linear-gradient(145deg,rgba(17,24,39,0.95)_0%,rgba(7,10,18,0.97)_100%)] p-4 shadow-[0_20px_50px_-28px_rgba(0,0,0,0.9)] backdrop-blur-md">
             <p className="text-[#F2529D] uppercase tracking-[0.4em] text-[10px] font-black">Navigation</p>
             <p className="mt-3 max-w-xs text-sm leading-relaxed text-[#D1D5DB]">
               Move through the lounge edit, treatments, stories, and contact details.
             </p>
           </div>
 
-          <div className="flex-1 min-h-0 w-full overflow-y-auto bg-[#0A0E1A] py-4 pr-1">
+          <div className="flex-1 min-h-0 w-full overflow-y-auto bg-[radial-gradient(circle_at_top,rgba(242,82,157,0.06),transparent_32%),radial-gradient(circle_at_bottom,rgba(199,157,51,0.05),transparent_28%),linear-gradient(180deg,rgba(10,14,26,0.18)_0%,rgba(10,14,26,0.72)_100%)] py-4 pr-1">
             <div className="space-y-3">
               {navLinks.map((link, index) => {
                 const isActive = location.pathname === link.path;
@@ -286,15 +291,15 @@ const Navigation = () => {
                     onClick={() => setIsMenuOpen(false)}
                     className={`group flex items-center justify-between gap-3 rounded-[1.6rem] border px-4 py-4 transition-all duration-300 sm:px-5 sm:py-5 ${
                       isActive
-                        ? 'border-[#F2529D]/80 bg-[linear-gradient(135deg,rgba(58,16,41,0.92)_0%,rgba(26,18,32,0.95)_100%)] shadow-[0_18px_50px_-25px_rgba(242,82,157,0.55)]'
-                        : 'border-[#273147] bg-[linear-gradient(145deg,rgba(17,24,39,0.96)_0%,rgba(8,12,22,0.96)_100%)] hover:border-[#F2529D]/70 hover:bg-[linear-gradient(145deg,rgba(20,27,43,0.98)_0%,rgba(36,16,34,0.96)_100%)]'
+                        ? 'border-[#F2529D]/80 bg-[radial-gradient(circle_at_top_right,rgba(242,82,157,0.18),transparent_30%),linear-gradient(135deg,rgba(58,16,41,0.94)_0%,rgba(26,18,32,0.98)_100%)] shadow-[0_18px_50px_-24px_rgba(242,82,157,0.62)]'
+                        : 'border-[#273147] bg-[radial-gradient(circle_at_top_right,rgba(255,255,255,0.04),transparent_32%),linear-gradient(145deg,rgba(17,24,39,0.96)_0%,rgba(8,12,22,0.98)_100%)] hover:border-[#F2529D]/70 hover:bg-[radial-gradient(circle_at_top_right,rgba(242,82,157,0.14),transparent_30%),linear-gradient(145deg,rgba(20,27,43,0.98)_0%,rgba(36,16,34,0.98)_100%)]'
                     }`}
                   >
                     <div className="flex min-w-0 items-center gap-4">
                       <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full border text-[10px] font-black uppercase tracking-[0.35em] transition-colors ${
                         isActive
-                          ? 'border-[#F2529D]/70 bg-[linear-gradient(145deg,rgba(59,16,41,0.98)_0%,rgba(92,24,62,0.92)_100%)] text-[#F2529D]'
-                          : 'border-[#273147] bg-[linear-gradient(145deg,rgba(11,15,26,0.95)_0%,rgba(20,26,39,0.95)_100%)] text-[#D1D5DB] group-hover:border-[#F2529D]/70 group-hover:text-[#F2529D]'
+                          ? 'border-[#F2529D]/70 bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.06),transparent_45%),linear-gradient(145deg,rgba(59,16,41,0.98)_0%,rgba(92,24,62,0.96)_100%)] text-[#F2529D]'
+                          : 'border-[#273147] bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.05),transparent_45%),linear-gradient(145deg,rgba(11,15,26,0.95)_0%,rgba(20,26,39,0.98)_100%)] text-[#D1D5DB] group-hover:border-[#F2529D]/70 group-hover:text-[#F2529D]'
                       }`}>
                         {String(index + 1).padStart(2, '0')}
                       </div>
@@ -317,7 +322,7 @@ const Navigation = () => {
             </div>
           </div>
 
-          <div className="rounded-[1.5rem] border border-[#273147] bg-[linear-gradient(145deg,rgba(17,24,39,0.96)_0%,rgba(11,15,26,0.98)_100%)] p-4 shadow-[0_18px_50px_-28px_rgba(0,0,0,0.9)] backdrop-blur-sm">
+          <div className="rounded-[1.5rem] border border-[#273147] bg-[radial-gradient(circle_at_top_right,rgba(242,82,157,0.1),transparent_36%),linear-gradient(145deg,rgba(17,24,39,0.96)_0%,rgba(11,15,26,0.98)_100%)] p-4 shadow-[0_18px_50px_-28px_rgba(0,0,0,0.92)] backdrop-blur-md">
             <p className="text-[10px] font-black uppercase tracking-[0.35em] text-[#F2529D]">
               Account
             </p>
@@ -338,7 +343,7 @@ const Navigation = () => {
               {currentUser ? (
                 <button
                   onClick={handleSignOut}
-                  className="shrink-0 rounded-full border border-[#273147] bg-[linear-gradient(145deg,rgba(11,15,26,0.96)_0%,rgba(31,41,55,0.94)_100%)] px-4 py-3 text-[10px] font-black uppercase tracking-[0.35em] text-white hover:border-[#F2529D]/70 hover:text-[#F2529D] transition-colors"
+                  className="shrink-0 rounded-full border border-[#273147] bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.05),transparent_45%),linear-gradient(145deg,rgba(11,15,26,0.96)_0%,rgba(31,41,55,0.94)_100%)] px-4 py-3 text-[10px] font-black uppercase tracking-[0.35em] text-white hover:border-[#F2529D]/70 hover:text-[#F2529D] transition-colors"
                 >
                   Sign out
                 </button>
@@ -355,7 +360,7 @@ const Navigation = () => {
           </div>
 
           <div className="grid w-full gap-4 border-t border-[#273147] bg-[#0A0E1A] pt-4 pb-6 sm:grid-cols-2">
-            <div className="rounded-[1.5rem] border border-[#273147] bg-[linear-gradient(145deg,rgba(17,24,39,0.96)_0%,rgba(11,15,26,0.98)_100%)] p-4 shadow-[0_18px_50px_-28px_rgba(0,0,0,0.9)] backdrop-blur-sm">
+            <div className="rounded-[1.5rem] border border-[#273147] bg-[radial-gradient(circle_at_top_right,rgba(242,82,157,0.08),transparent_36%),linear-gradient(145deg,rgba(17,24,39,0.96)_0%,rgba(11,15,26,0.98)_100%)] p-4 shadow-[0_18px_50px_-28px_rgba(0,0,0,0.92)] backdrop-blur-md">
               <p className="text-[10px] font-black uppercase tracking-[0.35em] text-[#F2529D]">
                 Specialty Beauty Lounge
               </p>
@@ -368,7 +373,7 @@ const Navigation = () => {
               </p>
             </div>
 
-            <div className="rounded-[1.5rem] border border-[#F2529D]/80 bg-[linear-gradient(135deg,#F2529D_0%,#FF6FB0_45%,#D36D2C_100%)] px-4 py-4 text-white shadow-[0_16px_40px_-20px_rgba(242,82,157,0.82)] transition-transform hover:scale-[1.01]">
+            <div className="rounded-[1.5rem] border border-[#F2529D]/80 bg-[radial-gradient(circle_at_top_right,rgba(255,255,255,0.22),transparent_26%),linear-gradient(135deg,#F2529D_0%,#FF6FB0_45%,#D36D2C_100%)] px-4 py-4 text-white shadow-[0_16px_40px_-20px_rgba(242,82,157,0.86)] transition-transform hover:scale-[1.01]">
               <Link to="/booking" onClick={() => setIsMenuOpen(false)} className="flex h-full items-center justify-between gap-4">
                 <div>
                   <p className="text-[10px] font-black uppercase tracking-[0.35em] text-white/70">Reserve</p>
@@ -378,17 +383,17 @@ const Navigation = () => {
               </Link>
             </div>
 
-            <div className="flex items-center justify-between rounded-[1.5rem] border border-[#273147] bg-[linear-gradient(145deg,rgba(17,24,39,0.96)_0%,rgba(11,15,26,0.98)_100%)] px-4 py-4 shadow-[0_18px_50px_-28px_rgba(0,0,0,0.9)] backdrop-blur-sm sm:col-span-2">
+            <div className="flex items-center justify-between rounded-[1.5rem] border border-[#273147] bg-[radial-gradient(circle_at_top_left,rgba(255,255,255,0.04),transparent_34%),linear-gradient(145deg,rgba(17,24,39,0.96)_0%,rgba(11,15,26,0.98)_100%)] px-4 py-4 shadow-[0_18px_50px_-28px_rgba(0,0,0,0.92)] backdrop-blur-md sm:col-span-2">
               <div>
                 <p className="text-[10px] font-black uppercase tracking-[0.35em] text-[#9CA3AF]">Stay connected</p>
                 <p className="mt-2 text-sm text-[#D1D5DB]">Follow the visual journal for new edits and offers.</p>
               </div>
 
               <div className="flex gap-3 text-[#D1D5DB]">
-                <a href="https://www.instagram.com/sibsstylebeauty?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw==" target="_blank" rel="noopener noreferrer" aria-label="Instagram" className="flex h-11 w-11 items-center justify-center rounded-full border border-[#273147] bg-[linear-gradient(145deg,rgba(17,24,39,0.96)_0%,rgba(11,15,26,0.98)_100%)] transition-all hover:border-[#F2529D]/70 hover:text-[#F2529D]">
+                <a href="https://www.instagram.com/sibsstylebeauty?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw==" target="_blank" rel="noopener noreferrer" aria-label="Instagram" className="flex h-11 w-11 items-center justify-center rounded-full border border-[#273147] bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.05),transparent_45%),linear-gradient(145deg,rgba(17,24,39,0.96)_0%,rgba(11,15,26,0.98)_100%)] transition-all hover:border-[#F2529D]/70 hover:text-[#F2529D]">
                   <span className="text-[10px] font-black uppercase tracking-[0.35em]">ig</span>
                 </a>
-                <a href="https://www.facebook.com/profile.php?id=61584300861932" target="_blank" rel="noopener noreferrer" aria-label="Facebook" className="flex h-11 w-11 items-center justify-center rounded-full border border-[#273147] bg-[linear-gradient(145deg,rgba(17,24,39,0.96)_0%,rgba(11,15,26,0.98)_100%)] transition-all hover:border-[#4267B2]/70 hover:text-[#4267B2]">
+                <a href="https://www.facebook.com/profile.php?id=61584300861932" target="_blank" rel="noopener noreferrer" aria-label="Facebook" className="flex h-11 w-11 items-center justify-center rounded-full border border-[#273147] bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.05),transparent_45%),linear-gradient(145deg,rgba(17,24,39,0.96)_0%,rgba(11,15,26,0.98)_100%)] transition-all hover:border-[#4267B2]/70 hover:text-[#4267B2]">
                   <span className="text-[10px] font-black uppercase tracking-[0.35em]">fb</span>
                 </a>
               </div>
