@@ -147,6 +147,7 @@ async function getSessionContext(ctx: any, request: Request): Promise<SessionCon
   const tokenHash = await sha256Hex(token);
   const session = await ctx.runQuery(internal.data.findSessionByTokenHash, { tokenHash });
   if (!session || session.revoked || session.expiresAt < Date.now()) {
+    // Expired or revoked sessions are treated the same as a missing session.
     return null;
   }
 
@@ -165,6 +166,7 @@ async function requireAdmin(ctx: any, request: Request): Promise<SessionContext 
   // Admin routes reuse the same session check, then add a role check on top.
   const session = await getSessionContext(ctx, request);
   if (!session || session.user.role !== "admin") {
+    // A valid customer account still cannot reach the admin tools.
     return null;
   }
   return session;
@@ -188,6 +190,7 @@ function mergeAppointmentBody(body: {
   notes?: string;
   assignedStylistId?: string | null;
 }) {
+  // Booking forms in the UI use a couple of different names, so this normalizes them once.
   return {
     guestName: (body.fullName ?? body.name ?? body.guestName ?? "").trim(),
     guestEmail: (body.email ?? body.guestEmail ?? "").trim(),
@@ -394,6 +397,7 @@ http.route({
 
       const token = randomToken();
       const tokenHash = await sha256Hex(token);
+      // The browser stores the raw token, but Convex only stores the hash.
       await ctx.runMutation(internal.data.createSession, {
         userId,
         tokenHash,
@@ -442,6 +446,7 @@ http.route({
       }
 
       const now = Date.now();
+      // Touching the login timestamp lets the dashboard show when the user last came back.
       await (ctx as any).runMutation(internal.data.touchUserLogin, {
         userId: user._id,
         lastLoginAt: now,
@@ -491,6 +496,7 @@ http.route({  path: "/api/appointments",
       const userId = auth.user.id as Id<"users">;
       const user = await (ctx as any).runQuery(internal.data.getUserById, { userId });
       // The signed-in profile wins, but the form still supplies a fallback for display.
+      // That way the booking stays usable even if the cached browser state is stale.
       const finalName = user?.fullName || body.guestName || "";
       const finalEmail = user?.email || body.guestEmail || "";
       const finalPhone = user?.phone || body.guestPhone || "";
@@ -618,6 +624,7 @@ http.route({
         body.avatarUrl ??
           "https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=400&auto=format&fit=crop",
       ).trim();
+      // The avatar falls back to a consistent stock image so the cards stay visually balanced.
       const serviceId = typeof body.serviceId === "string" && body.serviceId.trim() ? body.serviceId.trim() : null;
       const serviceName = typeof body.serviceName === "string" && body.serviceName.trim() ? body.serviceName.trim() : null;
 
@@ -764,6 +771,8 @@ http.route({
           storageId = await (ctx as any).storage.store(blob);
         }
       }
+
+      // The upload can be stored either as a URL reference or a Convex storage file.
 
       if (!title || !category) {
         return jsonResponse({ ok: false, error: "Title and category are required." }, 400);

@@ -12,6 +12,7 @@ const HomePage = () => {
   const [isCollectionOpen, setIsCollectionOpen] = useState(false);
 
   // A couple of animation branches depend on whether the screen is small.
+  // The modal moves differently on mobile because there is less room for the product grid.
   const isMobileViewport = () => window.innerWidth < 768;
 
   useEffect(() => {
@@ -24,6 +25,7 @@ const HomePage = () => {
       document.body.style.overflow = 'hidden';
       
       // The open animation starts with the dark veil, then lifts the panel forward.
+      // Sequencing the overlay first helps the modal feel like it belongs to the page.
       tl = gsap.timeline();
       tl.fromTo('.collection-overlay', 
           { opacity: 0 }, 
@@ -116,11 +118,13 @@ const HomePage = () => {
   const addToRefs = (el: HTMLDivElement | null) => {
     if (el && !revealRefs.current.includes(el)) {
       // Each section gets added once so it can fade in as the user scrolls.
+      // Keeping the list unique avoids replaying the reveal animation on the same card.
       revealRefs.current.push(el);
     }
   };
 
   // These are the four headline product stories shown inside the collection modal.
+  // They act like a small curated board of what the brand wants to feel like.
   const collections = [
     {
       icon: <Sparkles className="w-6 h-6" />,
@@ -149,6 +153,7 @@ const HomePage = () => {
   ];
 
   // The larger product grid uses this data to build the shop-like display.
+  // The images here are only presentation data, so the cards can stay purely decorative.
   const products = [
     { name: 'Aurora Serum', price: '$89', img: 'https://images.unsplash.com/photo-1596462502278-27ec8229babb?q=80&w=800', note: 'Hyaluronic Infusion', rating: '5.0' },
     { name: 'Orchid Cleanser', price: '$54', img: 'https://images.unsplash.com/photo-1556228578-0d85b1a4d571?q=80&w=800', note: 'Botanical Base', rating: '4.9' },

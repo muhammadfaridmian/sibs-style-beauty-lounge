@@ -214,6 +214,7 @@ export function getStoredAuthToken(): string | null {
   }
 
   // The token itself stays in browser storage so every protected request can reuse it.
+  // That keeps the session alive across page reloads without putting it into the backend.
   return window.localStorage.getItem(AUTH_TOKEN_KEY);
 }
 
@@ -223,6 +224,7 @@ export function setStoredAuthSession(session: AuthSession) {
   if (typeof window !== "undefined") {
     window.localStorage.setItem(AUTH_TOKEN_KEY, session.token);
     // The custom event tells the navigation bar and pages that auth state changed.
+    // It is how the header knows to switch between guest mode and signed-in mode instantly.
     window.dispatchEvent(new Event("sibs-style-auth-change"));
   }
 }
@@ -236,6 +238,7 @@ export function clearStoredAuthSession() {
   window.localStorage.removeItem(AUTH_TOKEN_KEY);
   window.localStorage.removeItem(AUTH_USER_KEY);
   // Clearing the session also notifies any components that depend on auth state.
+  // Without this event the nav could still show stale user info until the next refresh.
   window.dispatchEvent(new Event("sibs-style-auth-change"));
 }
 
@@ -260,6 +263,7 @@ async function requestJson<T>(path: string, init: RequestInit = {}, token?: stri
   });
 
   // Convex sends a small { ok, data, error } envelope, so we unwrap that here.
+  // That keeps the rest of the frontend code focused on the business data instead of transport details.
   const payload = await response.json().catch(() => null) as { ok?: boolean; data?: T; error?: string } | null;
   if (!response.ok || payload?.ok === false) {
     throw new Error(payload?.error || "Request failed");
@@ -395,6 +399,7 @@ export async function getCurrentAuthUser(authToken: string | null = getStoredAut
     return await requestJson<AuthUser>("/api/auth/me", { method: "GET" }, authToken);
   } catch (error) {
     console.error("Error loading auth session:", error);
+    // If the live request fails, we fall back to the cached user so the app does not boot blank.
     return getStoredAuthUser();
   }
 }
@@ -567,6 +572,7 @@ export async function submitReview(reviewData: {
 export async function getPromotions(): Promise<Promotion[]> {
   try {
     // The homepage and offers page both pull their promo cards from the same endpoint.
+    // Keeping them on one request means featured offers stay identical everywhere.
     const response = await fetch(`${API_BASE}/api/promotions`);
     if (!response.ok) throw new Error("Failed to fetch promotions");
     const data = await response.json();
@@ -586,6 +592,7 @@ export async function getPromotions(): Promise<Promotion[]> {
 export async function getStylists(): Promise<Stylist[]> {
   try {
     // Staff cards are public, so this request does not need a login token.
+    // The same list powers the stylists page and the admin assignment dropdowns.
     const response = await fetch(`${API_BASE}/api/staff`);
     if (!response.ok) throw new Error("Failed to fetch stylists");
     const data = await response.json();
@@ -603,6 +610,7 @@ export async function getStylists(): Promise<Stylist[]> {
  */
 export function formatPrice(priceCents: number): string {
   // Currency formatting stays simple because the app always displays AED.
+  // Converting from cents here keeps the UI code from repeating the same math everywhere.
   const amount = (priceCents / 100).toLocaleString('en-AE', {
     minimumFractionDigits: 0,
     maximumFractionDigits: 0,
@@ -615,6 +623,7 @@ export function formatPrice(priceCents: number): string {
  */
 export function formatDuration(minutes: number): string {
   // Durations are shown as short labels so the cards stay easy to scan.
+  // The uppercase label matches the visual language used across the booking page.
   return `${minutes} MINS`;
 }
 
@@ -623,6 +632,7 @@ export function formatDuration(minutes: number): string {
  */
 export function formatDate(dateString: string): string {
   // This converts the raw ISO date into the friendlier label used in the UI.
+  // The page components call this when they want the date to read like a normal sentence.
   return new Date(dateString).toLocaleDateString("en-US", {
     weekday: "short",
     month: "short",

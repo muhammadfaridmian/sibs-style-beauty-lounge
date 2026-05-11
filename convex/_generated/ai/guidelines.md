@@ -1,8 +1,13 @@
 # Convex guidelines
 
+<!-- This generated file explains the Convex-specific rules that shape the backend code in this project. -->
+<!-- The companion JSON file in the same folder stores sync metadata, not app logic. -->
+
 ## Function guidelines
 
 ### Http endpoint syntax
+
+<!-- HTTP rules matter here because the project exposes public salon routes through convex/http.ts. -->
 
 - HTTP endpoints are defined in `convex/http.ts` and require an `httpAction` decorator. For example:
 
@@ -23,6 +28,8 @@ http.route({
 - HTTP endpoints are always registered at the exact path you specify in the `path` field. For example, if you specify `/api/someRoute`, the endpoint will be registered at `/api/someRoute`.
 
 ### Validators
+
+<!-- Validators keep the database and the request handlers strict enough to stay predictable. -->
 
 - Below is an example of an array validator:
 
@@ -78,12 +85,16 @@ export default defineSchema({
 
 ### Function registration
 
+<!-- The app relies on public vs internal registration to keep sensitive helpers off the public API. -->
+
 - Use `internalQuery`, `internalMutation`, and `internalAction` to register internal functions. These functions are private and aren't part of an app's API. They can only be called by other Convex functions. These functions are always imported from `./_generated/server`.
 - Use `query`, `mutation`, and `action` to register public functions. These functions are part of the public API and are exposed to the public Internet. Do NOT use `query`, `mutation`, or `action` to register sensitive internal functions that should be kept private.
 - You CANNOT register a function through the `api` or `internal` objects.
 - ALWAYS include argument validators for all Convex functions. This includes all of `query`, `internalQuery`, `mutation`, `internalMutation`, `action`, and `internalAction`.
 
 ### Function calling
+
+<!-- These call rules explain why the backend hops between queries, mutations, and actions so carefully. -->
 
 - Use `ctx.runQuery` to call a query from a query, mutation, or action.
 - Use `ctx.runMutation` to call a mutation from a mutation or action.
@@ -112,6 +123,8 @@ export const g = query({
 
 ### Function references
 
+<!-- The api/internal references below map directly to the generated files in convex/_generated. -->
+
 - Use the `api` object defined by the framework in `convex/_generated/api.ts` to call public functions registered with `query`, `mutation`, or `action`.
 - Use the `internal` object defined by the framework in `convex/_generated/api.ts` to call internal (or private) functions registered with `internalQuery`, `internalMutation`, or `internalAction`.
 - Convex uses file-based routing, so a public function defined in `convex/example.ts` named `f` has a function reference of `api.example.f`.
@@ -119,6 +132,8 @@ export const g = query({
 - Functions can also registered within directories nested within the `convex/` folder. For example, a public function `h` defined in `convex/messages/access.ts` has a function reference of `api.messages.access.h`.
 
 ### Pagination
+
+<!-- Pagination is documented here because larger lists should stay bounded in a salon app like this one. -->
 
 - Define pagination using the following syntax:
 
@@ -149,6 +164,8 @@ Note: `paginationOpts` is an object with the following properties:
 
 ## Schema guidelines
 
+<!-- The schema guidance below maps directly to convex/schema.ts and the way the salon data is structured. -->
+
 - Always define your schema in `convex/schema.ts`.
 - Always import the schema definition functions from `convex/server`.
 - System fields are automatically added to all documents and are prefixed with an underscore. The two system fields that are automatically added to all documents are `_creationTime` which has the validator `v.number()` and `_id` which has the validator `v.id(tableName)`.
@@ -158,6 +175,8 @@ Note: `paginationOpts` is an object with the following properties:
 - Separate high-churn operational data (e.g. heartbeats, online status, typing indicators) from stable profile data. Storing frequently updated fields on a shared document forces every write to contend with reads of the entire document. Instead, create a dedicated table for the high-churn data with a foreign key back to the parent record.
 
 ## Authentication guidelines
+
+<!-- These auth notes explain why the browser only sees safe user data while the server keeps control of identity. -->
 
 - Convex supports JWT-based authentication through `convex/auth.config.ts`. ALWAYS create this file when using authentication. Without it, `ctx.auth.getUserIdentity()` will always return `null`.
 - Example `convex/auth.config.ts`:
@@ -197,6 +216,8 @@ function App({ children }: { children: React.ReactNode }) {
 The `useAuth` prop must return `{ isLoading, isAuthenticated, fetchAccessToken }`. Do NOT use plain `ConvexProvider` when authentication is needed — it will not send tokens with requests.
 
 ## Typescript guidelines
+
+<!-- These typing notes keep the Convex functions strict and help the app avoid weak any-based code paths. -->
 
 - You can use the helper typescript type `Id` imported from './\_generated/dataModel' to get the type of the id for a given table. For example if there is a table called 'users' you can use `Id<'users'>` to get the type of the id for that table.
 - Use `Doc<"tableName">` from `./_generated/dataModel` to get the full document type for a table.

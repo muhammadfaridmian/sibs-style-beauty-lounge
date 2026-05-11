@@ -23,6 +23,7 @@ const AuthPage: React.FC = () => {
   const safeRedirect = redirectParam.startsWith('/') ? redirectParam : '/booking';
   const resolveRedirect = (role: 'customer' | 'admin') => {
     // Admins always go to the dashboard; customers go back to the safe redirect target.
+    // That prevents a normal customer from being bounced into the admin screen by mistake.
     if (role === 'admin') {
       return '/admin';
     }
@@ -62,6 +63,7 @@ const AuthPage: React.FC = () => {
       // A live session means the auth page can quietly hand the user back to the app.
       const currentUser = await getCurrentAuthUser(authToken);
       if (currentUser) {
+        // A live session means the auth page is only a temporary stop, not the final destination.
         navigate(resolveRedirect(currentUser.role), { replace: true });
         return;
       }
@@ -116,6 +118,7 @@ const AuthPage: React.FC = () => {
   if (isLoadingSession) {
     return (
       <div className="min-h-screen bg-[#FAF9F6] flex items-center justify-center">
+        {/* The spinner covers the small window between loading the token and verifying it. */}
         <div className="w-12 h-12 rounded-full border-4 border-[#F2529D] border-t-transparent animate-spin"></div>
       </div>
     );
@@ -176,6 +179,7 @@ const AuthPage: React.FC = () => {
               </div>
 
               <div className="flex flex-wrap gap-3 sm:gap-4">
+                  {/* Switching modes keeps the login and registration forms in one place. */}
                 <button
                   type="button"
                   onClick={() => setMode('login')}

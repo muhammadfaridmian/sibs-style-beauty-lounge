@@ -14,6 +14,7 @@ const TestimonialsPage: React.FC = () => {
   const testimonialRef = useRef<HTMLDivElement>(null);
 
   // Form State
+  // The form stays controlled so every field can be reset after a successful submission.
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitSuccess, setSubmitSuccess] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
@@ -32,6 +33,7 @@ const TestimonialsPage: React.FC = () => {
       setIsLoading(true);
       // The review carousel and the submit form both need the latest service list.
       // We fetch both together so the page does not show mismatched testimonial data.
+      // Loading both resources in parallel keeps the page snappy without changing the content.
       const [fetchedReviews, fetchedServices] = await Promise.all([
         getReviews(),
         getServices()
@@ -66,6 +68,7 @@ const TestimonialsPage: React.FC = () => {
     if (reviews.length === 0) return;
     // The card animates out before the next review slides into the same spot.
     // The direction tells the animation which side to leave from.
+    // That tiny directional cue keeps the carousel feeling continuous.
     const direction = newIndex > currentIndex ? 1 : -1;
     
     gsap.to(testimonialRef.current, {
@@ -83,6 +86,7 @@ const TestimonialsPage: React.FC = () => {
   };
 
   // These helpers keep the review carousel looping in both directions.
+  // Wrapping around the ends makes the component feel like a proper infinite reel.
   const next = () => changeTestimonial((currentIndex + 1) % reviews.length);
   const prev = () => changeTestimonial((currentIndex - 1 + reviews.length) % reviews.length);
 
@@ -99,6 +103,7 @@ const TestimonialsPage: React.FC = () => {
     try {
       // The selected service name helps moderation staff understand which ritual the story refers to.
       const selectedService = services.find(s => s.id === formData.serviceId);
+      // The service lookup is optional, so a general inquiry can still be submitted cleanly.
       await submitReview({
         name: formData.name,
         email: formData.email,
@@ -109,6 +114,7 @@ const TestimonialsPage: React.FC = () => {
         serviceName: selectedService?.name || 'General Inquiry'
       }, sessionToken);
       // A successful post swaps the form for a short thank-you state.
+      // The reset clears the controlled fields so the next submission starts clean.
       setSubmitSuccess(true);
       setSubmitError(null);
       setFormData({ name: '', email: '', rating: 5, serviceId: '', mainQuote: '', subQuote1: '' });
@@ -123,6 +129,7 @@ const TestimonialsPage: React.FC = () => {
   if (isLoading) {
     return (
       <div className='bg-[#FAF9F6] min-h-screen flex items-center justify-center'>
+        {/* The spinner is just a simple loading shell while reviews and services arrive. */}
         <div className='w-12 h-12 border-4 border-[#F2529D] border-t-transparent rounded-full animate-spin'></div>
       </div>
     );
@@ -146,6 +153,7 @@ const TestimonialsPage: React.FC = () => {
           <div className='relative w-full flex items-center justify-center mb-24'>
             {/* Navigation Arrows */}
             {/* These arrows let the carousel move without losing the current review's focus. */}
+            {/* The card itself stays centered so the reader can focus on one voice at a time. */}
             <button 
               onClick={prev}
               className='absolute -left-4 sm:left-0 lg:left-20 z-10 w-10 h-10 md:w-16 md:h-16 bg-white rounded-full shadow-lg flex items-center justify-center text-[#F2529D] hover:bg-[#F2529D] hover:text-white transition-all hover:scale-110 active:scale-95 group'
@@ -209,6 +217,7 @@ const TestimonialsPage: React.FC = () => {
 
         {/* Share Your Story Form Section */}
           {/* The sign-in gate keeps the story tied to a verified customer account. */}
+          {/* That gate is what prevents anonymous submissions from polluting the testimonial stream. */}
             <div className='w-full max-w-6xl bg-[#0D0D0D] rounded-[2rem] sm:rounded-[4rem] p-4 sm:p-8 md:p-12 lg:p-20 text-white relative overflow-hidden mt-32 border border-white/5 shadow-2xl mx-auto'>
           {/* Ambient Background Elements */}
           <div className='absolute top-0 right-0 w-[40rem] h-[40rem] bg-[#F2529D] opacity-[0.03] blur-[120px] -mr-80 -mt-80'></div>

@@ -100,6 +100,7 @@ const BookingPage: React.FC = () => {
   // ==================== HANDLERS ====================
   const handleFormChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
+    // Every text field in the booking form updates through the same tiny helper.
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
@@ -156,6 +157,7 @@ const BookingPage: React.FC = () => {
   // ==================== DATA ====================
   const activeServiceData = services.find(s => s.id === viewingService);
   // Availability only shows the slots that Convex marked as open for the selected day.
+  // That makes the visible list match what the booking mutation will actually accept.
   const timeSlots = availability?.slots?.filter((slot: any) => slot.available) || [];
 
   // ==================== RENDER ====================
@@ -316,6 +318,7 @@ const BookingPage: React.FC = () => {
                     key={service.id} 
                     onClick={() => {
                       // Clicking a card both highlights it and opens the service detail overlay.
+                      // The same service id is reused later when the booking is finally submitted.
                       setSelectedService(service.id);
                       setViewingService(service.id);
                     }}
@@ -645,6 +648,7 @@ const BookingPage: React.FC = () => {
                   
                   <div className="flex flex-col items-center space-y-2 relative z-10">
                     {/* The summary restates the chosen ritual so the final confirmation is obvious. */}
+                    {/* The price and duration are repeated here so the final step feels transparent. */}
                     <span className="text-[0.55rem] sm:text-[0.65rem] font-black text-gray-400 tracking-[0.5em] sm:tracking-[0.8em] uppercase">RITUAL INVESTMENT</span>
                     <p className="text-[#333] font-black text-lg sm:text-xl md:text-2xl italic tracking-tighter text-center px-4">
                       {selectedService ? services.find(s => s.id === selectedService)?.name : 'Awaiting Selection'}

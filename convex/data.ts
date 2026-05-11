@@ -450,6 +450,7 @@ export const findUserByEmail = internalQuery({
   args: { email: v.string() },
   handler: async (ctx, args) => {
     // Login and registration both need this exact email lookup.
+    // Using the email index keeps the lookup fast even as the users table grows.
     const user = await ctx.db
       .query("users")
       .withIndex("by_email", (q) => q.eq("email", args.email))
@@ -462,6 +463,7 @@ export const getUserById = internalQuery({
   args: { userId: v.id("users") },
   handler: async (ctx, args) => {
     // The auth routes use this to refresh the public user profile after a mutation.
+    // The query returns the raw user row so the caller can reshape it as needed.
     return await ctx.db.get(args.userId);
   },
 });
@@ -470,6 +472,7 @@ export const findSessionByTokenHash = internalQuery({
   args: { tokenHash: v.string() },
   handler: async (ctx, args) => {
     // The raw token never leaves the browser; this query only sees the hashed version.
+    // That keeps session lookups possible without storing a reusable secret in plain text.
     const session = await ctx.db
       .query("sessions")
       .withIndex("by_tokenHash", (q) => q.eq("tokenHash", args.tokenHash))
@@ -495,6 +498,7 @@ export const listAppointmentsForAdmin = internalQuery({
   args: { limit: v.optional(v.number()) },
   handler: async (ctx, args) => {
     // The staff dashboard uses this to review the latest bookings quickly.
+    // The bounded take keeps the admin screen responsive when bookings accumulate.
     const appointments = await ctx.db.query("appointments").order("desc").take(args.limit ?? 100);
     return appointments.map(asAppointmentCard);
   },
@@ -525,6 +529,7 @@ export const getAvailability = internalQuery({
 
     const service = args.serviceId ? await ctx.db.get(args.serviceId) : null;
     const durationMinutes = service?.durationMinutes ?? 60;
+    // If the service does not exist yet, the page still gets a safe default duration.
 
     if (!operatingWindow) {
       return {
@@ -560,6 +565,8 @@ export const getAvailability = internalQuery({
         status: conflicts ? "booked" : "open",
       };
     }).filter((slot) => slot.available);
+
+    // Filtering after the map keeps the final list focused on the slots the client can actually book.
 
     return {
       date: args.appointmentDate,
@@ -667,11 +674,13 @@ export const createAppointment = internalMutation({
   },
   handler: async (ctx, args) => {
     // The booking form calls this, and Convex checks the slot before saving it.
+    // The service fetch below also protects against stale service ids from old page state.
     const service = await ctx.db.get(args.serviceId);
     if (!service) {
       throw new Error("Service not found.");
     }
 
+    // The display location comes from the salon defaults so the UI and admin tools match.
     const appointmentLocation = defaultAppointmentLocation;
 
     const profileDoc = await ctx.db.query("businessProfile").take(1);
@@ -706,6 +715,7 @@ export const createAppointment = internalMutation({
     );
     if (conflict) {
       // If we found a clash, we stop here so the same slot cannot be booked twice.
+      // That error bubbles back to the booking page and shows up as a friendly message.
       throw new Error("That time slot is already booked.");
     }
 
@@ -760,6 +770,7 @@ export const updateAppointmentStatus = internalMutation({
     }
 
     // The assigned stylist can change at the same time as the booking status.
+    // Keeping both fields together prevents the dashboard from showing half-updated cards.
     let assignedStylistName = appointment.assignedStylistName;
     let assignedStylistId = appointment.assignedStylistId;
 
@@ -846,6 +857,7 @@ export const updateReviewModeration = internalMutation({
       throw new Error("Review not found.");
     }
 
+    // Unchanged feature and sort values survive so the admin only edits what they touched.
     await ctx.db.patch(args.reviewId, {
       isApproved: args.isApproved,
       featured: args.featured ?? review.featured,
@@ -876,6 +888,8 @@ export const createGalleryItem = internalMutation({
     if (!args.imageUrl && !args.storageId) {
       throw new Error("Gallery items require either an image URL or an uploaded file.");
     }
+
+    // The gallery table stores the visual content plus the metadata needed for sorting and captions.
 
     return await ctx.db.insert("galleryItems", {
       title: args.title,

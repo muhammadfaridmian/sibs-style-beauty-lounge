@@ -20,7 +20,9 @@ export const seedDefaults = mutation({
   },
   handler: async (ctx, args) => {
     const now = Date.now();
+    // This flag lets the same seed mutation refresh existing content without wiping the whole database.
     const overwriteSeedContent = args.overwriteSeedContent ?? false;
+    // The summary makes it easy to see which sections were created or refreshed.
     const summary = {
       businessProfile: 0,
       services: 0,
@@ -31,6 +33,7 @@ export const seedDefaults = mutation({
       adminUser: 0,
     };
 
+    // The business profile is the public-facing salon card, so it seeds first.
     const existingBusinessProfile = await ctx.db.query("businessProfile").take(1);
     if (existingBusinessProfile.length === 0) {
       await ctx.db.insert("businessProfile", {
@@ -47,6 +50,7 @@ export const seedDefaults = mutation({
       summary.businessProfile = 1;
     }
 
+    // Services are the backbone of booking, so they are the next thing we seed.
     const existingServices = await ctx.db.query("services").take(100);
     if (existingServices.length === 0) {
       for (const service of defaultServices) {
@@ -88,6 +92,7 @@ export const seedDefaults = mutation({
       }
     }
 
+    // Stylists feed both the public team page and the admin assignment controls.
     const existingStylists = await ctx.db.query("stylists").take(100);
     if (existingStylists.length === 0) {
       for (const stylist of defaultStylists) {
@@ -125,6 +130,7 @@ export const seedDefaults = mutation({
       }
     }
 
+    // Gallery items can either point at stored files or at hosted image URLs.
     const existingGalleryItems = await ctx.db.query("galleryItems").take(100);
     if (existingGalleryItems.length === 0) {
       for (const item of defaultGalleryItems) {
@@ -167,6 +173,7 @@ export const seedDefaults = mutation({
       }
     }
 
+    // Reviews seed with public-facing quotes, but moderation still controls visibility.
     const existingReviews = await ctx.db.query("reviews").take(100);
     if (existingReviews.length === 0) {
       for (const review of defaultReviews) {
@@ -218,6 +225,7 @@ export const seedDefaults = mutation({
       }
     }
 
+    // Promotions power the offers page and the featured promo cards on the homepage.
     const existingPromotions = await ctx.db.query("promotions").take(100);
     if (existingPromotions.length === 0) {
       for (const promotion of defaultPromotions) {
@@ -258,18 +266,21 @@ export const seedDefaults = mutation({
       }
     }
 
+    // The admin login is normalized so the seeded account matches the auth lookup exactly.
     const normalizedAdminEmail = normalizeEmail(defaultAdminCredentials.email);
     let existingAdmin = await ctx.db
       .query("users")
       .withIndex("by_email", (q) => q.eq("email", normalizedAdminEmail))
       .unique();
     if (!existingAdmin) {
+      // Some older seeds may already have an admin user under a different address.
       const existingUsers = await ctx.db.query("users").take(100);
       existingAdmin = existingUsers.find((user) => user.role === "admin") ?? null;
     }
 
     // This starter admin record keeps the dashboard ready on first launch.
     if (existingAdmin) {
+      // Existing admins are refreshed in place so the dashboard never loses access.
       const { salt, passwordHash } = await hashPassword(defaultAdminCredentials.password);
       await ctx.db.patch(existingAdmin._id, {
         fullName: defaultAdminCredentials.fullName,
@@ -287,6 +298,7 @@ export const seedDefaults = mutation({
       });
       summary.adminUser = 1;
     } else {
+      // Fresh databases get one admin account seeded from the default credentials.
       const { salt, passwordHash } = await hashPassword(defaultAdminCredentials.password);
       await ctx.db.insert("users", {
         fullName: defaultAdminCredentials.fullName,

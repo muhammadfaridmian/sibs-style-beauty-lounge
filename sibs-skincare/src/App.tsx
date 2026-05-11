@@ -106,6 +106,7 @@ const Navigation = () => {
   useEffect(() => {
     const handleTrigger = (e: any) => {
       // The curtain event carries the next route path from whichever button fired it.
+      // That lets the reserve button and the nav buttons share the same transition logic.
       setPendingRoute(e.detail.path);
       setShowCurtain(true);
     };
@@ -116,6 +117,7 @@ const Navigation = () => {
   useEffect(() => {
     const syncAuthState = () => {
       // This keeps the header and mobile menu in sync with localStorage.
+      // It is the reason the nav updates immediately after login or logout.
       setCurrentUser(getStoredAuthUser());
     };
 
@@ -127,6 +129,7 @@ const Navigation = () => {
 
   const handleSignOut = () => {
     // Sign out clears the stored session and drops the user back home.
+    // The UI also closes the menu so the logout feels like a clean reset.
     clearStoredAuthSession();
     setCurrentUser(null);
     setIsMenuOpen(false);
@@ -184,6 +187,7 @@ const Navigation = () => {
             )}
 
             {/* Reserve uses the curtain transition so booking feels like an intentional reveal. */}
+            {/* Using a custom event here keeps the button logic separate from route rendering. */}
             <button
               onClick={() => {
                 const event = new CustomEvent('trigger-curtain', { detail: { path: '/booking' } });
@@ -205,6 +209,7 @@ const Navigation = () => {
           </div>
 
           <button className="lg:hidden text-black" onClick={() => setIsMenuOpen(true)}>
+            {/* The mobile icon opens the full-screen menu instead of squeezing links into the header. */}
             <Menu size={32} />
           </button>
         </div>
@@ -389,6 +394,7 @@ function App() {
         <ScrollToTop />
         <Navigation />
         {/* The route switch below is the single-page app handoff point. */}
+        {/* Each page component owns its own data loading and animation details. */}
         <main>
           <Routes>
             <Route path="/" element={<HomeScreen />} />

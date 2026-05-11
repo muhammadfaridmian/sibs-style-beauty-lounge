@@ -121,6 +121,7 @@ const AdminPage: React.FC = () => {
     setActionMessage(null);
     try {
       // Appointment edits flow back through Convex so the public and admin views stay aligned.
+      // The same mutation also updates the assigned stylist when the admin picks one.
       await updateAppointmentStatus({ appointmentId, status, authToken });
       setActionMessage(`Updated booking ${appointmentId.slice(0, 6).toUpperCase()}`);
       await refreshDashboard();
@@ -137,6 +138,7 @@ const AdminPage: React.FC = () => {
     setActionMessage(null);
     try {
       // Review moderation controls whether a testimonial is visible to visitors.
+      // The featured flag lets the team promote a review without changing the text.
       await moderateReview({
         reviewId: review.id,
         isApproved,
@@ -161,6 +163,7 @@ const AdminPage: React.FC = () => {
     setActionMessage(null);
     try {
       // New gallery items are created from the form fields above.
+      // This action keeps the gallery and the homepage visual feed in sync.
       await uploadGalleryItem({
         title: galleryForm.title,
         category: galleryForm.category,
