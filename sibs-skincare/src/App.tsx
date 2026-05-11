@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+﻿import { useState, useEffect, useRef } from 'react';
 import { BrowserRouter as Router, Routes, Route, Link, useLocation, useNavigate } from 'react-router-dom';
 import { Menu, X, ChevronRight } from 'lucide-react';
 import gsap from 'gsap';
@@ -249,6 +249,7 @@ const Navigation = () => {
       >
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(242,82,157,0.26),transparent_28%),radial-gradient(circle_at_bottom_left,rgba(199,157,51,0.14),transparent_30%),radial-gradient(circle_at_center,rgba(255,255,255,0.04),transparent_42%),linear-gradient(180deg,#05070D_0%,#0A0E1A_45%,#04060B_100%)]" />
         <div className="absolute inset-0 bg-[linear-gradient(135deg,transparent_18%,rgba(255,255,255,0.03)_36%,transparent_54%,rgba(255,255,255,0.02)_72%,transparent_86%)] opacity-70" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(124,97,255,0.08),transparent_40%)] opacity-60" />
         <div className="absolute inset-x-6 top-5 h-px bg-gradient-to-r from-transparent via-[#F2529D]/45 to-[#C79D33]/25" />
         <div className="absolute inset-y-0 left-0 w-px bg-gradient-to-b from-transparent via-[#F2529D]/20 to-transparent" />
         <div className="absolute inset-y-0 right-0 w-px bg-gradient-to-b from-transparent via-[#C79D33]/16 to-transparent" />
@@ -256,11 +257,21 @@ const Navigation = () => {
         <div className="absolute right-[-14%] bottom-[8%] h-72 w-72 rounded-full bg-[#C79D33]/10 blur-3xl" />
 
         <div className="relative flex min-h-[100dvh] w-full flex-col bg-transparent px-3 py-3 sm:px-6 sm:py-6">
-          <div className="rounded-[2rem] border border-[#273147] bg-[linear-gradient(145deg,rgba(17,24,39,0.96)_0%,rgba(7,10,18,0.98)_100%)] px-4 py-4 shadow-[0_30px_90px_-35px_rgba(0,0,0,0.92)] backdrop-blur-md">
-            <div className="flex items-start justify-between gap-4">
+          <div className="relative isolate overflow-hidden rounded-[2rem] border border-[#273147] bg-[linear-gradient(145deg,rgba(17,24,39,0.96)_0%,rgba(7,10,18,0.98)_100%)] px-4 py-4 shadow-[0_30px_90px_-35px_rgba(0,0,0,0.92)] backdrop-blur-md">
+            <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(242,82,157,0.14),transparent_34%),radial-gradient(circle_at_bottom_left,rgba(124,97,255,0.08),transparent_30%)]" />
+            <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/15 to-transparent" />
+            <div className="pointer-events-none absolute -right-6 -top-6 h-24 w-24 rounded-full bg-[#F2529D]/10 blur-3xl" />
+            <div className="pointer-events-none absolute -left-8 -bottom-8 h-28 w-28 rounded-full bg-[#C79D33]/10 blur-3xl" />
+            <div className="relative flex items-start justify-between gap-4">
               <div className="min-w-0">
                 <span className="block text-3xl font-display italic text-[#F2529D] sm:text-4xl">Sibs Style</span>
                 <p className="mt-2 text-[10px] font-black uppercase tracking-[0.45em] text-[#9CA3AF]">Curated mobile navigation</p>
+                <div className="mt-3 flex items-center gap-2">
+                  <span className="h-1.5 w-10 rounded-full bg-[#F2529D]" />
+                  <span className="h-1.5 w-5 rounded-full bg-[#C79D33]" />
+                  <span className="h-1.5 w-3 rounded-full bg-[#7C61FF]" />
+                  <span className="h-1.5 w-2 rounded-full bg-white/70" />
+                </div>
               </div>
               <button
                 onClick={() => setIsMenuOpen(false)}
@@ -272,15 +283,27 @@ const Navigation = () => {
             </div>
           </div>
 
-          <div className="mt-4 rounded-[2rem] border border-[#273147] bg-[linear-gradient(145deg,rgba(17,24,39,0.95)_0%,rgba(7,10,18,0.97)_100%)] p-4 shadow-[0_20px_50px_-28px_rgba(0,0,0,0.9)] backdrop-blur-md">
-            <p className="text-[#F2529D] uppercase tracking-[0.4em] text-[10px] font-black">Navigation</p>
-            <p className="mt-3 max-w-xs text-sm leading-relaxed text-[#D1D5DB]">
-              Move through the lounge edit, treatments, stories, and contact details.
-            </p>
+          <div className="relative mt-4 overflow-hidden rounded-[2rem] border border-[#273147] bg-[linear-gradient(145deg,rgba(17,24,39,0.95)_0%,rgba(7,10,18,0.97)_100%)] p-4 shadow-[0_20px_50px_-28px_rgba(0,0,0,0.9)] backdrop-blur-md">
+            <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(242,82,157,0.1),transparent_36%),radial-gradient(circle_at_bottom_left,rgba(199,157,51,0.06),transparent_28%),linear-gradient(135deg,rgba(255,255,255,0.02)_0%,transparent_38%,rgba(255,255,255,0.02)_100%)]" />
+            <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#F2529D]/35 via-[#C79D33]/30 to-transparent" />
+            <div className="relative">
+              <p className="text-[#F2529D] uppercase tracking-[0.4em] text-[10px] font-black">Navigation</p>
+              <p className="mt-3 max-w-xs text-sm leading-relaxed text-[#D1D5DB]">
+                Move through the lounge edit, treatments, stories, and contact details.
+              </p>
+              <div className="mt-4 flex items-center gap-2">
+                <span className="h-1.5 w-12 rounded-full bg-[#F2529D]" />
+                <span className="h-1.5 w-6 rounded-full bg-[#C79D33]" />
+                <span className="h-1.5 w-4 rounded-full bg-[#7C61FF]" />
+              </div>
+            </div>
           </div>
 
-          <div className="flex-1 min-h-0 w-full overflow-y-auto bg-[radial-gradient(circle_at_top,rgba(242,82,157,0.06),transparent_32%),radial-gradient(circle_at_bottom,rgba(199,157,51,0.05),transparent_28%),linear-gradient(180deg,rgba(10,14,26,0.18)_0%,rgba(10,14,26,0.72)_100%)] py-4 pr-1">
-            <div className="space-y-3">
+          <div className="relative flex-1 min-h-0 w-full overflow-y-auto bg-[radial-gradient(circle_at_top,rgba(242,82,157,0.06),transparent_32%),radial-gradient(circle_at_bottom,rgba(199,157,51,0.05),transparent_28%),linear-gradient(180deg,rgba(10,14,26,0.18)_0%,rgba(10,14,26,0.72)_100%)] py-4 pr-1">
+            <div className="pointer-events-none absolute inset-x-0 top-0 h-10 bg-gradient-to-b from-[#05070D] via-[#05070D]/80 to-transparent" />
+            <div className="pointer-events-none absolute inset-x-0 bottom-0 h-10 bg-gradient-to-t from-[#05070D] via-[#05070D]/80 to-transparent" />
+            <div className="pointer-events-none absolute right-2 top-8 h-[calc(100%-4rem)] w-px bg-gradient-to-b from-transparent via-white/10 to-transparent" />
+            <div className="relative space-y-3">
               {navLinks.map((link, index) => {
                 const isActive = location.pathname === link.path;
 
@@ -322,40 +345,50 @@ const Navigation = () => {
             </div>
           </div>
 
-          <div className="rounded-[1.5rem] border border-[#273147] bg-[radial-gradient(circle_at_top_right,rgba(242,82,157,0.1),transparent_36%),linear-gradient(145deg,rgba(17,24,39,0.96)_0%,rgba(11,15,26,0.98)_100%)] p-4 shadow-[0_18px_50px_-28px_rgba(0,0,0,0.92)] backdrop-blur-md">
-            <p className="text-[10px] font-black uppercase tracking-[0.35em] text-[#F2529D]">
-              Account
-            </p>
-            <div className="mt-3 flex items-center justify-between gap-4">
-              <div className="min-w-0">
-                <p className="truncate font-display italic text-2xl leading-none text-white">
-                  {currentUser ? currentUser.fullName : 'Guest access'}
-                </p>
-                <p className="mt-2 text-sm text-[#D1D5DB]">
-                  {currentUser
-                    ? currentUser.role === 'admin'
-                      ? 'Admin session active.'
-                      : 'Customer session active.'
-                    : 'Sign in to book, review, and reach the admin area if you have the admin account.'}
-                </p>
-              </div>
+          <div className="relative isolate overflow-hidden rounded-[1.5rem] border border-[#273147] bg-[radial-gradient(circle_at_top_right,rgba(242,82,157,0.1),transparent_36%),linear-gradient(145deg,rgba(17,24,39,0.96)_0%,rgba(11,15,26,0.98)_100%)] p-4 shadow-[0_18px_50px_-28px_rgba(0,0,0,0.92)] backdrop-blur-md">
+            <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(135deg,rgba(255,255,255,0.03)_0%,transparent_30%,rgba(255,255,255,0.02)_100%)]" />
+            <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#F2529D]/35 via-[#C79D33]/30 to-transparent" />
+            <div className="pointer-events-none absolute -right-6 top-[-1.5rem] h-24 w-24 rounded-full bg-[#F2529D]/10 blur-2xl" />
+            <div className="relative">
+              <p className="text-[10px] font-black uppercase tracking-[0.35em] text-[#F2529D]">
+                Account
+              </p>
+              <div className="mt-3 flex items-center justify-between gap-4">
+                <div className="min-w-0">
+                  <p className="truncate font-display italic text-2xl leading-none text-white">
+                    {currentUser ? currentUser.fullName : 'Guest access'}
+                  </p>
+                  <p className="mt-2 text-sm text-[#D1D5DB]">
+                    {currentUser
+                      ? currentUser.role === 'admin'
+                        ? 'Admin session active.'
+                        : 'Customer session active.'
+                      : 'Sign in to book, review, and reach the admin area if you have the admin account.'}
+                  </p>
+                  <div className="mt-4 flex items-center gap-2">
+                    <span className="h-1.5 w-12 rounded-full bg-[#F2529D]" />
+                    <span className="h-1.5 w-6 rounded-full bg-[#C79D33]" />
+                    <span className="h-1.5 w-4 rounded-full bg-[#7C61FF]" />
+                  </div>
+                </div>
 
-              {currentUser ? (
-                <button
-                  onClick={handleSignOut}
-                  className="shrink-0 rounded-full border border-[#273147] bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.05),transparent_45%),linear-gradient(145deg,rgba(11,15,26,0.96)_0%,rgba(31,41,55,0.94)_100%)] px-4 py-3 text-[10px] font-black uppercase tracking-[0.35em] text-white hover:border-[#F2529D]/70 hover:text-[#F2529D] transition-colors"
-                >
-                  Sign out
-                </button>
-              ) : (
-                <Link
-                  to="/auth"
-                  onClick={() => setIsMenuOpen(false)}
-                  className="shrink-0 rounded-full bg-[#F2529D] px-4 py-3 text-[10px] font-black uppercase tracking-[0.35em] text-white hover:bg-[#FF6FB0] hover:text-[#0A0E1A] transition-colors"
-                >
-                  Sign in
-                </Link>
-              )}
+                {currentUser ? (
+                  <button
+                    onClick={handleSignOut}
+                    className="shrink-0 rounded-full border border-[#273147] bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.05),transparent_45%),linear-gradient(145deg,rgba(11,15,26,0.96)_0%,rgba(31,41,55,0.94)_100%)] px-4 py-3 text-[10px] font-black uppercase tracking-[0.35em] text-white hover:border-[#F2529D]/70 hover:text-[#F2529D] transition-colors"
+                  >
+                    Sign out
+                  </button>
+                ) : (
+                  <Link
+                    to="/auth"
+                    onClick={() => setIsMenuOpen(false)}
+                    className="shrink-0 rounded-full bg-[#F2529D] px-4 py-3 text-[10px] font-black uppercase tracking-[0.35em] text-white hover:bg-[#FF6FB0] hover:text-[#0A0E1A] transition-colors"
+                  >
+                    Sign in
+                  </Link>
+                )}
+              </div>
             </div>
           </div>
 
