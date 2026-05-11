@@ -229,15 +229,16 @@ const Navigation = () => {
 
       {/* Mobile Menu */}
       <div
-        className={`fixed inset-0 z-[100] h-[100dvh] overflow-hidden text-white transition-all duration-700 ease-[cubic-bezier(0.19,1,0.22,1)] ${
+        className={`fixed inset-0 z-[100] h-[100dvh] overflow-y-auto overscroll-contain touch-pan-y text-white transition-all duration-700 ease-[cubic-bezier(0.19,1,0.22,1)] ${
           isMenuOpen ? 'opacity-100 visible translate-y-0' : 'opacity-0 invisible -translate-y-full'
         }`}
+        style={{ WebkitOverflowScrolling: 'touch' }}
       >
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(242,82,157,0.22),transparent_34%),radial-gradient(circle_at_bottom_left,rgba(191,156,52,0.16),transparent_30%),linear-gradient(180deg,#0A0E1A_0%,#04070F_100%)]" />
         <div className="absolute inset-x-6 top-5 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent" />
 
-        <div className="relative flex min-h-full flex-col px-3 py-3 sm:px-6 sm:py-6">
-          <div className="rounded-[2rem] border border-white/10 bg-white/5 px-4 py-4 shadow-[0_30px_90px_-30px_rgba(0,0,0,0.85)] backdrop-blur-2xl">
+        <div className="relative flex min-h-[100dvh] flex-col px-3 py-3 sm:px-6 sm:py-6">
+          <div className="rounded-[2rem] border border-[#273147] bg-[#111827] px-4 py-4 shadow-[0_30px_90px_-30px_rgba(0,0,0,0.85)]">
             <div className="flex items-start justify-between gap-4">
               <div className="min-w-0">
                 <span className="block text-3xl font-display italic text-[#F2529D] sm:text-4xl">Sibs Style</span>
@@ -371,10 +372,10 @@ const Navigation = () => {
               </div>
 
               <div className="flex gap-3 text-white/60">
-                <a href="https://www.instagram.com/sibsstylebeauty?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw==" target="_blank" rel="noopener noreferrer" aria-label="Instagram" className="flex h-11 w-11 items-center justify-center rounded-full border border-white/10 bg-white/[0.04] transition-all hover:border-[#F2529D]/50 hover:text-[#F2529D]">
+                <a href="https://www.instagram.com/sibsstylebeauty?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw==" target="_blank" rel="noopener noreferrer" aria-label="Instagram" className="flex h-11 w-11 items-center justify-center rounded-full border border-[#273147] bg-[#111827] transition-all hover:border-[#F2529D]/50 hover:text-[#F2529D]">
                   <span className="text-[10px] font-black uppercase tracking-[0.35em]">ig</span>
                 </a>
-                <a href="https://www.facebook.com/profile.php?id=61584300861932" target="_blank" rel="noopener noreferrer" aria-label="Facebook" className="flex h-11 w-11 items-center justify-center rounded-full border border-white/10 bg-white/[0.04] transition-all hover:border-[#4267B2]/50 hover:text-[#4267B2]">
+                <a href="https://www.facebook.com/profile.php?id=61584300861932" target="_blank" rel="noopener noreferrer" aria-label="Facebook" className="flex h-11 w-11 items-center justify-center rounded-full border border-[#273147] bg-[#111827] transition-all hover:border-[#4267B2]/50 hover:text-[#4267B2]">
                   <span className="text-[10px] font-black uppercase tracking-[0.35em]">fb</span>
                 </a>
               </div>
