@@ -638,7 +638,23 @@ export async function getAdminPromotions(authToken: string | null = getStoredAut
     throw new Error("Please sign in before opening the offers dashboard.");
   }
 
-  return await requestJson<Promotion[]>("/api/admin/promotions", { method: "GET" }, authToken);
+  try {
+    // Try the admin-only endpoint first (requires a valid token).
+    return await requestJson<Promotion[]>("/api/admin/promotions", { method: "GET" }, authToken);
+  } catch (adminErr) {
+    // If the admin endpoint fails (CORS, 404, network), fall back to the public promotions list so the admin UI can still display items read-only.
+    // This avoids a hard crash in the browser when the backend isn't deployed or CORS blocks the admin route.
+    console.warn("Admin promotions endpoint failed, falling back to public promotions:", adminErr);
+    try {
+      const response = await fetch(`${API_BASE}/api/promotions`);
+      if (!response.ok) throw new Error("Failed to fetch public promotions");
+      const data = await response.json();
+      return (data.data || []) as Promotion[];
+    } catch (publicErr) {
+      console.error("Failed to load public promotions as fallback:", publicErr);
+      throw new Error("Unable to load promotions from the server.");
+    }
+  }
 }
 
 export async function createPromotion(params: {
