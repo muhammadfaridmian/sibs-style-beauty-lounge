@@ -1,6 +1,5 @@
 import { useEffect } from 'react';
 import { Mail, Phone, MapPin, Clock } from 'lucide-react';
-import { Link } from 'react-router-dom';
 import Footer from './components/Footer';
 import gsap from 'gsap';
 

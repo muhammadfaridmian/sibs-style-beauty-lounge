@@ -3,81 +3,85 @@ import logo from '../assets/sibs-logo.svg';
 
 export default function Footer() {
   return (
-    <footer className="relative overflow-hidden bg-[#05070D] text-white pt-16 md:pt-24 pb-8 md:pb-12">
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(242,82,157,0.18),transparent_26%),radial-gradient(circle_at_top_right,rgba(199,157,51,0.16),transparent_24%),radial-gradient(circle_at_bottom_right,rgba(124,97,255,0.14),transparent_28%),linear-gradient(180deg,rgba(255,255,255,0.02)_0%,transparent_26%,rgba(255,255,255,0.02)_100%)]" />
-      <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#F2529D]/60 via-[#C79D33]/60 to-transparent" />
-      <div className="pointer-events-none absolute left-[-5rem] top-12 h-44 w-44 rounded-full bg-[#F2529D]/10 blur-3xl" />
-      <div className="pointer-events-none absolute right-[-4rem] bottom-0 h-56 w-56 rounded-full bg-[#C79D33]/12 blur-3xl" />
+    <footer className="relative overflow-hidden bg-[#05070D] text-white pt-20 md:pt-28 pb-12 md:pb-16">
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(242,82,157,0.12),transparent_32%),radial-gradient(circle_at_bottom_right,rgba(199,157,51,0.1),transparent_35%)]" />
+      <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#F2529D]/40 to-transparent" />
 
-      <div className="relative mx-auto max-w-7xl px-6 md:px-8">
-        <div className="rounded-[2rem] border border-white/8 bg-[linear-gradient(145deg,rgba(11,15,26,0.96)_0%,rgba(4,6,11,0.98)_100%)] p-6 md:p-8 shadow-[0_30px_100px_-40px_rgba(0,0,0,0.95)] backdrop-blur-sm">
-          <div className="grid grid-cols-1 gap-8 md:gap-10 lg:grid-cols-[1.15fr_0.95fr_0.95fr_1.1fr]">
-            <div className="space-y-5 md:pr-4">
-              <div className="flex items-center gap-3">
-                <div className="rounded-full border border-[#F2529D]/35 bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.9),rgba(255,255,255,0.72))] p-1 shadow-[0_10px_30px_-14px_rgba(242,82,157,0.9)]">
-                  <img src={logo} alt="Sibs Style logo" className="h-14 w-auto rounded-full" />
-                </div>
-                <div>
-                  <p className="text-[10px] font-black uppercase tracking-[0.45em] text-[#BF9C34]">Sibs Style</p>
-                  <p className="mt-1 text-[11px] font-medium uppercase tracking-[0.3em] text-white/50">Beauty Lounge L.L.C</p>
-                </div>
+      <div className="relative mx-auto max-w-7xl px-6 md:px-10 space-y-16 md:space-y-20">
+        <div className="grid grid-cols-1 gap-12 md:gap-16 lg:grid-cols-4">
+          {/* Brand Section */}
+          <div className="space-y-6">
+            <div className="flex items-center gap-3 w-fit">
+              <div className="rounded-full border-2 border-[#F2529D]/30 bg-white/8 p-2 shadow-[0_8px_24px_-12px_rgba(242,82,157,0.4)]">
+                <img src={logo} alt="Sibs Style logo" className="h-12 w-auto rounded-full" />
               </div>
-
-              <p className="max-w-sm text-[15px] md:text-[16px] leading-7 text-white/78">
-                Elevating your natural beauty with premium services in a luxurious, relaxing environment.
-              </p>
-
-              <div className="flex flex-wrap gap-3">
-                <span className="rounded-full border border-[#F2529D]/25 bg-[#F2529D]/10 px-4 py-2 text-[10px] font-black uppercase tracking-[0.28em] text-[#FF9BC2]">Luxury rituals</span>
-                <span className="rounded-full border border-[#C79D33]/25 bg-[#C79D33]/10 px-4 py-2 text-[10px] font-black uppercase tracking-[0.28em] text-[#F5D37B]">Curated care</span>
-                <span className="rounded-full border border-white/10 bg-white/5 px-4 py-2 text-[10px] font-black uppercase tracking-[0.28em] text-white/70">Dubai based</span>
+              <div>
+                <p className="text-sm font-black uppercase tracking-[0.4em] text-[#F2529D]">Sibs Style</p>
+                <p className="text-[10px] font-bold uppercase tracking-[0.25em] text-white/40 mt-0.5">Beauty Lounge L.L.C</p>
               </div>
             </div>
 
-            <div className="rounded-[1.5rem] border border-white/8 bg-white/[0.03] p-5 md:p-6 shadow-[0_16px_48px_-26px_rgba(0,0,0,0.75)]">
-              <h4 className="text-[11px] font-black uppercase tracking-[0.45em] text-[#BF9C34]">Quick Links</h4>
-              <div className="mt-5 h-px bg-gradient-to-r from-[#F2529D]/40 via-[#C79D33]/30 to-transparent" />
-              <ul className="mt-4 grid gap-2 text-[15px] text-white/78">
-                <li><Link to="/" className="group flex items-center justify-between rounded-xl border border-transparent px-3 py-2 transition-all hover:border-[#F2529D]/25 hover:bg-[#F2529D]/8 hover:text-white"><span>Home</span><span className="text-[#F2529D] opacity-0 transition-opacity group-hover:opacity-100">↗</span></Link></li>
-                <li><Link to="/booking" className="group flex items-center justify-between rounded-xl border border-transparent px-3 py-2 transition-all hover:border-[#F2529D]/25 hover:bg-[#F2529D]/8 hover:text-white"><span>Treatments</span><span className="text-[#F2529D] opacity-0 transition-opacity group-hover:opacity-100">↗</span></Link></li>
-                <li><Link to="/artisans" className="group flex items-center justify-between rounded-xl border border-transparent px-3 py-2 transition-all hover:border-[#F2529D]/25 hover:bg-[#F2529D]/8 hover:text-white"><span>Artisans</span><span className="text-[#F2529D] opacity-0 transition-opacity group-hover:opacity-100">↗</span></Link></li>
-                <li><Link to="/offers" className="group flex items-center justify-between rounded-xl border border-transparent px-3 py-2 transition-all hover:border-[#F2529D]/25 hover:bg-[#F2529D]/8 hover:text-white"><span>Offers</span><span className="text-[#F2529D] opacity-0 transition-opacity group-hover:opacity-100">↗</span></Link></li>
-              </ul>
-            </div>
+            <p className="text-[15px] leading-7 text-white/70 font-medium">
+              Elevating your natural beauty with premium services in a luxurious, relaxing environment.
+            </p>
 
-            <div className="rounded-[1.5rem] border border-white/8 bg-white/[0.03] p-5 md:p-6 shadow-[0_16px_48px_-26px_rgba(0,0,0,0.75)]">
-              <h4 className="text-[11px] font-black uppercase tracking-[0.45em] text-[#BF9C34]">Contact</h4>
-              <div className="mt-5 h-px bg-gradient-to-r from-[#C79D33]/35 via-[#F2529D]/25 to-transparent" />
-              <ul className="mt-4 space-y-4 text-[15px] leading-7 text-white/78">
-                <li className="rounded-xl border border-white/6 bg-black/15 px-3 py-3">Al Hashar Building, Salah Al Din St, Office 301</li>
-                <li className="rounded-xl border border-white/6 bg-black/15 px-3 py-3">Muteena, Deira, Dubai</li>
-                <li className="rounded-xl border border-white/6 bg-black/15 px-3 py-3 text-[#F5D37B]">052 906 3016</li>
-              </ul>
-            </div>
-
-            <div className="rounded-[1.5rem] border border-white/8 bg-[linear-gradient(180deg,rgba(242,82,157,0.12)_0%,rgba(199,157,51,0.06)_42%,rgba(255,255,255,0.03)_100%)] p-5 md:p-6 shadow-[0_16px_48px_-26px_rgba(0,0,0,0.75)]">
-              <h4 className="text-[11px] font-black uppercase tracking-[0.45em] text-[#BF9C34]">Follow</h4>
-              <div className="mt-5 h-px bg-gradient-to-r from-[#F2529D]/35 via-[#C79D33]/35 to-transparent" />
-
-              <div className="mt-6 flex flex-col gap-4">
-                <a href="https://www.instagram.com/sibsstylebeauty/" target="_blank" rel="noopener noreferrer" className="group flex items-center justify-between rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 transition-all hover:border-[#F2529D]/40 hover:bg-[#F2529D]/10">
-                  <span className="text-[15px] text-white/85 group-hover:text-[#FFB3D0]">Instagram</span>
-                  <span className="text-[#F2529D] opacity-0 transition-opacity group-hover:opacity-100">↗</span>
-                </a>
-              </div>
+            <div className="flex flex-wrap gap-2">
+              <span className="inline-flex rounded-full border border-[#F2529D]/20 bg-[#F2529D]/8 px-3 py-2 text-[10px] font-black uppercase tracking-[0.25em] text-[#FFB3D0]">Luxury Rituals</span>
+              <span className="inline-flex rounded-full border border-[#C79D33]/20 bg-[#C79D33]/8 px-3 py-2 text-[10px] font-black uppercase tracking-[0.25em] text-[#F5D37B]">Curated Care</span>
+              <span className="inline-flex rounded-full border border-white/10 bg-white/5 px-3 py-2 text-[10px] font-black uppercase tracking-[0.25em] text-white/60">Dubai Based</span>
             </div>
           </div>
 
-          <div className="mt-8 md:mt-10 flex flex-col gap-5 border-t border-white/8 pt-6 md:flex-row md:items-center md:justify-between">
-            <div className="flex flex-wrap items-center gap-3 text-[12px] md:text-[13px] font-black uppercase tracking-[0.3em] text-white/45">
-              <span className="text-[#F2529D]">© 2025 SIBS STYLE BEAUTY LOUNGE.</span>
-              <span>All rights reserved.</span>
+          {/* Quick Links Section */}
+          <div className="space-y-5">
+            <div>
+              <h4 className="text-[11px] font-black uppercase tracking-[0.4em] text-[#BF9C34]">Quick Links</h4>
+              <div className="mt-3 h-0.5 w-12 bg-gradient-to-r from-[#F2529D]/60 to-transparent" />
             </div>
+            <ul className="space-y-3 text-[15px] text-white/75 font-medium">
+              <li><Link to="/" className="hover:text-[#F2529D] transition-colors duration-300">Home</Link></li>
+              <li><Link to="/booking" className="hover:text-[#F2529D] transition-colors duration-300">Treatments</Link></li>
+              <li><Link to="/artisans" className="hover:text-[#F2529D] transition-colors duration-300">Artisans</Link></li>
+              <li><Link to="/offers" className="hover:text-[#F2529D] transition-colors duration-300">Offers</Link></li>
+            </ul>
+          </div>
 
-            <div className="flex flex-wrap items-center gap-5 text-[12px] md:text-[13px] font-black uppercase tracking-[0.28em] text-white/50">
-              <Link to="#" className="transition-colors hover:text-[#F2529D]">Privacy Policy</Link>
-              <Link to="#" className="transition-colors hover:text-[#F2529D]">Terms of Luxury</Link>
+          {/* Contact Section */}
+          <div className="space-y-5">
+            <div>
+              <h4 className="text-[11px] font-black uppercase tracking-[0.4em] text-[#BF9C34]">Contact</h4>
+              <div className="mt-3 h-0.5 w-12 bg-gradient-to-r from-[#C79D33]/60 to-transparent" />
             </div>
+            <ul className="space-y-3 text-[15px] leading-6 text-white/75 font-medium">
+              <li className="text-white/70">Al Hashar Building, Salah Al Din St, Office 301</li>
+              <li className="text-white/70">Muteena, Deira, Dubai</li>
+              <li className="text-[#F5D37B] font-black tracking-wider">052 906 3016</li>
+            </ul>
+          </div>
+
+          {/* Follow Section */}
+          <div className="space-y-5">
+            <div>
+              <h4 className="text-[11px] font-black uppercase tracking-[0.4em] text-[#BF9C34]">Follow</h4>
+              <div className="mt-3 h-0.5 w-12 bg-gradient-to-r from-[#F2529D]/60 to-transparent" />
+            </div>
+            <div className="flex items-center justify-center w-12 h-12 rounded-full border border-white/20 bg-white/8 hover:border-[#F2529D]/60 hover:bg-[#F2529D]/12 transition-all duration-300">
+              <a href="https://www.instagram.com/sibsstylebeauty/" target="_blank" rel="noopener noreferrer" className="text-lg font-black text-white/80 hover:text-[#FFB3D0] transition-colors duration-300">Ig</a>
+            </div>
+          </div>
+        </div>
+
+        {/* Bottom Bar */}
+        <div className="border-t border-white/10 pt-8 md:pt-12 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+          <p className="text-[12px] font-black uppercase tracking-[0.25em] text-white/45">
+            <span className="text-[#F2529D]">© 2025 SIBS STYLE BEAUTY LOUNGE.</span>
+            <span className="ml-2">ALL RIGHTS RESERVED.</span>
+          </p>
+
+          <div className="flex items-center gap-6 text-[12px] font-black uppercase tracking-[0.25em] text-white/50">
+            <a href="#" className="hover:text-[#F2529D] transition-colors duration-300">Privacy Policy</a>
+            <span className="text-white/20">•</span>
+            <a href="#" className="hover:text-[#F2529D] transition-colors duration-300">Terms of Luxury</a>
           </div>
         </div>
       </div>
