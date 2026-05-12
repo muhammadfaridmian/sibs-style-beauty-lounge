@@ -13,13 +13,19 @@
 }
 
 @layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
   body {
     /* Base page style before any page-specific section kicks in. */
     /* The default canvas stays warm and neutral so the pink and gold accents can stand out. */
     @apply font-body bg-[#FAFAFA] text-[#333];
     overflow-x: hidden;
-    overscroll-behavior-y: none;
+    overflow-y: auto;
+    overscroll-behavior-y: auto;
     -webkit-overflow-scrolling: touch;
+    touch-action: pan-y;
   }
 
   html,
@@ -27,8 +33,10 @@
   #root {
     width: 100%;
     max-width: 100%;
+    min-height: 100%;
     overflow-x: hidden;
-    overscroll-behavior-y: none;
+    overflow-y: auto;
+    overscroll-behavior-y: auto;
   }
 }
 
