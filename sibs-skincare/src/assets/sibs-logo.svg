@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="240" height="80" viewBox="0 0 240 80" fill="none">
+  <defs>
+    <linearGradient id="g1" x1="0" x2="1">
+      <stop offset="0%" stop-color="#F2529D" />
+      <stop offset="100%" stop-color="#C79D33" />
+    </linearGradient>
+  </defs>
+  <circle cx="36" cy="40" r="28" fill="white" stroke="url(#g1)" stroke-width="3" />
+  <path d="M24 40c0-9 8-16 18-16" stroke="#C79D33" stroke-width="3" fill="none"/>
+  <text x="68" y="48" font-family="Georgia, 'Times New Roman', serif" font-size="28" font-weight="700" fill="#F2529D">Sibs</text>
+  <text x="140" y="48" font-family="Georgia, 'Times New Roman', serif" font-size="28" font-weight="700" fill="#C79D33">Style</text>
+</svg>

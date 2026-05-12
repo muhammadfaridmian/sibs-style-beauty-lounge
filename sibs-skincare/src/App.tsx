@@ -2,6 +2,7 @@
 import { BrowserRouter as Router, Routes, Route, Link, useLocation, useNavigate } from 'react-router-dom';
 import { Menu, X, ChevronRight } from 'lucide-react';
 import gsap from 'gsap';
+import logo from './assets/sibs-logo.svg';
 import HomeScreen from './HomePage.tsx';
 import BookingPage from './BookingPage.tsx';
 import StylistsPage from './StylistsPage.tsx';
@@ -163,17 +164,20 @@ const Navigation = () => {
   return (
     <>
       <nav className="fixed top-0 w-full z-50 bg-[#FAF9F6]/95 md:bg-[#FAF9F6]/92 backdrop-blur-xl md:backdrop-blur-2xl border-b border-gray-100 shadow-sm">
-        <div className="max-w-[1800px] mx-auto px-10 h-32 flex items-center justify-between">
-          <Link to="/" className="text-4xl font-display font-black italic text-[#F2529D] shrink-0">
-            Sibs Style
+        <div className="max-w-[1800px] mx-auto px-8 h-32 flex items-center gap-6">
+          <Link to="/" className="flex items-center gap-3 shrink-0" aria-label="Sibs Style home">
+            <img src={logo} alt="Sibs Style logo" className="h-12 w-auto rounded-full border-2 border-transparent transition-transform duration-300 hover:scale-105 shadow-sm" />
+            <span className="text-2xl md:text-3xl font-display font-black italic tracking-tight text-[#0A0E1A]">
+              Sibs Style
+            </span>
           </Link>
 
-          <div className="hidden lg:flex items-center space-x-6 xl:space-x-10 px-4">
+          <div className="hidden lg:flex items-center space-x-6 xl:space-x-10 px-4 flex-1 justify-center">
             {navLinks.map((link) => (
               <Link
                 key={link.path}
                 to={link.path}
-                className={`text-[15px] font-[900] uppercase tracking-[0.45em] transition-all duration-300 whitespace-nowrap ${
+                className={`text-[14px] font-black uppercase tracking-[0.25em] transition-all duration-300 whitespace-nowrap ${
                   location.pathname === link.path
                     ? 'text-[#F2529D] underline underline-offset-[14px] decoration-2 scale-105'
                     : 'text-gray-500 hover:text-[#F2529D] hover:scale-105'
