@@ -453,7 +453,7 @@ function App() {
             <Route path="/booking" element={<BookingPage />} />
             <Route path="/auth" element={<AuthPage />} />
             <Route path="/login" element={<AuthPage />} />
-            <Route path="/admin" element={<AdminPage />} />
+            <Route path="/admin/*" element={<AdminPage />} />
             <Route path="/artisans" element={<StylistsPage />} />
             <Route path="/testimonials" element={<TestimonialsPage />} />
             <Route path="/offers" element={<ExclusiveOffers />} />
