@@ -45,6 +45,13 @@ const AdminPage: React.FC = () => {
   const [currentUser, setCurrentUser] = useState<AuthUser | null>(null);
   const [appointments, setAppointments] = useState<AdminAppointment[]>([]);
   const [reviews, setReviews] = useState<AdminReview[]>([]);
+  const [pendingAction, setPendingAction] = useState<
+    | { type: 'booking'; appointment: AdminAppointment }
+    | { type: 'review'; review: AdminReview }
+    | null
+  >(null);
+  const [removingAppointmentIds, setRemovingAppointmentIds] = useState<string[]>([]);
+  const [removingReviewIds, setRemovingReviewIds] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -119,13 +126,39 @@ const AdminPage: React.FC = () => {
     }
 
     setActionMessage(null);
+
+    if (status === 'cancelled') {
+      setRemovingAppointmentIds((currentIds) => [...currentIds, appointmentId]);
+    }
+
     try {
       // Appointment edits flow back through Convex so the public and admin views stay aligned.
       // The same mutation also updates the assigned stylist when the admin picks one.
       await updateAppointmentStatus({ appointmentId, status, authToken });
       setActionMessage(`Updated booking ${appointmentId.slice(0, 6).toUpperCase()}`);
+
+      setAppointments((currentAppointments) =>
+        currentAppointments.map((appointment) =>
+          appointment.id === appointmentId
+            ? { ...appointment, status }
+            : appointment
+        )
+      );
+
+      if (status === 'cancelled') {
+        window.setTimeout(() => {
+          setAppointments((currentAppointments) =>
+            currentAppointments.filter((appointment) => appointment.id !== appointmentId)
+          );
+          setRemovingAppointmentIds((currentIds) => currentIds.filter((id) => id !== appointmentId));
+        }, 420);
+      }
+
       await refreshDashboard();
     } catch (updateError) {
+      if (status === 'cancelled') {
+        setRemovingAppointmentIds((currentIds) => currentIds.filter((id) => id !== appointmentId));
+      }
       setError(updateError instanceof Error ? updateError.message : 'Unable to update this booking.');
     }
   };
@@ -147,11 +180,68 @@ const AdminPage: React.FC = () => {
         authToken,
       });
       setActionMessage(`Updated review ${review.name}`);
+
+      setReviews((currentReviews) =>
+        currentReviews.map((currentReview) =>
+          currentReview.id === review.id
+            ? { ...currentReview, isApproved }
+            : currentReview
+        )
+      );
+
       await refreshDashboard();
     } catch (updateError) {
       setError(updateError instanceof Error ? updateError.message : 'Unable to update this review.');
     }
   };
+
+  const handleDeleteBookingConfirm = async () => {
+    if (!pendingAction || pendingAction.type !== 'booking') {
+      return;
+    }
+
+    const appointmentId = pendingAction.appointment.id;
+    setPendingAction(null);
+    await handleAppointmentStatus(appointmentId, 'cancelled');
+  };
+
+  const handleDeleteReviewConfirm = async () => {
+    if (!pendingAction || pendingAction.type !== 'review') {
+      return;
+    }
+
+    const reviewId = pendingAction.review.id;
+    const reviewName = pendingAction.review.name;
+    const featured = pendingAction.review.featured;
+    const sortOrder = pendingAction.review.sortOrder;
+    setPendingAction(null);
+    setRemovingReviewIds((currentIds) => [...currentIds, reviewId]);
+
+    try {
+      await moderateReview({
+        reviewId,
+        isApproved: false,
+        featured,
+        sortOrder,
+        authToken,
+      });
+
+      window.setTimeout(() => {
+        setReviews((currentReviews) => currentReviews.filter((review) => review.id !== reviewId));
+        setRemovingReviewIds((currentIds) => currentIds.filter((id) => id !== reviewId));
+      }, 420);
+
+      setActionMessage(`Removed review ${reviewName}`);
+    } catch (deleteError) {
+      setRemovingReviewIds((currentIds) => currentIds.filter((id) => id !== reviewId));
+      setError(deleteError instanceof Error ? deleteError.message : 'Unable to remove this review.');
+    }
+  };
+
+  const activeAppointments = appointments.filter((appointment) => appointment.status !== 'completed' && appointment.status !== 'cancelled');
+  const completedAppointments = appointments.filter((appointment) => appointment.status === 'completed');
+  const pendingReviews = reviews.filter((review) => !review.isApproved);
+  const approvedReviews = reviews.filter((review) => review.isApproved);
 
   const handleGalleryUpload = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -287,7 +377,7 @@ const AdminPage: React.FC = () => {
       </div>
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-16 sm:pb-24 space-y-8 sm:space-y-12 lg:space-y-16">
-        <section className="rounded-[2rem] sm:rounded-[3rem] bg-[#0A0E1A] text-white p-6 sm:p-8 lg:p-12 shadow-[0_30px_90px_-30px_rgba(0,0,0,0.35)] border border-white/10 overflow-hidden relative">
+        <section className="mt-4 sm:mt-0 rounded-[2rem] sm:rounded-[3rem] bg-[#0A0E1A] text-white p-6 sm:p-8 lg:p-12 shadow-[0_30px_90px_-30px_rgba(0,0,0,0.35)] border border-white/10 overflow-hidden relative">
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(242,82,157,0.18),transparent_28%),radial-gradient(circle_at_bottom_left,rgba(191,156,52,0.12),transparent_24%)]"></div>
           <div className="relative z-10 grid grid-cols-1 lg:grid-cols-[1.2fr_0.8fr] gap-8 lg:gap-10 items-center">
             <div className="space-y-5 sm:space-y-6">
@@ -331,13 +421,18 @@ const AdminPage: React.FC = () => {
           </div>
 
           <div className="grid gap-4 sm:gap-5 lg:grid-cols-2">
-            {appointments.length === 0 ? (
+            {activeAppointments.length === 0 ? (
               <div className="lg:col-span-2 rounded-[2rem] bg-white border border-gray-100 p-8 sm:p-12 text-center text-gray-400">
                 No bookings yet.
               </div>
             ) : (
-              appointments.map((appointment) => (
-                <article key={appointment.id} className="rounded-[2rem] bg-white border border-gray-100 shadow-[0_20px_60px_-25px_rgba(0,0,0,0.2)] p-5 sm:p-6 space-y-5">
+              activeAppointments.map((appointment) => (
+                <article
+                  key={appointment.id}
+                  className={`rounded-[2rem] bg-white border border-gray-100 shadow-[0_20px_60px_-25px_rgba(0,0,0,0.2)] p-5 sm:p-6 space-y-5 transition-all duration-500 ${
+                    removingAppointmentIds.includes(appointment.id) ? 'opacity-0 translate-y-2 scale-[0.98]' : ''
+                  }`}
+                >
                   <div className="flex items-start justify-between gap-4">
                     <div className="space-y-2">
                       <p className="text-[10px] font-black uppercase tracking-[0.35em] text-[#BF9C34]">{appointment.serviceName}</p>
@@ -389,7 +484,7 @@ const AdminPage: React.FC = () => {
                     )}
                     {appointment.status !== 'cancelled' && (
                       <button
-                        onClick={() => handleAppointmentStatus(appointment.id, 'cancelled')}
+                        onClick={() => setPendingAction({ type: 'booking', appointment })}
                         className="inline-flex items-center gap-2 rounded-full border border-gray-200 bg-white px-4 py-3 text-[10px] font-black uppercase tracking-[0.35em] text-gray-500 hover:text-red-700 transition-colors"
                       >
                         <XCircle size={14} />
@@ -405,18 +500,69 @@ const AdminPage: React.FC = () => {
 
         <section className="space-y-5 sm:space-y-6">
           <div className="flex items-center gap-3">
+            <CheckCircle2 className="text-emerald-600" size={20} />
+            <h2 className="text-3xl sm:text-4xl font-display italic font-black text-[#0A0E1A]">Completed bookings</h2>
+          </div>
+
+          <div className="grid gap-4 sm:gap-5 lg:grid-cols-2">
+            {completedAppointments.length === 0 ? (
+              <div className="lg:col-span-2 rounded-[2rem] bg-white border border-gray-100 p-8 sm:p-12 text-center text-gray-400">
+                No completed bookings yet.
+              </div>
+            ) : (
+              completedAppointments.map((appointment) => (
+                <article
+                  key={appointment.id}
+                  className="rounded-[2rem] border border-emerald-200 bg-emerald-50 shadow-[0_20px_60px_-25px_rgba(16,185,129,0.16)] p-5 sm:p-6 space-y-5"
+                >
+                  <div className="flex items-start justify-between gap-4">
+                    <div className="space-y-2">
+                      <p className="text-[10px] font-black uppercase tracking-[0.35em] text-emerald-600">{appointment.serviceName}</p>
+                      <h3 className="text-2xl font-display italic font-black text-emerald-950">{appointment.guestName}</h3>
+                      <p className="text-sm text-emerald-900/70 leading-relaxed">{appointment.guestEmail} · {appointment.guestPhone}</p>
+                    </div>
+                    <span className="inline-flex rounded-full border border-emerald-200 bg-white px-3 py-1 text-[10px] font-black uppercase tracking-[0.35em] text-emerald-700">
+                      completed
+                    </span>
+                  </div>
+
+                  <div className="grid gap-3 text-sm text-emerald-900/70 sm:grid-cols-2">
+                    <div className="rounded-[1.25rem] bg-white p-4">
+                      <p className="text-[10px] font-black uppercase tracking-[0.35em] text-emerald-500">Schedule</p>
+                      <p className="mt-2 font-semibold text-emerald-950">{appointment.appointmentDate} · {appointment.appointmentTimeLabel}</p>
+                      <p className="mt-1 text-xs text-emerald-700/70">{appointment.startTimeLabel} to {appointment.endTimeLabel}</p>
+                    </div>
+                    <div className="rounded-[1.25rem] bg-white p-4">
+                      <p className="text-[10px] font-black uppercase tracking-[0.35em] text-emerald-500">Assigned stylist</p>
+                      <p className="mt-2 font-semibold text-emerald-950">{appointment.assignedStylistName ?? 'Unassigned'}</p>
+                      <p className="mt-1 text-xs text-emerald-700/70">{appointment.location}</p>
+                    </div>
+                  </div>
+                </article>
+              ))
+            )}
+          </div>
+        </section>
+
+        <section className="space-y-5 sm:space-y-6">
+          <div className="flex items-center gap-3">
             <MessageSquare className="text-[#F2529D]" size={20} />
             <h2 className="text-3xl sm:text-4xl font-display italic font-black text-[#0A0E1A]">Review moderation</h2>
           </div>
 
           <div className="grid gap-4 sm:gap-5 lg:grid-cols-2">
-            {reviews.length === 0 ? (
+            {pendingReviews.length === 0 ? (
               <div className="lg:col-span-2 rounded-[2rem] bg-white border border-gray-100 p-8 sm:p-12 text-center text-gray-400">
-                No reviews yet.
+                No pending reviews yet.
               </div>
             ) : (
-              reviews.map((review) => (
-                <article key={review.id} className="rounded-[2rem] bg-white border border-gray-100 shadow-[0_20px_60px_-25px_rgba(0,0,0,0.2)] p-5 sm:p-6 space-y-4">
+              pendingReviews.map((review) => (
+                <article
+                  key={review.id}
+                  className={`rounded-[2rem] bg-white border border-gray-100 shadow-[0_20px_60px_-25px_rgba(0,0,0,0.2)] p-5 sm:p-6 space-y-4 transition-all duration-500 ${
+                    removingReviewIds.includes(review.id) ? 'opacity-0 translate-y-2 scale-[0.98]' : ''
+                  }`}
+                >
                   <div className="flex items-start justify-between gap-4">
                     <div className="space-y-2">
                       <p className="text-[10px] font-black uppercase tracking-[0.35em] text-[#BF9C34]">{review.serviceName ?? 'General'}</p>
@@ -456,15 +602,61 @@ const AdminPage: React.FC = () => {
                         <CheckCircle2 size={14} />
                         Approve
                       </button>
-                    ) : (
+                    ) : null}
+                    {!review.isApproved && (
                       <button
-                        onClick={() => handleReviewModeration(review, false)}
-                        className="inline-flex items-center gap-2 rounded-full border border-gray-200 bg-white px-4 py-3 text-[10px] font-black uppercase tracking-[0.35em] text-gray-500 hover:text-red-700 transition-colors"
+                        onClick={() => setPendingAction({ type: 'review', review })}
+                        className="inline-flex items-center gap-2 rounded-full border border-red-200 bg-white px-4 py-3 text-[10px] font-black uppercase tracking-[0.35em] text-red-700 hover:bg-red-50 transition-colors"
                       >
                         <XCircle size={14} />
-                        Hide
+                        Delete
                       </button>
                     )}
+                  </div>
+                </article>
+              ))
+            )}
+          </div>
+        </section>
+
+        <section className="space-y-5 sm:space-y-6">
+          <div className="flex items-center gap-3">
+            <CheckCircle2 className="text-[#BF9C34]" size={20} />
+            <h2 className="text-3xl sm:text-4xl font-display italic font-black text-[#0A0E1A]">Approved chronicles</h2>
+          </div>
+
+          <div className="grid gap-4 sm:gap-5 lg:grid-cols-2">
+            {approvedReviews.length === 0 ? (
+              <div className="lg:col-span-2 rounded-[2rem] bg-white border border-gray-100 p-8 sm:p-12 text-center text-gray-400">
+                No approved reviews yet.
+              </div>
+            ) : (
+              approvedReviews.map((review) => (
+                <article
+                  key={review.id}
+                  className="rounded-[2rem] border border-[#F2529D]/15 bg-[#FFF7FB] shadow-[0_20px_60px_-25px_rgba(242,82,157,0.14)] p-5 sm:p-6 space-y-4"
+                >
+                  <div className="flex items-start justify-between gap-4">
+                    <div className="space-y-2">
+                      <p className="text-[10px] font-black uppercase tracking-[0.35em] text-[#BF9C34]">{review.serviceName ?? 'General'}</p>
+                      <h3 className="text-2xl font-display italic font-black text-[#0A0E1A]">{review.name}</h3>
+                      <p className="text-sm text-gray-500 leading-relaxed">{review.role} · {review.email}</p>
+                    </div>
+                    <div className="flex items-center gap-2 rounded-full bg-[#BF9C34]/10 px-3 py-2 text-[#BF9C34]">
+                      <Star size={14} fill="currentColor" />
+                      <span className="text-[10px] font-black uppercase tracking-[0.35em]">{review.rating}/5</span>
+                    </div>
+                  </div>
+
+                  <p className="text-sm sm:text-base text-gray-600 leading-relaxed italic">{review.mainQuote}</p>
+                  <p className="text-sm text-gray-500 leading-relaxed">{review.subQuote1}</p>
+                  <p className="text-sm text-gray-500 leading-relaxed">{review.subQuote2}</p>
+
+                  <div className="flex items-center justify-between gap-3 pt-2">
+                    <span className="inline-flex rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1 text-[10px] font-black uppercase tracking-[0.35em] text-emerald-700">
+                      Approved
+                    </span>
+                    <span className="text-[10px] font-black uppercase tracking-[0.35em] text-gray-400">{review.avatarUrl ? 'Has avatar' : 'No avatar'}</span>
                   </div>
                 </article>
               ))
@@ -570,6 +762,37 @@ const AdminPage: React.FC = () => {
           </form>
         </section>
       </main>
+
+      {pendingAction ? (
+        <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/60 px-4 py-6 backdrop-blur-md">
+          <div className="w-full max-w-lg rounded-[2rem] border border-white/10 bg-[#0A0E1A] p-6 sm:p-8 text-white shadow-[0_40px_100px_-30px_rgba(0,0,0,0.7)]">
+            <p className="text-[10px] font-black uppercase tracking-[0.45em] text-[#F2529D]">Confirm action</p>
+            <h3 className="mt-3 text-2xl sm:text-3xl font-display italic font-black leading-tight">
+              {pendingAction.type === 'booking' ? 'Are you sure you want to delete this booking?' : 'Are you sure you want to delete this review?'}
+            </h3>
+            <p className="mt-4 text-sm sm:text-base leading-relaxed text-white/70">
+              {pendingAction.type === 'booking'
+                ? 'This removes the booking from the dashboard after the fade animation and keeps the Convex status in sync.'
+                : 'This removes the rating from moderation and clears it from the dashboard after the fade animation.'}
+            </p>
+
+            <div className="mt-8 flex flex-col sm:flex-row gap-3">
+              <button
+                onClick={() => setPendingAction(null)}
+                className="flex-1 rounded-full border border-white/15 bg-white/5 px-6 py-4 text-[10px] font-black uppercase tracking-[0.35em] text-white hover:bg-white/10 transition-colors"
+              >
+                No
+              </button>
+              <button
+                onClick={pendingAction.type === 'booking' ? handleDeleteBookingConfirm : handleDeleteReviewConfirm}
+                className="flex-1 rounded-full bg-[#F2529D] px-6 py-4 text-[10px] font-black uppercase tracking-[0.35em] text-white hover:bg-[#ff6fb0] transition-colors"
+              >
+                Yes, delete
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : null}
     </div>
   );
 };
