@@ -167,25 +167,27 @@ const Navigation = () => {
         <div className="max-w-[1800px] mx-auto px-8 h-32 flex items-center gap-6">
           <Link to="/" className="flex items-center gap-3 shrink-0" aria-label="Sibs Style home">
             <img src={logo} alt="Sibs Style logo" className="h-12 w-auto rounded-full border-2 border-transparent transition-transform duration-300 hover:scale-105 shadow-sm" />
-            <span className="text-2xl md:text-3xl font-display font-black italic tracking-tight text-[#0A0E1A]">
-              Sibs Style
-            </span>
           </Link>
 
-          <div className="hidden lg:flex items-center space-x-6 xl:space-x-10 px-4 flex-1 justify-center">
-            {navLinks.map((link) => (
-              <Link
-                key={link.path}
-                to={link.path}
-                className={`text-[14px] font-black uppercase tracking-[0.25em] transition-all duration-300 whitespace-nowrap ${
-                  location.pathname === link.path
-                    ? 'text-[#F2529D] underline underline-offset-[14px] decoration-2 scale-105'
-                    : 'text-gray-500 hover:text-[#F2529D] hover:scale-105'
-                }`}
-              >
-                {link.name}
-              </Link>
-            ))}
+          <div className="hidden lg:flex items-center px-4 flex-1 justify-center">
+            <div className="flex items-center gap-4 overflow-hidden">
+              {navLinks.map((link) => {
+                const isActive = location.pathname === link.path;
+                return (
+                  <Link
+                    key={link.path}
+                    to={link.path}
+                    className={`group relative flex items-center justify-center px-4 py-2 rounded-full transition-all duration-350 transform ${
+                      isActive
+                        ? 'bg-gradient-to-r from-[#F2529D]/30 via-[#7C61FF]/20 to-[#C79D33]/20 text-[#0A0E1A] scale-105 shadow-[0_6px_22px_-8px_rgba(199,57,128,0.28)]'
+                        : 'bg-transparent text-gray-600 hover:text-[#0A0E1A] hover:scale-[1.03]'
+                    }`}>
+                    <span className="text-[14px] font-black uppercase tracking-[0.18em] pointer-events-none">{link.name}</span>
+                    <span className={`absolute left-1/2 -bottom-1 h-1 rounded-full bg-gradient-to-r from-[#F2529D] via-[#7C61FF] to-[#C79D33] transition-all duration-300 ${isActive ? 'w-10 -translate-x-1/2' : 'w-0 group-hover:w-10 -translate-x-1/2'}`} />
+                  </Link>
+                );
+              })}
+            </div>
           </div>
 
           <div className="hidden lg:flex items-center gap-4 shrink-0">
