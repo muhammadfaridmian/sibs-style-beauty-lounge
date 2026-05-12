@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Convex API Configuration & Helpers
  * Central hub for all backend API calls
  * Base URL: https://proficient-akita-599.convex.site
@@ -130,11 +130,13 @@ export interface Promotion {
   id: string;
   title: string;
   description: string;
-  discountPercentage: number;
   code: string;
   imageUrl: string;
+  tag: string;
+  discountText: string;
   featured: boolean;
   active: boolean;
+  sortOrder: number;
   startDate: string;
   endDate: string;
   createdAt: number;
@@ -631,6 +633,83 @@ export async function getPromotions(): Promise<Promotion[]> {
   }
 }
 
+export async function getAdminPromotions(authToken: string | null = getStoredAuthToken()): Promise<Promotion[]> {
+  if (!authToken) {
+    throw new Error("Please sign in before opening the offers dashboard.");
+  }
+
+  return await requestJson<Promotion[]>("/api/admin/promotions", { method: "GET" }, authToken);
+}
+
+export async function createPromotion(params: {
+  promotion: {
+    title: string;
+    description: string;
+    code: string;
+    imageUrl: string;
+    tag: string;
+    discountText: string;
+    featured: boolean;
+    active: boolean;
+    sortOrder: number;
+    startDate: string;
+    endDate: string;
+  };
+  authToken?: string | null;
+}): Promise<Promotion> {
+  const authToken = params.authToken ?? getStoredAuthToken();
+  if (!authToken) {
+    throw new Error("Please sign in before creating promotions.");
+  }
+
+  return await requestJson<Promotion>("/api/admin/promotions", {
+    method: "POST",
+    body: JSON.stringify(params.promotion),
+  }, authToken);
+}
+
+export async function updatePromotion(params: {
+  promotionId: string;
+  updates: Partial<{
+    title: string;
+    description: string;
+    code: string;
+    imageUrl: string;
+    tag: string;
+    discountText: string;
+    featured: boolean;
+    active: boolean;
+    sortOrder: number;
+    startDate: string;
+    endDate: string;
+  }>;
+  authToken?: string | null;
+}): Promise<{ promotionId: string }> {
+  const authToken = params.authToken ?? getStoredAuthToken();
+  if (!authToken) {
+    throw new Error("Please sign in before updating promotions.");
+  }
+
+  return await requestJson<{ promotionId: string }>(`/api/admin/promotions/${params.promotionId}`, {
+    method: "PUT",
+    body: JSON.stringify(params.updates),
+  }, authToken);
+}
+
+export async function deletePromotion(params: {
+  promotionId: string;
+  authToken?: string | null;
+}): Promise<{ promotionId: string }> {
+  const authToken = params.authToken ?? getStoredAuthToken();
+  if (!authToken) {
+    throw new Error("Please sign in before deleting promotions.");
+  }
+
+  return await requestJson<{ promotionId: string }>(`/api/admin/promotions/${params.promotionId}`, {
+    method: "DELETE",
+  }, authToken);
+}
+
 // ==================== STYLISTS ====================
 
 /**
@@ -688,3 +767,5 @@ export function formatDate(dateString: string): string {
     year: "numeric",
   });
 }
+
+

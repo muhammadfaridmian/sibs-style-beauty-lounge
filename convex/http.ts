@@ -1,4 +1,4 @@
-import { httpAction, internalAction } from "./_generated/server";
+﻿import { httpAction, internalAction } from "./_generated/server";
 import { internal } from "./_generated/api";
 import { httpRouter } from "convex/server";
 import type { Id } from "./_generated/dataModel";
@@ -321,6 +321,163 @@ http.route({
     } catch (error) {
       const message = error instanceof Error ? error.message : "Unable to load promotions.";
       return jsonResponse({ ok: false, error: message }, 500);
+    }
+  }),
+});
+
+http.route({
+  path: "/api/admin/promotions",
+  method: "GET",
+  handler: httpAction(async (ctx, request) => {
+    const admin = await requireAdmin(ctx, request);
+    if (!admin) {
+      return jsonResponse({ ok: false, error: "Admin access required." }, 403);
+    }
+
+    try {
+      const promotions = await ctx.runQuery(internal.data.listPromotionsForAdmin, {});
+      return jsonResponse({ ok: true, data: promotions });
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Unable to load promotions.";
+      return jsonResponse({ ok: false, error: message }, 500);
+    }
+  }),
+});
+
+http.route({
+  path: "/api/admin/promotions",
+  method: "POST",
+  handler: httpAction(async (ctx, request) => {
+    const admin = await requireAdmin(ctx, request);
+    if (!admin) {
+      return jsonResponse({ ok: false, error: "Admin access required." }, 403);
+    }
+
+    try {
+      const body = await readJson<{
+        title?: string;
+        description?: string;
+        code?: string;
+        imageUrl?: string;
+        tag?: string;
+        discountText?: string;
+        featured?: boolean;
+        active?: boolean;
+        sortOrder?: number;
+        startDate?: string;
+        endDate?: string;
+      }>(request);
+
+      if (!body.title || !body.description || !body.code || !body.imageUrl) {
+        return jsonResponse({ ok: false, error: "Title, description, code, and image are required." }, 400);
+      }
+
+      const promotionId = await (ctx as any).runMutation(internal.data.createPromotion, {
+        title: body.title.trim(),
+        description: body.description.trim(),
+        code: body.code.trim().toUpperCase(),
+        imageUrl: body.imageUrl.trim(),
+        tag: (body.tag ?? "Featured").trim() || "Featured",
+        discountText: (body.discountText ?? "").trim(),
+        featured: Boolean(body.featured ?? true),
+        active: Boolean(body.active ?? true),
+        sortOrder: Number(body.sortOrder ?? Date.now()),
+        startDate: (body.startDate ?? "2025-01-01").trim(),
+        endDate: (body.endDate ?? "2026-12-31").trim(),
+        createdAt: Date.now(),
+        updatedAt: Date.now(),
+      });
+
+      const promotions = await (ctx as any).runQuery(internal.data.listPromotionsForAdmin, {});
+      const created = (promotions as any[]).find((item: { id: string }) => item.id === promotionId) ?? null;
+      return jsonResponse({ ok: true, data: created }, 201);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Unable to create promotion.";
+      return jsonResponse({ ok: false, error: message }, statusFromError(message));
+    }
+  }),
+});
+
+http.route({
+  pathPrefix: "/api/admin/promotions/",
+  method: "PUT",
+  handler: httpAction(async (ctx, request) => {
+    const admin = await requireAdmin(ctx, request);
+    if (!admin) {
+      return jsonResponse({ ok: false, error: "Admin access required." }, 403);
+    }
+
+    try {
+      const pathname = new URL(request.url).pathname;
+      const promotionId = getPathSuffix(pathname, "/api/admin/promotions/");
+      if (!promotionId) {
+        return jsonResponse({ ok: false, error: "Promotion id is required." }, 400);
+      }
+
+      const body = await readJson<{
+        title?: string;
+        description?: string;
+        code?: string;
+        imageUrl?: string;
+        tag?: string;
+        discountText?: string;
+        featured?: boolean;
+        active?: boolean;
+        sortOrder?: number;
+        startDate?: string;
+        endDate?: string;
+      }>(request);
+
+      await (ctx as any).runMutation(internal.data.updatePromotion, {
+        promotionId: promotionId as Id<"promotions">,
+        title: body.title?.trim(),
+        description: body.description?.trim(),
+        code: body.code?.trim().toUpperCase(),
+        imageUrl: body.imageUrl?.trim(),
+        tag: body.tag?.trim(),
+        discountText: body.discountText?.trim(),
+        featured: typeof body.featured === "boolean" ? body.featured : undefined,
+        active: typeof body.active === "boolean" ? body.active : undefined,
+        sortOrder: typeof body.sortOrder === "number" ? body.sortOrder : undefined,
+        startDate: body.startDate?.trim(),
+        endDate: body.endDate?.trim(),
+        updatedAt: Date.now(),
+      });
+
+      const promotions = await (ctx as any).runQuery(internal.data.listPromotionsForAdmin, {});
+      const updated = (promotions as any[]).find((item: { id: string }) => item.id === promotionId) ?? null;
+      return jsonResponse({ ok: true, data: updated });
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Unable to update promotion.";
+      return jsonResponse({ ok: false, error: message }, statusFromError(message));
+    }
+  }),
+});
+
+http.route({
+  pathPrefix: "/api/admin/promotions/",
+  method: "DELETE",
+  handler: httpAction(async (ctx, request) => {
+    const admin = await requireAdmin(ctx, request);
+    if (!admin) {
+      return jsonResponse({ ok: false, error: "Admin access required." }, 403);
+    }
+
+    try {
+      const pathname = new URL(request.url).pathname;
+      const promotionId = getPathSuffix(pathname, "/api/admin/promotions/");
+      if (!promotionId) {
+        return jsonResponse({ ok: false, error: "Promotion id is required." }, 400);
+      }
+
+      const result = await (ctx as any).runMutation(internal.data.deletePromotion, {
+        promotionId: promotionId as Id<"promotions">,
+      });
+
+      return jsonResponse({ ok: true, data: result });
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Unable to delete promotion.";
+      return jsonResponse({ ok: false, error: message }, statusFromError(message));
     }
   }),
 });
@@ -894,3 +1051,5 @@ http.route({
 });
 
 export default http;
+
+

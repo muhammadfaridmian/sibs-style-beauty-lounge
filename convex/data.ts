@@ -1,4 +1,4 @@
-import { internalMutation, internalQuery } from "./_generated/server";
+﻿import { internalMutation, internalQuery } from "./_generated/server";
 import { v } from "convex/values";
 import { formatMoney, formatTimeLabel, parseTimeLabel } from "./utils";
 import { defaultAppointmentLocation, defaultBusinessProfile } from "./seedData";
@@ -442,6 +442,14 @@ export const listPromotions = internalQuery({
       .withIndex("by_active_and_sortOrder", (q) => q.eq("active", true))
       .order("asc")
       .take(50);
+    return promotions.map(asPromotionCard);
+  },
+});
+
+export const listPromotionsForAdmin = internalQuery({
+  args: {},
+  handler: async (ctx) => {
+    const promotions = await ctx.db.query("promotions").order("asc").take(100);
     return promotions.map(asPromotionCard);
   },
 });
@@ -907,6 +915,115 @@ export const createGalleryItem = internalMutation({
   },
 });
 
+export const createPromotion = internalMutation({
+  args: {
+    title: v.string(),
+    description: v.string(),
+    code: v.string(),
+    imageUrl: v.string(),
+    tag: v.string(),
+    discountText: v.string(),
+    featured: v.boolean(),
+    active: v.boolean(),
+    sortOrder: v.number(),
+    startDate: v.string(),
+    endDate: v.string(),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  },
+  handler: async (ctx, args) => {
+    const existing = await ctx.db
+      .query("promotions")
+      .withIndex("by_code", (q) => q.eq("code", args.code))
+      .unique();
+    if (existing) {
+      throw new Error("A promotion with that code already exists.");
+    }
+
+    return await ctx.db.insert("promotions", {
+      title: args.title,
+      description: args.description,
+      code: args.code,
+      imageUrl: args.imageUrl,
+      tag: args.tag,
+      discountText: args.discountText,
+      featured: args.featured,
+      active: args.active,
+      sortOrder: args.sortOrder,
+      startDate: args.startDate,
+      endDate: args.endDate,
+      createdAt: args.createdAt,
+      updatedAt: args.updatedAt,
+    });
+  },
+});
+
+export const updatePromotion = internalMutation({
+  args: {
+    promotionId: v.id("promotions"),
+    title: v.optional(v.string()),
+    description: v.optional(v.string()),
+    code: v.optional(v.string()),
+    imageUrl: v.optional(v.string()),
+    tag: v.optional(v.string()),
+    discountText: v.optional(v.string()),
+    featured: v.optional(v.boolean()),
+    active: v.optional(v.boolean()),
+    sortOrder: v.optional(v.number()),
+    startDate: v.optional(v.string()),
+    endDate: v.optional(v.string()),
+    updatedAt: v.number(),
+  },
+  handler: async (ctx, args) => {
+    const promotion = await ctx.db.get(args.promotionId);
+    if (!promotion) {
+      throw new Error("Promotion not found.");
+    }
+
+    if (args.code && args.code !== promotion.code) {
+      const existing = await ctx.db
+        .query("promotions")
+        .withIndex("by_code", (q) => q.eq("code", args.code as string))
+        .unique();
+      if (existing && existing._id.toString() !== args.promotionId.toString()) {
+        throw new Error("A promotion with that code already exists.");
+      }
+    }
+
+    await ctx.db.patch(args.promotionId, {
+      title: args.title ?? promotion.title,
+      description: args.description ?? promotion.description,
+      code: args.code ?? promotion.code,
+      imageUrl: args.imageUrl ?? promotion.imageUrl,
+      tag: args.tag ?? promotion.tag,
+      discountText: args.discountText ?? promotion.discountText,
+      featured: args.featured ?? promotion.featured,
+      active: args.active ?? promotion.active,
+      sortOrder: args.sortOrder ?? promotion.sortOrder,
+      startDate: args.startDate ?? promotion.startDate,
+      endDate: args.endDate ?? promotion.endDate,
+      updatedAt: args.updatedAt,
+    });
+
+    return args.promotionId;
+  },
+});
+
+export const deletePromotion = internalMutation({
+  args: {
+    promotionId: v.id("promotions"),
+  },
+  handler: async (ctx, args) => {
+    const promotion = await ctx.db.get(args.promotionId);
+    if (!promotion) {
+      throw new Error("Promotion not found.");
+    }
+
+    await ctx.db.delete(args.promotionId);
+    return { promotionId: args.promotionId };
+  },
+});
+
 export const deleteAppointment = internalMutation({
   args: {
     appointmentId: v.id("appointments"),
@@ -986,3 +1103,7 @@ export const moveAppointmentToCompleted = internalMutation({
     return { appointmentId: args.appointmentId };
   },
 });
+
+
+
+

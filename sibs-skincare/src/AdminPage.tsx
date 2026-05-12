@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+﻿import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import {
   AlertTriangle,
@@ -32,6 +32,7 @@ import {
   type AdminReview,
   type AuthUser,
 } from './api/convex-api';
+import OffersManager from './components/OffersManager';
 
 const statusTone: Record<AdminAppointment['status'], string> = {
   pending: 'bg-[#BF9C34]/10 text-[#BF9C34] border-[#BF9C34]/20',
@@ -501,7 +502,7 @@ const AdminPage: React.FC = () => {
                     <div className="space-y-2">
                       <p className="text-[10px] font-black uppercase tracking-[0.35em] text-[#BF9C34]">{appointment.serviceName}</p>
                       <h3 className="text-2xl font-display italic font-black text-[#0A0E1A]">{appointment.guestName}</h3>
-                      <p className="text-sm text-gray-500 leading-relaxed">{appointment.guestEmail} · {appointment.guestPhone}</p>
+                      <p className="text-sm text-gray-500 leading-relaxed">{appointment.guestEmail} Â· {appointment.guestPhone}</p>
                     </div>
                     <span className={`inline-flex rounded-full border px-3 py-1 text-[10px] font-black uppercase tracking-[0.35em] ${statusTone[appointment.status]}`}>
                       {appointment.status}
@@ -511,7 +512,7 @@ const AdminPage: React.FC = () => {
                   <div className="grid gap-3 text-sm text-gray-500 sm:grid-cols-2">
                     <div className="rounded-[1.25rem] bg-[#FAF9F6] p-4">
                       <p className="text-[10px] font-black uppercase tracking-[0.35em] text-gray-400">Schedule</p>
-                      <p className="mt-2 font-semibold text-gray-800">{appointment.appointmentDate} · {appointment.appointmentTimeLabel}</p>
+                      <p className="mt-2 font-semibold text-gray-800">{appointment.appointmentDate} Â· {appointment.appointmentTimeLabel}</p>
                       <p className="mt-1 text-xs text-gray-500">{appointment.startTimeLabel} to {appointment.endTimeLabel}</p>
                     </div>
                     <div className="rounded-[1.25rem] bg-[#FAF9F6] p-4">
@@ -583,7 +584,7 @@ const AdminPage: React.FC = () => {
                     <div className="space-y-2">
                       <p className="text-[10px] font-black uppercase tracking-[0.35em] text-emerald-600">{appointment.serviceName}</p>
                       <h3 className="text-2xl font-display italic font-black text-emerald-950">{appointment.guestName}</h3>
-                      <p className="text-sm text-emerald-900/70 leading-relaxed">{appointment.guestEmail} · {appointment.guestPhone}</p>
+                      <p className="text-sm text-emerald-900/70 leading-relaxed">{appointment.guestEmail} Â· {appointment.guestPhone}</p>
                     </div>
                     <span className="inline-flex rounded-full border border-emerald-200 bg-white px-3 py-1 text-[10px] font-black uppercase tracking-[0.35em] text-emerald-700">
                       completed
@@ -593,7 +594,7 @@ const AdminPage: React.FC = () => {
                   <div className="grid gap-3 text-sm text-emerald-900/70 sm:grid-cols-2">
                     <div className="rounded-[1.25rem] bg-white p-4">
                       <p className="text-[10px] font-black uppercase tracking-[0.35em] text-emerald-500">Schedule</p>
-                      <p className="mt-2 font-semibold text-emerald-950">{appointment.appointmentDate} · {appointment.appointmentTimeLabel}</p>
+                      <p className="mt-2 font-semibold text-emerald-950">{appointment.appointmentDate} Â· {appointment.appointmentTimeLabel}</p>
                       <p className="mt-1 text-xs text-emerald-700/70">{appointment.startTimeLabel} to {appointment.endTimeLabel}</p>
                     </div>
                     <div className="rounded-[1.25rem] bg-white p-4">
@@ -639,7 +640,7 @@ const AdminPage: React.FC = () => {
                     <div className="space-y-2">
                       <p className="text-[10px] font-black uppercase tracking-[0.35em] text-[#BF9C34]">{review.serviceName ?? 'General'}</p>
                       <h3 className="text-2xl font-display italic font-black text-[#0A0E1A]">{review.name}</h3>
-                      <p className="text-sm text-gray-500 leading-relaxed">{review.role} · {review.email}</p>
+                      <p className="text-sm text-gray-500 leading-relaxed">{review.role} Â· {review.email}</p>
                     </div>
                     <div className="flex items-center gap-2 rounded-full bg-[#BF9C34]/10 px-3 py-2 text-[#BF9C34]">
                       <Star size={14} fill="currentColor" />
@@ -712,7 +713,7 @@ const AdminPage: React.FC = () => {
                     <div className="space-y-2">
                       <p className="text-[10px] font-black uppercase tracking-[0.35em] text-[#BF9C34]">{review.serviceName ?? 'General'}</p>
                       <h3 className="text-2xl font-display italic font-black text-[#0A0E1A]">{review.name}</h3>
-                      <p className="text-sm text-gray-500 leading-relaxed">{review.role} · {review.email}</p>
+                      <p className="text-sm text-gray-500 leading-relaxed">{review.role} Â· {review.email}</p>
                     </div>
                     <div className="flex items-center gap-2 rounded-full bg-[#BF9C34]/10 px-3 py-2 text-[#BF9C34]">
                       <Star size={14} fill="currentColor" />
@@ -743,6 +744,8 @@ const AdminPage: React.FC = () => {
             )}
           </div>
         </section>
+
+        <OffersManager authToken={authToken} />
 
         <section className="grid gap-6 lg:grid-cols-[0.95fr_1.05fr]">
           <div className="rounded-[2rem] sm:rounded-[3rem] bg-[#0A0E1A] text-white p-6 sm:p-8 lg:p-10 relative overflow-hidden border border-white/10 shadow-[0_30px_90px_-30px_rgba(0,0,0,0.35)]">
@@ -889,3 +892,6 @@ const MetricCard = ({ label, value, accent }: { label: string; value: number | s
 const ArrowButtonIcon = () => <ChevronRight size={14} />;
 
 export default AdminPage;
+
+
+
