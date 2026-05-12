@@ -59,28 +59,18 @@ export default function Footer() {
               <h4 className="text-[11px] font-black uppercase tracking-[0.45em] text-[#BF9C34]">Follow</h4>
               <div className="mt-5 h-px bg-gradient-to-r from-[#F2529D]/35 via-[#C79D33]/35 to-transparent" />
 
-              <div className="mt-4 flex flex-wrap items-center gap-3">
-                <a href="#" className="flex h-11 w-11 items-center justify-center rounded-full border border-white/10 bg-white/5 text-white/85 transition-all hover:-translate-y-1 hover:border-[#F2529D]/50 hover:bg-[#F2529D]/15 hover:text-[#FFB3D0]">Fb</a>
-                <a href="#" className="flex h-11 w-11 items-center justify-center rounded-full border border-white/10 bg-white/5 text-white/85 transition-all hover:-translate-y-1 hover:border-[#F2529D]/50 hover:bg-[#F2529D]/15 hover:text-[#FFB3D0]">Ig</a>
-                <a href="#" className="flex h-11 w-11 items-center justify-center rounded-full border border-white/10 bg-white/5 text-white/85 transition-all hover:-translate-y-1 hover:border-[#F2529D]/50 hover:bg-[#F2529D]/15 hover:text-[#FFB3D0]">Yt</a>
-              </div>
-
-              <div className="mt-5 rounded-2xl border border-white/8 bg-black/20 p-4">
-                <p className="text-[10px] font-black uppercase tracking-[0.38em] text-[#F2529D]">Newsletter</p>
-                <p className="mt-2 text-[14px] leading-6 text-white/75">
-                  Sign up for our newsletter to receive exclusive offers and stories.
-                </p>
-                <div className="mt-4 flex gap-2">
-                  <div className="min-w-0 flex-1 rounded-full border border-white/10 bg-white/[0.04] px-4 py-3 text-[13px] text-white/45">Your email</div>
-                  <div className="shrink-0 rounded-full bg-gradient-to-r from-[#F2529D] via-[#D36D2C] to-[#C79D33] px-4 py-3 text-[11px] font-black uppercase tracking-[0.3em] text-white shadow-[0_10px_24px_-12px_rgba(242,82,157,0.75)]">Join</div>
-                </div>
+              <div className="mt-6 flex flex-col gap-4">
+                <a href="https://www.instagram.com/sibsstylebeauty/" target="_blank" rel="noopener noreferrer" className="group flex items-center justify-between rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 transition-all hover:border-[#F2529D]/40 hover:bg-[#F2529D]/10">
+                  <span className="text-[15px] text-white/85 group-hover:text-[#FFB3D0]">Instagram</span>
+                  <span className="text-[#F2529D] opacity-0 transition-opacity group-hover:opacity-100">↗</span>
+                </a>
               </div>
             </div>
           </div>
 
           <div className="mt-8 md:mt-10 flex flex-col gap-5 border-t border-white/8 pt-6 md:flex-row md:items-center md:justify-between">
             <div className="flex flex-wrap items-center gap-3 text-[12px] md:text-[13px] font-black uppercase tracking-[0.3em] text-white/45">
-              <span className="text-[#F2529D]">© 2024 SIBS STYLE BEAUTY LOUNGE.</span>
+              <span className="text-[#F2529D]">© 2025 SIBS STYLE BEAUTY LOUNGE.</span>
               <span>All rights reserved.</span>
             </div>
 
