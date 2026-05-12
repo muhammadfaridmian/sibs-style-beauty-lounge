@@ -184,12 +184,29 @@ const Navigation = () => {
             ))}
           </div>
 
-          <div className="hidden lg:flex items-center gap-3 shrink-0">
+          <div className="hidden lg:flex items-center gap-4 shrink-0">
+            {currentUser && currentUser.role === 'admin' && (
+              <Link
+                to="/admin"
+                className="rounded-xl border border-[#F2529D]/30 bg-[#F2529D]/5 px-6 py-4 text-[13px] font-black uppercase tracking-[0.3em] text-[#F2529D] hover:bg-[#F2529D]/10 hover:border-[#F2529D]/60 transition-all whitespace-nowrap"
+              >
+                Admin
+              </Link>
+            )}
+            
             {currentUser ? (
-              <div className="rounded-2xl border border-gray-200 bg-white px-4 py-3 text-right shadow-sm">
-                <p className="text-[9px] font-black uppercase tracking-[0.35em] text-gray-400">Signed in</p>
-                <p className="mt-1 max-w-[180px] truncate text-sm font-black text-[#0A0E1A]">{currentUser.fullName}</p>
-              </div>
+              <>
+                <div className="rounded-lg border border-gray-200 bg-white px-3 py-2 text-center shadow-sm">
+                  <p className="text-[9px] font-black uppercase tracking-[0.35em] text-gray-400">Signed in</p>
+                  <p className="mt-0.5 max-w-[140px] truncate text-xs font-black text-[#0A0E1A]">{currentUser.fullName}</p>
+                </div>
+                <button
+                  onClick={handleSignOut}
+                  className="rounded-xl border border-gray-200 bg-white px-6 py-4 text-[13px] font-black uppercase tracking-[0.3em] text-gray-600 hover:border-[#F2529D]/30 hover:text-[#F2529D] transition-all whitespace-nowrap"
+                >
+                  Sign out
+                </button>
+              </>
             ) : (
               <Link
                 to="/auth"
@@ -210,15 +227,6 @@ const Navigation = () => {
             >
               RESERVE
             </button>
-
-            {currentUser && (
-              <button
-                onClick={handleSignOut}
-                className="rounded-xl border border-gray-200 bg-white px-6 py-4 text-[13px] font-black uppercase tracking-[0.3em] text-gray-600 hover:border-[#F2529D]/30 hover:text-[#F2529D] transition-all whitespace-nowrap"
-              >
-                Sign out
-              </button>
-            )}
           </div>
 
           <button className="lg:hidden text-black" onClick={() => setIsMenuOpen(true)}>
@@ -349,41 +357,44 @@ const Navigation = () => {
             <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(135deg,rgba(255,255,255,0.03)_0%,transparent_30%,rgba(255,255,255,0.02)_100%)]" />
             <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#F2529D]/35 via-[#C79D33]/30 to-transparent" />
             <div className="pointer-events-none absolute -right-6 top-[-1.5rem] h-24 w-24 rounded-full bg-[#F2529D]/10 blur-2xl" />
-            <div className="relative">
+            <div className="relative space-y-3">
               <p className="text-[10px] font-black uppercase tracking-[0.35em] text-[#F2529D]">
                 Account
               </p>
-              <div className="mt-3 flex items-center justify-between gap-4">
-                <div className="min-w-0">
-                  <p className="truncate font-display italic text-2xl leading-none text-white">
-                    {currentUser ? currentUser.fullName : 'Guest access'}
-                  </p>
-                  <p className="mt-2 text-sm text-[#D1D5DB]">
-                    {currentUser
-                      ? currentUser.role === 'admin'
-                        ? 'Admin session active.'
-                        : 'Customer session active.'
-                      : 'Sign in to book, review, and reach the admin area if you have the admin account.'}
-                  </p>
-                  <div className="mt-4 flex items-center gap-2">
-                    <span className="h-1.5 w-12 rounded-full bg-[#F2529D]" />
-                    <span className="h-1.5 w-6 rounded-full bg-[#C79D33]" />
-                    <span className="h-1.5 w-4 rounded-full bg-[#7C61FF]" />
+              
+              {currentUser && currentUser.role === 'admin' && (
+                <Link
+                  to="/admin"
+                  onClick={() => setIsMenuOpen(false)}
+                  className="flex items-center justify-between gap-3 rounded-[1.2rem] border border-[#F2529D]/50 bg-[linear-gradient(145deg,rgba(242,82,157,0.12)_0%,rgba(26,18,32,0.98)_100%)] px-4 py-3 transition-all hover:border-[#F2529D]/80 hover:bg-[radial-gradient(circle_at_top_right,rgba(242,82,157,0.2),transparent_30%),linear-gradient(145deg,rgba(58,16,41,0.96)_0%,rgba(36,16,34,0.98)_100%)]"
+                >
+                  <div>
+                    <p className="text-sm font-black text-[#F2529D]">Admin Panel</p>
+                    <p className="text-[10px] text-[#9CA3AF]">Manage bookings & reviews</p>
                   </div>
-                </div>
+                  <ChevronRight size={16} className="text-[#F2529D]" />
+                </Link>
+              )}
 
+              <div className="flex flex-col gap-2 pt-2">
                 {currentUser ? (
-                  <button
-                    onClick={handleSignOut}
-                    className="shrink-0 rounded-full border border-[#273147] bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.05),transparent_45%),linear-gradient(145deg,rgba(11,15,26,0.96)_0%,rgba(31,41,55,0.94)_100%)] px-4 py-3 text-[10px] font-black uppercase tracking-[0.35em] text-white hover:border-[#F2529D]/70 hover:text-[#F2529D] transition-colors"
-                  >
-                    Sign out
-                  </button>
+                  <>
+                    <div className="rounded-lg border border-[#273147] bg-[linear-gradient(145deg,rgba(11,15,26,0.96)_0%,rgba(20,26,39,0.98)_100%)] px-4 py-3">
+                      <p className="text-[9px] font-black uppercase tracking-[0.35em] text-[#9CA3AF]">Signed in as</p>
+                      <p className="mt-1 text-sm font-black text-white truncate">{currentUser.fullName}</p>
+                    </div>
+                    <button
+                      onClick={handleSignOut}
+                      className="rounded-lg border border-[#273147] bg-[linear-gradient(145deg,rgba(11,15,26,0.96)_0%,rgba(20,26,39,0.98)_100%)] px-4 py-3 text-[10px] font-black uppercase tracking-[0.35em] text-white hover:border-[#F2529D]/70 hover:text-[#F2529D] transition-colors"
+                    >
+                      Sign out
+                    </button>
+                  </>
                 ) : (
                   <Link
                     to="/auth"
                     onClick={() => setIsMenuOpen(false)}
-                    className="shrink-0 rounded-full bg-[#F2529D] px-4 py-3 text-[10px] font-black uppercase tracking-[0.35em] text-white hover:bg-[#FF6FB0] hover:text-[#0A0E1A] transition-colors"
+                    className="rounded-lg bg-[#F2529D] px-4 py-3 text-[10px] font-black uppercase tracking-[0.35em] text-white hover:bg-[#FF6FB0] transition-colors text-center"
                   >
                     Sign in
                   </Link>

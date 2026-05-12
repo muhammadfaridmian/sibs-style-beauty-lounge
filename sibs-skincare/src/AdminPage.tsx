@@ -48,6 +48,8 @@ const AdminPage: React.FC = () => {
   const [currentUser, setCurrentUser] = useState<AuthUser | null>(null);
   const [appointments, setAppointments] = useState<AdminAppointment[]>([]);
   const [reviews, setReviews] = useState<AdminReview[]>([]);
+  const [recentlyCompletedBookings, setRecentlyCompletedBookings] = useState<(AdminAppointment & { completedAt: number })[]>([]);
+  const [recentlyApprovedReviews, setRecentlyApprovedReviews] = useState<(AdminReview & { approvedAt: number })[]>([]);
   const [pendingAction, setPendingAction] = useState<
     | { type: 'booking'; appointment: AdminAppointment }
     | { type: 'review'; review: AdminReview }
@@ -111,6 +113,26 @@ const AdminPage: React.FC = () => {
     loadDashboard();
   }, []);
 
+  // Auto-remove completed bookings and approved reviews after 60 minutes
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const now = Date.now();
+      const sixtyMinutes = 60 * 60 * 1000;
+
+      // Auto-remove completed bookings that are older than 60 minutes
+      setRecentlyCompletedBookings((prev) => {
+        return prev.filter((booking) => now - booking.completedAt < sixtyMinutes);
+      });
+
+      // Auto-remove approved reviews that are older than 60 minutes
+      setRecentlyApprovedReviews((prev) => {
+        return prev.filter((review) => now - review.approvedAt < sixtyMinutes);
+      });
+    }, 10000); // Check every 10 seconds
+
+    return () => clearInterval(interval);
+  }, []);
+
   const refreshDashboard = async () => {
     // Manual refresh just repeats the same secure load flow.
     setIsRefreshing(true);
@@ -137,8 +159,14 @@ const AdminPage: React.FC = () => {
     try {
       if (status === 'completed') {
         // Move to completedAppointments table instead of just updating status
+        const appointmentToComplete = appointments.find((a) => a.id === appointmentId);
         await completeAppointment({ appointmentId, authToken });
         setActionMessage(`Completed booking ${appointmentId.slice(0, 6).toUpperCase()}`);
+        
+        // Add to recently completed bookings with timestamp
+        if (appointmentToComplete) {
+          setRecentlyCompletedBookings((prev) => [...prev, { ...appointmentToComplete, completedAt: Date.now() }]);
+        }
       } else {
         // For other statuses, update the status normally
         await updateAppointmentStatus({ appointmentId, status, authToken });
@@ -206,6 +234,11 @@ const AdminPage: React.FC = () => {
         )
       );
 
+      // If review was just approved, add to recently approved reviews with timestamp
+      if (isApproved) {
+        setRecentlyApprovedReviews((prev) => [...prev, { ...review, isApproved, approvedAt: Date.now() }]);
+      }
+
       await refreshDashboard();
     } catch (updateError) {
       setError(updateError instanceof Error ? updateError.message : 'Unable to update this review.');
@@ -228,6 +261,9 @@ const AdminPage: React.FC = () => {
       window.setTimeout(() => {
         setAppointments((currentAppointments) =>
           currentAppointments.filter((appointment) => appointment.id !== appointmentId)
+        );
+        setRecentlyCompletedBookings((currentBookings) =>
+          currentBookings.filter((booking) => booking.id !== appointmentId)
         );
         setRemovingAppointmentIds((currentIds) => currentIds.filter((id) => id !== appointmentId));
       }, 420);
@@ -255,6 +291,9 @@ const AdminPage: React.FC = () => {
 
       window.setTimeout(() => {
         setReviews((currentReviews) => currentReviews.filter((review) => review.id !== reviewId));
+        setRecentlyApprovedReviews((currentReviews) =>
+          currentReviews.filter((review) => review.id !== reviewId)
+        );
         setRemovingReviewIds((currentIds) => currentIds.filter((id) => id !== reviewId));
       }, 420);
 
@@ -266,9 +305,7 @@ const AdminPage: React.FC = () => {
   };
 
   const activeAppointments = appointments.filter((appointment) => appointment.status !== 'completed' && appointment.status !== 'cancelled');
-  const completedAppointments = appointments.filter((appointment) => appointment.status === 'completed');
   const pendingReviews = reviews.filter((review) => !review.isApproved);
-  const approvedReviews = reviews.filter((review) => review.isApproved);
 
   const handleGalleryUpload = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -532,12 +569,12 @@ const AdminPage: React.FC = () => {
           </div>
 
           <div className="grid gap-4 sm:gap-5 lg:grid-cols-2">
-            {completedAppointments.length === 0 ? (
+            {recentlyCompletedBookings.length === 0 ? (
               <div className="lg:col-span-2 rounded-[2rem] bg-white border border-gray-100 p-8 sm:p-12 text-center text-gray-400">
                 No completed bookings yet.
               </div>
             ) : (
-              completedAppointments.map((appointment) => (
+              recentlyCompletedBookings.map((appointment) => (
                 <article
                   key={appointment.id}
                   className="rounded-[2rem] border border-emerald-200 bg-emerald-50 shadow-[0_20px_60px_-25px_rgba(16,185,129,0.16)] p-5 sm:p-6 space-y-5"
@@ -565,6 +602,14 @@ const AdminPage: React.FC = () => {
                       <p className="mt-1 text-xs text-emerald-700/70">{appointment.location}</p>
                     </div>
                   </div>
+
+                  <button
+                    onClick={() => setRecentlyCompletedBookings((prev) => prev.filter((a) => a.id !== appointment.id))}
+                    className="w-full inline-flex items-center justify-center gap-2 rounded-full border border-emerald-300 bg-white px-4 py-3 text-[10px] font-black uppercase tracking-[0.35em] text-emerald-600 hover:bg-emerald-100 transition-colors"
+                  >
+                    <XCircle size={14} />
+                    Remove
+                  </button>
                 </article>
               ))
             )}
@@ -653,12 +698,12 @@ const AdminPage: React.FC = () => {
           </div>
 
           <div className="grid gap-4 sm:gap-5 lg:grid-cols-2">
-            {approvedReviews.length === 0 ? (
+            {recentlyApprovedReviews.length === 0 ? (
               <div className="lg:col-span-2 rounded-[2rem] bg-white border border-gray-100 p-8 sm:p-12 text-center text-gray-400">
                 No approved reviews yet.
               </div>
             ) : (
-              approvedReviews.map((review) => (
+              recentlyApprovedReviews.map((review) => (
                 <article
                   key={review.id}
                   className="rounded-[2rem] border border-[#F2529D]/15 bg-[#FFF7FB] shadow-[0_20px_60px_-25px_rgba(242,82,157,0.14)] p-5 sm:p-6 space-y-4"
@@ -685,6 +730,14 @@ const AdminPage: React.FC = () => {
                     </span>
                     <span className="text-[10px] font-black uppercase tracking-[0.35em] text-gray-400">{review.avatarUrl ? 'Has avatar' : 'No avatar'}</span>
                   </div>
+
+                  <button
+                    onClick={() => setRecentlyApprovedReviews((prev) => prev.filter((r) => r.id !== review.id))}
+                    className="w-full inline-flex items-center justify-center gap-2 rounded-full border border-[#F2529D]/30 bg-white px-4 py-3 text-[10px] font-black uppercase tracking-[0.35em] text-[#F2529D] hover:bg-[#FFF0F8] transition-colors"
+                  >
+                    <XCircle size={14} />
+                    Remove
+                  </button>
                 </article>
               ))
             )}
