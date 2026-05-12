@@ -906,3 +906,83 @@ export const createGalleryItem = internalMutation({
     });
   },
 });
+
+export const deleteAppointment = internalMutation({
+  args: {
+    appointmentId: v.id("appointments"),
+  },
+  handler: async (ctx, args) => {
+    // Hard delete removes the appointment from the database completely.
+    const appointment = await ctx.db.get(args.appointmentId);
+    if (!appointment) {
+      throw new Error("Appointment not found.");
+    }
+
+    // Remove the appointment record
+    await ctx.db.delete(args.appointmentId);
+
+    return { appointmentId: args.appointmentId };
+  },
+});
+
+export const deleteReview = internalMutation({
+  args: {
+    reviewId: v.id("reviews"),
+  },
+  handler: async (ctx, args) => {
+    // Hard delete removes the review from the database completely.
+    const review = await ctx.db.get(args.reviewId);
+    if (!review) {
+      throw new Error("Review not found.");
+    }
+
+    // Remove the review record
+    await ctx.db.delete(args.reviewId);
+
+    return { reviewId: args.reviewId };
+  },
+});
+
+export const moveAppointmentToCompleted = internalMutation({
+  args: {
+    appointmentId: v.id("appointments"),
+    completedAt: v.number(),
+  },
+  handler: async (ctx, args) => {
+    // Move appointment to completedAppointments table and remove from appointments
+    const appointment = await ctx.db.get(args.appointmentId);
+    if (!appointment) {
+      throw new Error("Appointment not found.");
+    }
+
+    // Insert into completedAppointments
+    await ctx.db.insert("completedAppointments", {
+      userId: appointment.userId,
+      guestName: appointment.guestName,
+      guestEmail: appointment.guestEmail,
+      guestPhone: appointment.guestPhone,
+      serviceId: appointment.serviceId,
+      serviceName: appointment.serviceName,
+      serviceSlug: appointment.serviceSlug,
+      servicePriceCents: appointment.servicePriceCents,
+      serviceDurationMinutes: appointment.serviceDurationMinutes,
+      appointmentDate: appointment.appointmentDate,
+      appointmentTimeLabel: appointment.appointmentTimeLabel,
+      startMinutes: appointment.startMinutes,
+      endMinutes: appointment.endMinutes,
+      location: appointment.location,
+      notes: appointment.notes,
+      assignedStylistId: appointment.assignedStylistId,
+      assignedStylistName: appointment.assignedStylistName,
+      source: appointment.source,
+      completedAt: args.completedAt,
+      createdAt: appointment.createdAt,
+      updatedAt: appointment.updatedAt,
+    });
+
+    // Remove from appointments
+    await ctx.db.delete(args.appointmentId);
+
+    return { appointmentId: args.appointmentId };
+  },
+});

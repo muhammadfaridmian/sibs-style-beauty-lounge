@@ -211,4 +211,32 @@ export default defineSchema({
     .index("by_userId_and_date", ["userId", "appointmentDate"])
     .index("by_status_and_date", ["status", "appointmentDate"])
     .index("by_serviceId_and_date", ["serviceId", "appointmentDate"]),
+
+  // Completed appointments archive stores finished bookings for historical tracking and analytics.
+  completedAppointments: defineTable({
+    userId: v.union(v.id("users"), v.null()),
+    guestName: v.string(),
+    guestEmail: v.string(),
+    guestPhone: v.string(),
+    serviceId: v.id("services"),
+    serviceName: v.string(),
+    serviceSlug: v.string(),
+    servicePriceCents: v.number(),
+    serviceDurationMinutes: v.number(),
+    appointmentDate: v.string(),
+    appointmentTimeLabel: v.string(),
+    startMinutes: v.number(),
+    endMinutes: v.number(),
+    location: v.string(),
+    notes: v.string(),
+    assignedStylistId: v.union(v.id("stylists"), v.null()),
+    assignedStylistName: v.union(v.string(), v.null()),
+    source: v.string(),
+    completedAt: v.number(),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  })
+    .index("by_date", ["appointmentDate"])
+    .index("by_userId_and_date", ["userId", "appointmentDate"])
+    .index("by_completedAt", ["completedAt"]),
 });

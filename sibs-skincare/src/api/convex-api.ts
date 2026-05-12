@@ -496,6 +496,54 @@ export async function uploadGalleryItem(params: {
   }, authToken);
 }
 
+export async function deleteAppointment(params: {
+  appointmentId: string;
+  authToken?: string | null;
+}): Promise<{ appointmentId: string }> {
+  const authToken = params.authToken ?? getStoredAuthToken();
+  if (!authToken) {
+    throw new Error("Please sign in before deleting appointments.");
+  }
+
+  // Hard delete removes the appointment completely from the database.
+  return await requestJson<{ appointmentId: string }>(`/api/appointments/${params.appointmentId}`, {
+    method: "DELETE",
+  }, authToken);
+}
+
+export async function deleteReview(params: {
+  reviewId: string;
+  authToken?: string | null;
+}): Promise<{ reviewId: string }> {
+  const authToken = params.authToken ?? getStoredAuthToken();
+  if (!authToken) {
+    throw new Error("Please sign in before deleting reviews.");
+  }
+
+  // Hard delete removes the review completely from the database.
+  return await requestJson<{ reviewId: string }>(`/api/reviews/${params.reviewId}`, {
+    method: "DELETE",
+  }, authToken);
+}
+
+export async function completeAppointment(params: {
+  appointmentId: string;
+  authToken?: string | null;
+}): Promise<{ appointmentId: string }> {
+  const authToken = params.authToken ?? getStoredAuthToken();
+  if (!authToken) {
+    throw new Error("Please sign in before completing appointments.");
+  }
+
+  // Move completed appointment to archive and remove from active appointments.
+  return await requestJson<{ appointmentId: string }>("/api/appointments/complete", {
+    method: "POST",
+    body: JSON.stringify({
+      appointmentId: params.appointmentId,
+    }),
+  }, authToken);
+}
+
 // ==================== GALLERY ====================
 
 /**

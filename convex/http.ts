@@ -802,4 +802,95 @@ http.route({
   }),
 });
 
+// Delete routes for hard-deleting appointments and reviews
+http.route({
+  pathPrefix: "/api/appointments/",
+  method: "DELETE",
+  handler: httpAction(async (ctx, request) => {
+    const admin = await requireAdmin(ctx, request);
+    if (!admin) {
+      return jsonResponse({ ok: false, error: "Admin access required." }, 403);
+    }
+
+    try {
+      // Extract appointment ID from URL path
+      const pathname = new URL(request.url).pathname;
+      const appointmentId = getPathSuffix(pathname, "/api/appointments/");
+      if (!appointmentId) {
+        return jsonResponse({ ok: false, error: "Appointment id is required." }, 400);
+      }
+
+      // Delete the appointment from database
+      const result = await (ctx as any).runMutation(internal.data.deleteAppointment, {
+        appointmentId: appointmentId as Id<"appointments">,
+      });
+
+      return jsonResponse({ ok: true, data: result });
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Unable to delete appointment.";
+      return jsonResponse({ ok: false, error: message }, statusFromError(message));
+    }
+  }),
+});
+
+http.route({
+  pathPrefix: "/api/reviews/",
+  method: "DELETE",
+  handler: httpAction(async (ctx, request) => {
+    const admin = await requireAdmin(ctx, request);
+    if (!admin) {
+      return jsonResponse({ ok: false, error: "Admin access required." }, 403);
+    }
+
+    try {
+      // Extract review ID from URL path
+      const pathname = new URL(request.url).pathname;
+      const reviewId = getPathSuffix(pathname, "/api/reviews/");
+      if (!reviewId) {
+        return jsonResponse({ ok: false, error: "Review id is required." }, 400);
+      }
+
+      // Delete the review from database
+      const result = await (ctx as any).runMutation(internal.data.deleteReview, {
+        reviewId: reviewId as Id<"reviews">,
+      });
+
+      return jsonResponse({ ok: true, data: result });
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Unable to delete review.";
+      return jsonResponse({ ok: false, error: message }, statusFromError(message));
+    }
+  }),
+});
+
+http.route({
+  path: "/api/appointments/complete",
+  method: "POST",
+  handler: httpAction(async (ctx, request) => {
+    const admin = await requireAdmin(ctx, request);
+    if (!admin) {
+      return jsonResponse({ ok: false, error: "Admin access required." }, 403);
+    }
+
+    try {
+      // This endpoint moves a completed appointment to the completedAppointments archive table
+      const body = await readJson<{ appointmentId?: string }>(request);
+      if (!body.appointmentId) {
+        return jsonResponse({ ok: false, error: "Appointment id is required." }, 400);
+      }
+
+      // Move appointment to completed archive
+      const result = await (ctx as any).runMutation(internal.data.moveAppointmentToCompleted, {
+        appointmentId: body.appointmentId as Id<"appointments">,
+        completedAt: Date.now(),
+      });
+
+      return jsonResponse({ ok: true, data: result });
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Unable to archive completed appointment.";
+      return jsonResponse({ ok: false, error: message }, statusFromError(message));
+    }
+  }),
+});
+
 export default http;

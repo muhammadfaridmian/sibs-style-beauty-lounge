@@ -18,6 +18,9 @@ import {
 } from 'lucide-react';
 import {
   clearStoredAuthSession,
+  completeAppointment,
+  deleteAppointment,
+  deleteReview,
   getAdminAppointments,
   getAdminReviews,
   getCurrentAuthUser,
@@ -132,10 +135,15 @@ const AdminPage: React.FC = () => {
     }
 
     try {
-      // Appointment edits flow back through Convex so the public and admin views stay aligned.
-      // The same mutation also updates the assigned stylist when the admin picks one.
-      await updateAppointmentStatus({ appointmentId, status, authToken });
-      setActionMessage(`Updated booking ${appointmentId.slice(0, 6).toUpperCase()}`);
+      if (status === 'completed') {
+        // Move to completedAppointments table instead of just updating status
+        await completeAppointment({ appointmentId, authToken });
+        setActionMessage(`Completed booking ${appointmentId.slice(0, 6).toUpperCase()}`);
+      } else {
+        // For other statuses, update the status normally
+        await updateAppointmentStatus({ appointmentId, status, authToken });
+        setActionMessage(`Updated booking ${appointmentId.slice(0, 6).toUpperCase()}`);
+      }
 
       setAppointments((currentAppointments) =>
         currentAppointments.map((appointment) =>
@@ -151,6 +159,15 @@ const AdminPage: React.FC = () => {
             currentAppointments.filter((appointment) => appointment.id !== appointmentId)
           );
           setRemovingAppointmentIds((currentIds) => currentIds.filter((id) => id !== appointmentId));
+        }, 420);
+      }
+
+      if (status === 'completed') {
+        // Remove from active list after a short delay
+        window.setTimeout(() => {
+          setAppointments((currentAppointments) =>
+            currentAppointments.filter((appointment) => appointment.id !== appointmentId)
+          );
         }, 420);
       }
 
@@ -202,7 +219,24 @@ const AdminPage: React.FC = () => {
 
     const appointmentId = pendingAction.appointment.id;
     setPendingAction(null);
-    await handleAppointmentStatus(appointmentId, 'cancelled');
+    setRemovingAppointmentIds((currentIds) => [...currentIds, appointmentId]);
+
+    try {
+      // Hard delete the appointment from the database
+      await deleteAppointment({ appointmentId, authToken });
+
+      window.setTimeout(() => {
+        setAppointments((currentAppointments) =>
+          currentAppointments.filter((appointment) => appointment.id !== appointmentId)
+        );
+        setRemovingAppointmentIds((currentIds) => currentIds.filter((id) => id !== appointmentId));
+      }, 420);
+
+      setActionMessage(`Deleted booking ${appointmentId.slice(0, 6).toUpperCase()}`);
+    } catch (deleteError) {
+      setRemovingAppointmentIds((currentIds) => currentIds.filter((id) => id !== appointmentId));
+      setError(deleteError instanceof Error ? deleteError.message : 'Unable to delete this booking.');
+    }
   };
 
   const handleDeleteReviewConfirm = async () => {
@@ -212,29 +246,22 @@ const AdminPage: React.FC = () => {
 
     const reviewId = pendingAction.review.id;
     const reviewName = pendingAction.review.name;
-    const featured = pendingAction.review.featured;
-    const sortOrder = pendingAction.review.sortOrder;
     setPendingAction(null);
     setRemovingReviewIds((currentIds) => [...currentIds, reviewId]);
 
     try {
-      await moderateReview({
-        reviewId,
-        isApproved: false,
-        featured,
-        sortOrder,
-        authToken,
-      });
+      // Hard delete the review from the database
+      await deleteReview({ reviewId, authToken });
 
       window.setTimeout(() => {
         setReviews((currentReviews) => currentReviews.filter((review) => review.id !== reviewId));
         setRemovingReviewIds((currentIds) => currentIds.filter((id) => id !== reviewId));
       }, 420);
 
-      setActionMessage(`Removed review ${reviewName}`);
+      setActionMessage(`Deleted review ${reviewName}`);
     } catch (deleteError) {
       setRemovingReviewIds((currentIds) => currentIds.filter((id) => id !== reviewId));
-      setError(deleteError instanceof Error ? deleteError.message : 'Unable to remove this review.');
+      setError(deleteError instanceof Error ? deleteError.message : 'Unable to delete this review.');
     }
   };
 
@@ -377,7 +404,7 @@ const AdminPage: React.FC = () => {
       </div>
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-16 sm:pb-24 space-y-8 sm:space-y-12 lg:space-y-16">
-        <section className="mt-4 sm:mt-0 rounded-[2rem] sm:rounded-[3rem] bg-[#0A0E1A] text-white p-6 sm:p-8 lg:p-12 shadow-[0_30px_90px_-30px_rgba(0,0,0,0.35)] border border-white/10 overflow-hidden relative">
+        <section className="mt-8 sm:mt-6 lg:mt-4 rounded-[2rem] sm:rounded-[3rem] bg-[#0A0E1A] text-white p-6 sm:p-8 lg:p-12 shadow-[0_30px_90px_-30px_rgba(0,0,0,0.35)] border border-white/10 overflow-hidden relative">
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(242,82,157,0.18),transparent_28%),radial-gradient(circle_at_bottom_left,rgba(191,156,52,0.12),transparent_24%)]"></div>
           <div className="relative z-10 grid grid-cols-1 lg:grid-cols-[1.2fr_0.8fr] gap-8 lg:gap-10 items-center">
             <div className="space-y-5 sm:space-y-6">
