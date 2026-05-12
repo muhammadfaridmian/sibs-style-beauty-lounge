@@ -757,6 +757,19 @@ http.route({
   }),
 });
 
+// Catch-all API routes for unhandled methods/paths under /api/
+// This ensures responses always include the CORS headers so browsers do not block
+// client-side code with a missing Access-Control-Allow-Origin header on 404s.
+["GET", "POST", "PUT", "DELETE"].forEach((m) => {
+  http.route({
+    pathPrefix: "/api/",
+    method: m as any,
+    handler: httpAction(async () => {
+      return jsonResponse({ ok: false, error: "Not found" }, 404);
+    }),
+  });
+});
+
 http.route({
   path: "/api/reviews",
   method: "POST",

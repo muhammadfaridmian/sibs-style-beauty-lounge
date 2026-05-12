@@ -166,10 +166,14 @@ const OffersPage = () => {
       { opacity: 1, y: 0, duration: 1.2, ease: 'power3.out', clearProps: 'transform' },
     );
 
-    gsap.fromTo('.offers-header',
-      { opacity: 0, scale: 0.95 },
-      { opacity: 1, scale: 1, duration: 1.5, ease: 'expo.out', delay: 0.3 },
-    );
+    // Guard header animation to avoid GSAP warning when the selector isn't present.
+    const offersHeader = document.querySelector('.offers-header');
+    if (offersHeader) {
+      gsap.fromTo(offersHeader,
+        { opacity: 0, scale: 0.95 },
+        { opacity: 1, scale: 1, duration: 1.5, ease: 'expo.out', delay: 0.3 },
+      );
+    }
   }, []);
 
   useEffect(() => {

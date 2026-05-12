@@ -42,11 +42,14 @@ const HomePage = () => {
       );
 
       if (!isMobile) {
-        tl.fromTo('.product-card-anim', 
-            { y: 60, opacity: 0, rotate: 5 }, 
+        const productCards = gsap.utils.toArray('.product-card-anim');
+        if (productCards.length) {
+          tl.fromTo(productCards,
+            { y: 60, opacity: 0, rotate: 5 },
             { y: 0, opacity: 1, rotate: 0, duration: 1, stagger: 0.1, ease: 'power4.out' },
             '-=0.8'
-        );
+          );
+        }
       }
     } else {
       document.body.style.overflow = 'unset';
@@ -66,12 +69,15 @@ const HomePage = () => {
       { opacity: 1, duration: 1.2, ease: 'power2.inOut' }
     );
 
-    // Initial positioning for hero elements
-    gsap.set(['.hero-title', '.hero-p', '.hero-btn', '.hero-img-wrap', '.hero-img-bg'], { 
-      opacity: 0,
-      y: 50,
-      visibility: 'visible'
-    });
+    // Initial positioning for hero elements (guard selectors to avoid GSAP warnings)
+    const heroElems = gsap.utils.toArray('.hero-title, .hero-p, .hero-btn, .hero-img-wrap, .hero-img-bg');
+    if (heroElems.length) {
+      gsap.set(heroElems, {
+        opacity: 0,
+        y: 50,
+        visibility: 'visible'
+      });
+    }
 
     const tl = gsap.timeline({ 
       defaults: { ease: 'power4.out' },
@@ -104,11 +110,14 @@ const HomePage = () => {
 
     const handleMouseMove = (e: MouseEvent) => {
       // The image gets a tiny parallax shift so the hero feels more alive.
-      gsap.to('.parallax-img', {
-        x: (e.clientX - window.innerWidth / 2) / 60,
-        y: (e.clientY - window.innerHeight / 2) / 60,
-        duration: 1,
-      });
+      const targets = gsap.utils.toArray('.parallax-img');
+      if (targets.length) {
+        gsap.to(targets, {
+          x: (e.clientX - window.innerWidth / 2) / 60,
+          y: (e.clientY - window.innerHeight / 2) / 60,
+          duration: 1,
+        });
+      }
     };
 
     window.addEventListener('mousemove', handleMouseMove);

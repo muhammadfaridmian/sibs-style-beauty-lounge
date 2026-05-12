@@ -21,10 +21,14 @@ const ScrollToTop = () => {
   useEffect(() => {
     window.scrollTo(0, 0);
     // Global Fade-in on route change
-    gsap.fromTo('main', 
-      { opacity: 0, scale: 0.98 }, 
-      { opacity: 1, scale: 1, duration: 1.2, ease: 'expo.out', clearProps: 'all' }
-    );
+    const mainEl = document.querySelector('main');
+    if (mainEl) {
+      gsap.fromTo(
+        mainEl,
+        { opacity: 0, scale: 0.98 },
+        { opacity: 1, scale: 1, duration: 1.2, ease: 'expo.out', clearProps: 'all' }
+      );
+    }
   }, [pathname]);
 
   return null;

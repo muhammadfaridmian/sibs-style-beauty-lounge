@@ -53,16 +53,22 @@ const TestimonialsPage: React.FC = () => {
     loadData();
 
     const tl = gsap.timeline();
-    
-    tl.fromTo('.heading-anim', 
-      { opacity: 0, y: 30 }, 
-      { opacity: 1, y: 0, duration: 1.2, ease: 'power3.out' }
-    )
-    .fromTo('.review-box-anim', 
-      { opacity: 0, y: 50, scale: 0.98 },
-      { opacity: 1, y: 0, scale: 1, duration: 1.5, ease: 'expo.out' },
-      '-=0.8'
-    );
+    // Guard animations so missing selectors don't produce console warnings.
+    const heading = document.querySelector('.heading-anim');
+    const reviewBoxes = gsap.utils.toArray('.review-box-anim');
+    if (heading) {
+      tl.fromTo(heading,
+        { opacity: 0, y: 30 },
+        { opacity: 1, y: 0, duration: 1.2, ease: 'power3.out' }
+      );
+    }
+    if (reviewBoxes.length) {
+      tl.fromTo(reviewBoxes,
+        { opacity: 0, y: 50, scale: 0.98 },
+        { opacity: 1, y: 0, scale: 1, duration: 1.5, ease: 'expo.out' },
+        heading ? '-=0.8' : undefined
+      );
+    }
   }, []);
 
   const changeTestimonial = (newIndex: number) => {
