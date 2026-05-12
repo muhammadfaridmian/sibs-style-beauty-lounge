@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import Footer from './components/Footer';
 import { Link } from 'react-router-dom';
 import { Clock, ChevronLeft, ChevronRight, Mail as MailIcon, Phone, MapPin, Calendar as CalendarIcon, User, ArrowRight, AlertCircle, Sparkles, Info } from 'lucide-react';
 import gsap from 'gsap';
@@ -674,19 +675,7 @@ const BookingPage: React.FC = () => {
         </div>
       </div>
 
-      <footer className="bg-white border-t border-gray-100 py-20">
-        <div className="max-w-7xl mx-auto px-4 flex flex-col md:flex-row justify-between items-center text-[#555]">
-          <div>
-            <h3 className="text-3xl font-display italic font-bold text-[#F2529D]">Sibs Style</h3>
-            <p className="text-[10px] font-black uppercase tracking-[0.5em] text-gray-400 mt-4">© 2024 SIBS STYLE BEAUTY LOUNGE.</p>
-          </div>
-          <div className="flex space-x-12 text-[10px] font-black uppercase tracking-widest text-gray-400 mt-10 md:mt-0">
-            <a href="#" className="hover:text-[#F2529D] transition-colors">PRIVACY POLICY</a>
-            <a href="#" className="hover:text-[#F2529D] transition-colors">TERMS OF SERVICE</a>
-            <a href="#" className="hover:text-[#F2529D] transition-colors">CONTACT</a>
-          </div>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 };

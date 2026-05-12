@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import Footer from './components/Footer';
 import gsap from 'gsap';
 
 const StylistsPage: React.FC = () => {
@@ -118,51 +119,7 @@ const StylistsPage: React.FC = () => {
         </p>
       </div>
 
-      {/* Simple Footer */}
-      {/* The footer stays lighter and more minimal than the hero and cards above it. */}
-      <footer className='border-t border-gray-100 bg-white py-24'>
-        <div className='max-w-7xl mx-auto px-8'>
-          <div className='grid grid-cols-1 md:grid-cols-4 gap-16'>
-            <div className='col-span-1 md:col-span-1'>
-              <h3 className='text-2xl font-display italic font-bold text-gray-900 mb-6'>Sibs Style</h3>
-              <p className='text-sm text-gray-500 leading-relaxed font-medium'>
-                An editorial approach to skincare, curated for the modern aesthetic enthusiast.
-              </p>
-            </div>
-            
-            <div>
-              <h4 className='text-[10px] font-black uppercase tracking-[0.3em] text-[#BF9C34] mb-8'>EXPERIENCE</h4>
-              <ul className='space-y-4 text-xs font-bold text-gray-500'>
-                <li><Link to='/booking' className='hover:text-[#D14081] transition-colors decoration-none'>Rituals</Link></li>
-                <li><Link to='/' className='hover:text-[#D14081] transition-colors decoration-none'>Boutique</Link></li>
-                <li><Link to='/artisans' className='hover:text-[#D14081] transition-colors decoration-none'>Our Artisans</Link></li>
-              </ul>
-            </div>
-
-            <div>
-              <h4 className='text-[10px] font-black uppercase tracking-[0.3em] text-[#BF9C34] mb-8'>LEGAL</h4>
-              <ul className='space-y-4 text-xs font-bold text-gray-500'>
-                <li><a href='#' className='hover:text-[#D14081] transition-colors decoration-none'>Privacy Policy</a></li>
-                <li><a href='#' className='hover:text-[#D14081] transition-colors decoration-none'>Terms of Service</a></li>
-                <li><a href='#' className='hover:text-[#D14081] transition-colors decoration-none'>Shipping & Returns</a></li>
-              </ul>
-            </div>
-
-            <div className='md:text-left'>
-              <h4 className='text-[10px] font-black uppercase tracking-[0.3em] text-[#BF9C34] mb-8'>CONTACT</h4>
-              <ul className='space-y-4 text-xs font-bold text-gray-500'>
-                <li><a href='#' className='hover:text-[#D14081] transition-colors decoration-none'>Contact Us</a></li>
-                <li className='text-gray-400 italic font-medium mt-6'>London • Paris • New York</li>
-              </ul>
-            </div>
-          </div>
-          <div className='mt-24 pt-12 border-t border-gray-50 text-center'>
-            <p className='text-[10px] font-bold tracking-[0.1em] text-gray-400 uppercase'>
-              © 2024 Sibs Style Editorial Beauty. All Rights Reserved.
-            </p>
-          </div>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 };

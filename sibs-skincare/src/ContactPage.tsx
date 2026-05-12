@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { Mail, Phone, MapPin, Clock } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import Footer from './components/Footer';
 import gsap from 'gsap';
 
 const ContactPage = () => {
@@ -168,52 +169,9 @@ const ContactPage = () => {
                 </div>
             </div>
 
-            {/* Specialized Footer */}
-            {/* The footer uses a darker palette so the utility links feel separate from the contact card above. */}
-            <footer className="mt-20 sm:mt-32 pt-16 sm:pt-24 pb-10 sm:pb-12 bg-[#0A0E1A] text-white px-4 sm:px-6 contact-footer">
-                <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-12 sm:gap-24 items-start">
-                    <div className="space-y-6 sm:space-y-8">
-                        <span className="text-3xl sm:text-4xl font-display italic text-[#F2529D] font-black">Sibs Style</span>
-                        <p className="text-gray-400 font-body italic text-base sm:text-lg leading-relaxed">
-                            Elevating your natural beauty with premium services in a luxurious, relaxing environment.
-                        </p>
-                    </div>
-                    
-                    <div className="space-y-6 sm:space-y-8">
-                        <h4 className="text-[10px] font-black uppercase tracking-[0.4em] text-[#BF9C34]">Quick Links</h4>
-                        <div className="flex flex-col gap-3 sm:gap-4 text-sm font-medium text-gray-400">
-                            <Link to="/" className="hover:text-[#F2529D] transition-colors decoration-none">Home</Link>
-                            <Link to="/booking" className="hover:text-[#F2529D] transition-colors decoration-none">Treatments</Link>
-                            <Link to="/artisans" className="hover:text-[#F2529D] transition-colors decoration-none">Artisans</Link>
-                            <Link to="/offers" className="hover:text-[#F2529D] transition-colors decoration-none">Exclusive Selection</Link>
-                            <Link to="/testimonials" className="hover:text-[#F2529D] transition-colors decoration-none">Chronicles</Link>
-                            <Link to="/contact" className="text-[#F2529D] decoration-none">Contact & Location</Link>
-                        </div>
-                    </div>
-
-                    <div className="space-y-6 sm:space-y-8">
-                        <h4 className="text-[10px] font-black uppercase tracking-[0.4em] text-[#BF9C34]">Follow Us</h4>
-                        <div className="flex gap-8 sm:gap-10">
-                            <Link to="#" className="text-gray-400 hover:text-[#F2529D] transition-transform hover:scale-125">
-                                <span className="font-display italic text-2xl">Fb</span>
-                            </Link>
-                            <Link to="#" className="text-gray-400 hover:text-[#F2529D] transition-transform hover:scale-125">
-                                <span className="font-display italic text-2xl">Tw</span>
-                            </Link>
-                            <Link to="#" className="text-gray-400 hover:text-[#F2529D] transition-transform hover:scale-125">
-                                <span className="font-display italic text-2xl">Yt</span>
-                            </Link>
-                        </div>
-                    </div>
-                </div>
-                <div className="max-w-7xl mx-auto border-t border-white/5 mt-24 pt-12 flex justify-between items-center text-[10px] font-black uppercase tracking-[0.3em] text-gray-600">
-                    <p>© 2024 SIBS STYLE BEAUTY LOUNGE. ALL RIGHTS RESERVED.</p>
-                    <div className="flex gap-8">
-                        <span>Privacy Policy</span>
-                        <span>Terms of Luxury</span>
-                    </div>
-                </div>
-            </footer>
+            <div className="contact-footer">
+              <Footer />
+            </div>
         </div>
     );
 };

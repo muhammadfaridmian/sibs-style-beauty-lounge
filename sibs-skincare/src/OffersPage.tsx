@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
+import Footer from './components/Footer';
 import { ArrowRight, X } from 'lucide-react';
 import gsap from 'gsap';
 
@@ -263,15 +264,7 @@ const OffersPage = () => {
                 </div>
             )}
 
-            <footer className='bg-black py-20 px-6 text-center'>
-                <p className='text-[#F2529D] font-display italic font-black text-5xl mb-8 tracking-tighter underline underline-offset-[16px]'>Sibs Style</p>
-                <p className='text-[15px] font-black text-gray-500 tracking-[0.6em] uppercase'>© 2024 SIBS STYLE BEAUTY LOUNGE. ALL RIGHTS RESERVED.</p>
-                <div className='mt-8 flex justify-center gap-12 text-gray-700 text-[15px] font-black tracking-widest'>
-                    <span>PRIVACY</span>
-                    <span>TERMS</span>
-                    <span>LUXURY ETHOS</span>
-                </div>
-            </footer>
+            <Footer />
         </div>
     );
 };

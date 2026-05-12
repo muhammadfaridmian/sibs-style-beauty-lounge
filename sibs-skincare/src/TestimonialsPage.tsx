@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
+import Footer from './components/Footer';
 import { ChevronLeft, ChevronRight, Star, Quote, Send, CheckCircle2 } from 'lucide-react';
 import gsap from 'gsap';
 import { getReviews, submitReview, getServices, getStoredAuthToken } from './api/convex-api';
@@ -410,38 +411,7 @@ const TestimonialsPage: React.FC = () => {
         </div>
       </div>
 
-      <footer className='bg-white border-t border-gray-100 py-32 mt-32'>
-        <div className='max-w-7xl mx-auto px-8 grid grid-cols-1 md:grid-cols-3 gap-24'>
-          <div className='space-y-8'>
-            <h3 className='text-3xl font-display italic font-bold text-[#F2529D]'>Sibs Style</h3>
-            <p className='text-sm text-gray-500 leading-relaxed font-medium'>
-              Elevating beauty and wellness through personalized, luxurious treatments in a serene environment.
-            </p>
-          </div>
-          <div className='space-y-8 text-center'>
-            <h4 className='text-[10px] font-black uppercase tracking-[0.3em] text-[#333]'>QUICK LINKS</h4>
-            <ul className='space-y-4 text-xs font-bold text-gray-400'>
-              <li><Link to='/booking' className='hover:text-[#F2529D] transition-colors decoration-none'>Treatments</Link></li>
-              <li><Link to='/' className='hover:text-[#F2529D] transition-colors decoration-none'>Our Story</Link></li>
-              <li><Link to='/testimonials' className='hover:text-[#F2529D] transition-colors decoration-none'>Client Reviews</Link></li>
-              <li><Link to='/booking' className='hover:text-[#F2529D] transition-colors decoration-none'>Book Now</Link></li>
-            </ul>
-          </div>
-          <div className='space-y-8 text-right'>
-            <h4 className='text-[10px] font-black uppercase tracking-[0.3em] text-[#333]'>CONNECT</h4>
-            <ul className='space-y-2 text-xs font-bold text-gray-400'>
-              <li>Al Hashar Building, Office 301, Deira, Dubai</li>
-              <li>mcjalandoni@yahoo.com</li>
-              <li>052 906 3016</li>
-            </ul>
-          </div>
-        </div>
-        <div className='mt-32 pt-12 border-t border-gray-50 text-center'>
-            <p className='text-[10px] font-bold tracking-[0.1em] text-gray-400 uppercase'>
-              © 2024 Sibs Style Beauty Lounge. All rights reserved.
-            </p>
-          </div>
-      </footer>
+      <Footer />
     </div>
   );
 };

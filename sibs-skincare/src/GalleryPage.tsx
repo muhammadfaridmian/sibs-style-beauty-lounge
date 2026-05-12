@@ -2,6 +2,7 @@ import { useEffect, useRef } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { Link } from 'react-router-dom';
+import Footer from './components/Footer';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -432,25 +433,7 @@ const GalleryPage = () => {
         </div>
       </section>
 
-      {/* Footer from Screenshot */}
-      <footer className="bg-black text-white pt-32 pb-12 px-10">
-        <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center border-b border-white/10 pb-20 mb-12">
-           <div className="flex gap-12 text-[10px] font-black uppercase tracking-[0.3em] text-gray-400 mb-8 md:mb-0">
-             <Link to="#" className="hover:text-white transition-colors">Privacy Policy</Link>
-             <Link to="#" className="hover:text-white transition-colors">Terms of Service</Link>
-           </div>
-           
-           <h4 className="text-5xl font-display italic font-black">Sibs Style</h4>
-
-           <div className="flex gap-8 text-white/50">
-             <span className="cursor-pointer hover:text-[#F2529D] transition-colors font-display italic text-2xl">Fb</span>
-             <span className="cursor-pointer hover:text-[#F2529D] transition-colors font-display italic text-2xl">Ig</span>
-           </div>
-        </div>
-        <p className="text-center text-[10px] font-black uppercase tracking-[0.4em] text-gray-600">
-          © 2024 SIBS STYLE BEAUTY LOUNGE. ALL RIGHTS RESERVED.
-        </p>
-      </footer>
+      <Footer />
     </div>
   );
 };
