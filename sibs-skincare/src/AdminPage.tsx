@@ -78,8 +78,8 @@ const AdminPage: React.FC = () => {
   const [collectionForm, setCollectionForm] = useState({
     title: '',
     description: '',
-    assetKey: Object.keys(availableProductAssets)[0] || '',
-    customAsset: '',
+    assetKey: '',
+    imageUrl: '',
     priceLabel: '',
     priceCents: undefined as number | undefined,
     active: true,
@@ -106,8 +106,11 @@ const AdminPage: React.FC = () => {
           body: collectionFile,
         });
         if (!resp.ok) throw new Error('File upload failed');
-        const payload = await resp.json();
-        imageUrl = payload?.data?.imageUrl ?? undefined;
+        const responseText = await resp.text();
+        if (responseText.trim()) {
+          const payload = JSON.parse(responseText) as { data?: { imageUrl?: string } };
+          imageUrl = payload?.data?.imageUrl ?? undefined;
+        }
       }
 
       const itemPayload: any = {
@@ -123,17 +126,19 @@ const AdminPage: React.FC = () => {
       if (imageUrl) {
         itemPayload.imageUrl = imageUrl;
       } else {
-        const customValue = collectionForm.customAsset.trim();
-        if (customValue && (/^(https?:)?\/\//i.test(customValue) || customValue.startsWith('/') || customValue.startsWith('data:'))) {
-          itemPayload.imageUrl = customValue;
+        const customAssetKey = collectionForm.assetKey.trim();
+        const customImageUrl = collectionForm.imageUrl.trim();
+
+        if (customImageUrl) {
+          itemPayload.imageUrl = customImageUrl;
         } else {
-          itemPayload.assetKey = customValue || collectionForm.assetKey;
+          itemPayload.assetKey = customAssetKey;
         }
       }
 
       await createCollection({ item: itemPayload, authToken });
       setActionMessage(`Created ${collectionForm.title}`);
-      setCollectionForm((prev) => ({ ...prev, title: '', description: '', customAsset: '' }));
+      setCollectionForm((prev) => ({ ...prev, title: '', description: '', assetKey: '', imageUrl: '' }));
       setCollectionFile(null);
       await refreshDashboard();
     } catch (err) {
@@ -986,15 +991,12 @@ const AdminPage: React.FC = () => {
 
               <label className="space-y-2">
                 <span className="text-[10px] font-black uppercase tracking-[0.35em] text-gray-400">Asset</span>
-                <select
+                <input
                   value={collectionForm.assetKey}
                   onChange={(e) => setCollectionForm((prev) => ({ ...prev, assetKey: e.target.value }))}
                   className="w-full rounded-[1.25rem] border border-gray-200 bg-[#FAF9F6] px-4 py-4 text-base focus:outline-none focus:border-[#F2529D]"
-                >
-                  {Object.keys(availableProductAssets).map((key) => (
-                    <option key={key} value={key}>{availableProductAssets[key].label}</option>
-                  ))}
-                </select>
+                  placeholder="Type an asset key, like himalaya"
+                />
               </label>
             </div>
 
@@ -1010,12 +1012,12 @@ const AdminPage: React.FC = () => {
               </label>
 
               <label className="space-y-2">
-                <span className="text-[10px] font-black uppercase tracking-[0.35em] text-gray-400">Custom asset URL or key</span>
+                <span className="text-[10px] font-black uppercase tracking-[0.35em] text-gray-400">Image URL</span>
                 <input
-                  value={collectionForm.customAsset}
-                  onChange={(e) => setCollectionForm((prev) => ({ ...prev, customAsset: e.target.value }))}
+                  value={collectionForm.imageUrl}
+                  onChange={(e) => setCollectionForm((prev) => ({ ...prev, imageUrl: e.target.value }))}
                   className="w-full rounded-[1.25rem] border border-gray-200 bg-[#FAF9F6] px-4 py-4 text-base focus:outline-none focus:border-[#F2529D]"
-                  placeholder="https://... or myCustomAssetKey"
+                  placeholder="https://..."
                 />
               </label>
             </div>
@@ -1043,13 +1045,13 @@ const AdminPage: React.FC = () => {
               </label>
 
               <label className="space-y-2">
-                <span className="text-[10px] font-black uppercase tracking-[0.35em] text-gray-400">Price (cents)</span>
+                <span className="text-[10px] font-black uppercase tracking-[0.35em] text-gray-400">Price</span>
                 <input
                   type="number"
                   value={collectionForm.priceCents ?? ''}
                   onChange={(e) => setCollectionForm((prev) => ({ ...prev, priceCents: e.target.value ? Number(e.target.value) : undefined }))}
                   className="w-full rounded-[1.25rem] border border-gray-200 bg-[#FAF9F6] px-4 py-4 text-base focus:outline-none focus:border-[#F2529D]"
-                  placeholder="12000"
+                  placeholder="120"
                 />
               </label>
             </div>
