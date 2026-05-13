@@ -39,6 +39,7 @@ export interface Service {
   shortDescription: string;
   fullDescription: string;
   priceCents: number;
+  priceLabel?: string;
   durationMinutes: number;
   category: string;
   imageUrl: string;

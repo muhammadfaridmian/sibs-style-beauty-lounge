@@ -96,6 +96,7 @@ const TestimonialsPage: React.FC = () => {
   // Wrapping around the ends makes the component feel like a proper infinite reel.
   const next = () => changeTestimonial((currentIndex + 1) % reviews.length);
   const prev = () => changeTestimonial((currentIndex - 1 + reviews.length) % reviews.length);
+  const displayRating = Math.min(5, Math.max(0, reviews[currentIndex]?.rating || 5));
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -186,8 +187,13 @@ const TestimonialsPage: React.FC = () => {
 
               <div className='text-center space-y-6 sm:space-y-8'>
                 {/* Stars */}
-                <div className='flex flex-wrap justify-center gap-2 sm:gap-3 text-[#BF9C34] px-4'>
-                  {[...Array(reviews[currentIndex]?.rating || 5)].map((_, i) => <Star key={i} className='w-5 h-5 sm:w-6 sm:h-6 fill-current' />)}
+                <div className='flex flex-wrap justify-center gap-2 sm:gap-3 px-4'>
+                  {[...Array(5)].map((_, i) => (
+                    <Star
+                      key={i}
+                      className={`w-5 h-5 sm:w-6 sm:h-6 ${i < displayRating ? 'text-[#BF9C34] fill-current' : 'text-[#E7DDCB] fill-none'}`}
+                    />
+                  ))}
                 </div>
 
                 {/* Main Quote */}

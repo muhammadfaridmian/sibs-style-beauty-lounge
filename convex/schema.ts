@@ -84,6 +84,7 @@ export default defineSchema({
     shortDescription: v.string(),
     fullDescription: v.string(),
     priceCents: v.number(),
+    priceLabel: v.optional(v.string()),
     durationMinutes: v.number(),
     category: v.string(),
     imageUrl: v.string(),

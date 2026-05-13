@@ -1,7 +1,9 @@
 import { useEffect, useRef, useState } from 'react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { Sparkles, Flower2, Droplets, Eye, ArrowRight, X, Heart, Star, ShoppingBag } from 'lucide-react';
+import { ArrowRight, X, Heart, Star, ShoppingBag } from 'lucide-react';
+import silkyCoolProductsImage from './assets/Silkycoolproducts.jpeg';
+import goldProductsImage from './assets/Goldproducts.jpeg';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -132,35 +134,6 @@ const HomePage = () => {
     }
   };
 
-  // These are the four headline product stories shown inside the collection modal.
-  // They act like a small curated board of what the brand wants to feel like.
-  const collections = [
-    {
-      icon: <Sparkles className="w-6 h-6" />,
-      title: 'Luminous Serum',
-      desc: 'An elixir of illuminating botanicals for ethereal radiance.',
-      btn: 'Shop Elixir'
-    },
-    {
-      icon: <Flower2 className="w-6 h-6" />,
-      title: 'Floral Facelift',
-      desc: 'Restorative ritual utilizing rare floral extracts to rejuvenate.',
-      btn: 'Explore Ritual'
-    },
-    {
-      icon: <Droplets className="w-6 h-6" />,
-      title: 'Velvet Mask',
-      desc: 'Nourishing mask that restores optimal moisture balance.',
-      btn: 'Shop Mask'
-    },
-    {
-      icon: <Eye className="w-6 h-6" />,
-      title: 'Celestial Eye',
-      desc: 'Potent formula to brighten and reduce fine lines.',
-      btn: 'Shop Creme'
-    }
-  ];
-
   // The larger product grid uses this data to build the shop-like display.
   // The images here are only presentation data, so the cards can stay purely decorative.
   const products = [
@@ -229,7 +202,7 @@ const HomePage = () => {
           <div className="hero-img-wrap relative block !opacity-100 !visible z-0 mt-10 md:mt-0">
             <div className="aspect-square md:aspect-[3/4] shadow-2xl relative z-10 overflow-hidden rounded-[2rem] md:rounded-[3rem] border-4 md:border-8 border-white bg-white">
               <img 
-                src="src/assets/Silkycoolproducts.jpeg"
+                src={silkyCoolProductsImage}
                 className="w-full h-full object-cover parallax-img scale-105" 
                 alt="Hero" 
               />
@@ -330,7 +303,7 @@ const HomePage = () => {
           <div ref={addToRefs} className="relative">
             <div className="shadow-2xl overflow-hidden rounded-[2rem]">
               <img 
-                src="https://i.pinimg.com/1200x/1c/50/15/1c50159eea9cf20752fba1401f90a8ec.jpg" 
+                src={goldProductsImage} 
                 className="w-full h-[400px] md:h-[700px] object-cover" 
                 alt="Texture" 
               />
@@ -350,55 +323,6 @@ const HomePage = () => {
               <p>Our curation represents the pinnacle of <span className="text-pink-400 italic font-display">botanical luxury</span>, transforming routines into ceremonies.</p>
             </div>
           </div>
-        </div>
-      </section>
-
-      {/* Collections Section */}
-      <section className="py-20 md:py-48 px-6 bg-[#FAF9F6] overflow-hidden">
-        <div ref={addToRefs} className="max-w-7xl mx-auto text-center mb-16 md:mb-36">
-          <p className="text-[#BF9C34] uppercase tracking-[0.3em] md:tracking-[0.5em] text-[10px] md:text-[13px] font-black mb-3 md:mb-5">Signature Curation</p>
-          <h2 className="text-4xl md:text-[6.5rem] italic font-black font-display leading-none tracking-tighter text-black">Curated Collections</h2>
-        </div>
-        <div className="max-w-[1400px] mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
-          {collections.map((item, i) => (
-            <div 
-              key={i} 
-              ref={addToRefs}
-              className="group relative p-8 md:p-12 rounded-[3rem] md:rounded-[4rem] bg-white text-center md:hover:translate-y-[-24px] shadow-[0_15px_35px_-10px_rgba(0,0,0,0.06)] md:hover:shadow-[0_60px_100px_-30px_rgba(0,0,0,0.15)] border-2 border-transparent md:hover:border-[#BF9C34]/10 transition-all duration-700 cursor-pointer flex flex-col items-center overflow-hidden"
-            >
-              {/* Subtle glass background effect on hover */}
-              <div className="absolute inset-0 bg-[#BF9C34]/[0.02] opacity-0 md:group-hover:opacity-100 transition-opacity duration-700 rounded-[4rem]"></div>
-              
-              {/* Decorative corner accent */}
-              <div className="absolute -top-10 -right-10 w-24 h-24 md:w-32 md:h-32 bg-[#F2529D]/5 rounded-full blur-2xl md:blur-3xl md:group-hover:bg-[#F2529D]/10 transition-colors duration-700"></div>
-
-              <div className="relative z-10 w-16 h-16 md:w-24 md:h-24 bg-gray-50 rounded-2xl md:rounded-3xl mb-8 md:mb-12 flex items-center justify-center md:group-hover:bg-black md:group-hover:rotate-[15deg] transition-all duration-700 text-[#F2529D] shadow-sm transform-gpu">
-                {item.icon}
-                {/* Floating particle detail */}
-                <div className="absolute -top-2 -right-2 w-3 h-3 md:w-4 md:h-4 bg-[#BF9C34] rounded-full scale-0 md:group-hover:scale-100 transition-transform delay-300 duration-500"></div>
-              </div>
-
-              <div className="relative z-10 space-y-3 md:space-y-4 flex-grow">
-                <h3 className="text-2xl md:text-3xl lg:text-4xl text-black md:group-hover:text-[#F2529D] italic font-black font-display leading-[1.1] transition-colors duration-500 px-2">{item.title}</h3>
-                
-                {/* Visual Separator */}
-                <div className="w-8 h-[2px] md:w-12 md:h-[2px] bg-gray-100 mx-auto md:group-hover:w-20 md:group-hover:bg-[#BF9C34] transition-all duration-700"></div>
-                
-                <p className="text-sm md:text-lg text-gray-400 md:group-hover:text-gray-600 leading-relaxed font-bold transition-colors duration-500 mt-2 md:mt-4 px-2 md:px-4">{item.desc}</p>
-              </div>
-
-              <div className="relative z-10 w-full mt-8 md:mt-12 overflow-hidden rounded-full">
-                <button className="w-full py-4 md:py-6 rounded-full text-[10px] md:text-[13px] font-black uppercase tracking-[0.2em] md:tracking-[0.4em] bg-gray-50 text-gray-400 md:group-hover:bg-[#F2529D] md:group-hover:text-white transition-all duration-500 shadow-sm active:scale-95 border border-transparent hover:shadow-lg">
-                  {item.btn}
-                </button>
-              </div>
-              
-              {/* Background text decoration */}
-              <div className="absolute -bottom-4 -left-4 text-7xl md:text-9xl font-display italic text-gray-50 opacity-0 md:group-hover:opacity-100 transition-opacity duration-1000 select-none pointer-events-none -z-10 hidden md:block">
-                0{i + 1}
-              </div>
-            </div>
-          ))}
         </div>
       </section>
 

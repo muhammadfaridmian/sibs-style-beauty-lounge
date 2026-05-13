@@ -5,7 +5,6 @@ import gsap from 'gsap';
 import logo from './assets/sibs-logo.svg';
 import HomeScreen from './HomePage.tsx';
 import BookingPage from './BookingPage.tsx';
-import StylistsPage from './StylistsPage.tsx';
 import TestimonialsPage from './TestimonialsPage.tsx';
 import ExclusiveOffers from './OffersPage.tsx';
 import ContactPage from './ContactPage.tsx';
@@ -158,7 +157,6 @@ const Navigation = () => {
   const navLinks = [
     { name: 'Home', path: '/' },
     { name: 'Treatments', path: '/booking' },
-    { name: 'Artisans', path: '/artisans' },
     { name: 'Offers', path: '/offers' },
     { name: 'Chronicles', path: '/testimonials' },
     { name: 'Gallery', path: '/gallery' },
@@ -475,7 +473,6 @@ function App() {
             <Route path="/auth" element={<AuthPage />} />
             <Route path="/login" element={<AuthPage />} />
             <Route path="/admin/*" element={<AdminPage />} />
-            <Route path="/artisans" element={<StylistsPage />} />
             <Route path="/testimonials" element={<TestimonialsPage />} />
             <Route path="/offers" element={<ExclusiveOffers />} />
             <Route path="/contact" element={<ContactPage />} />

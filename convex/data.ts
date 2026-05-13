@@ -77,6 +77,7 @@ function asServiceCard(doc: {
   shortDescription: string;
   fullDescription: string;
   priceCents: number;
+  priceLabel?: string;
   durationMinutes: number;
   category: string;
   imageUrl: string;
@@ -94,6 +95,7 @@ function asServiceCard(doc: {
     description: doc.shortDescription,
     fullDescription: doc.fullDescription,
     priceCents: doc.priceCents,
+    priceLabel: doc.priceLabel,
     price: formatMoney(doc.priceCents),
     durationMinutes: doc.durationMinutes,
     durationLabel: `${doc.durationMinutes} MINS`,

@@ -75,6 +75,7 @@ export const seedDefaults = mutation({
             shortDescription: service.shortDescription,
             fullDescription: service.fullDescription,
             priceCents: service.priceCents,
+            priceLabel: service.priceLabel,
             durationMinutes: service.durationMinutes,
             category: service.category,
             imageUrl: service.imageUrl,

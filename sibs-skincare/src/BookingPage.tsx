@@ -1,9 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import Footer from './components/Footer';
 import { Link } from 'react-router-dom';
 import { Clock, ChevronLeft, ChevronRight, Mail as MailIcon, Phone, MapPin, Calendar as CalendarIcon, User, ArrowRight, AlertCircle, Sparkles, Info } from 'lucide-react';
 import gsap from 'gsap';
 import { getServices, getAvailability, createAppointment, formatPrice, formatDuration, getStoredAuthToken, type Service } from './api/convex-api';
+import bookingHeroImage from './assets/Sibshall.jpeg';
+import experienceImage from './assets/Jikai.jpeg';
 
 const BookingPage: React.FC = () => {
   // ==================== STATE ====================
@@ -18,6 +20,7 @@ const BookingPage: React.FC = () => {
   const [isLoadingAvailability, setIsLoadingAvailability] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
+  const [bookingSuccess, setBookingSuccess] = useState<{ serviceName: string; date: string; time: string } | null>(null);
   const [formData, setFormData] = useState({
     fullName: '',
     email: '',
@@ -29,6 +32,7 @@ const BookingPage: React.FC = () => {
   // The calendar header uses the current month as the visual anchor for the booking flow.
   const currentMonth = new Date();
   const authToken = getStoredAuthToken();
+  const serviceSectionOrder = ['Hair Services', 'Nail Care', 'Eyelash', 'Facial & Threading', 'Waxing', 'Relaxing Massage'];
 
   // ==================== LOAD SERVICES ====================
   useEffect(() => {
@@ -142,7 +146,11 @@ const BookingPage: React.FC = () => {
 
       const result = await createAppointment(appointmentData, sessionToken);
       if (result) {
-        alert(`✨ Booking Confirmed! ✨\n\nYour appointment for ${service.name} has been booked!\nThank you for choosing Sibs Style Beauty Lounge.`);
+        setBookingSuccess({
+          serviceName: service.name,
+          date: appointmentData.appointmentDate,
+          time: appointmentData.appointmentTime,
+        });
         setFormData({ fullName: '', email: '', phone: '', location: 'Downtown Sibs Lounge', info: '' });
         setSelectedService(null);
         setSelectedTime(null);
@@ -160,6 +168,16 @@ const BookingPage: React.FC = () => {
   // Availability only shows the slots that Convex marked as open for the selected day.
   // That makes the visible list match what the booking mutation will actually accept.
   const timeSlots = availability?.slots?.filter((slot: any) => slot.available) || [];
+  const groupedServices = useMemo(() => {
+    return serviceSectionOrder
+      .map((category) => ({
+        category,
+        services: services
+          .filter((service) => service.category === category)
+          .sort((left, right) => left.sortOrder - right.sortOrder),
+      }))
+      .filter((section) => section.services.length > 0);
+  }, [serviceSectionOrder, services]);
 
   // ==================== RENDER ====================
   return (
@@ -210,7 +228,7 @@ const BookingPage: React.FC = () => {
                 <div className="mt-auto flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 border-t-2 border-gray-50 pt-6 sm:pt-10">
                   <div className="flex flex-col">
                     <span className="text-[0.65rem] sm:text-xs font-black text-gray-400 tracking-widest uppercase mb-1">Price Investment</span>
-                    <span className="text-3xl sm:text-5xl font-display italic text-[#F2529D] font-black">{formatPrice(activeServiceData.priceCents)}</span>
+                      <span className="text-3xl sm:text-5xl font-display italic text-[#F2529D] font-black">{activeServiceData.priceLabel ?? formatPrice(activeServiceData.priceCents)}</span>
                   </div>
                   <button 
                     onClick={() => {
@@ -231,7 +249,7 @@ const BookingPage: React.FC = () => {
       {/* Hero Section */}
       <div className="relative h-[700px] w-full overflow-hidden booking-header">
         <img 
-          src="https://i.pinimg.com/1200x/8b/cf/ba/8bcfba4e073d6a55ddd55680b7d283d2.jpg" 
+          src={bookingHeroImage} 
           alt="Luxury Skincare" 
           className="w-full h-full object-cover brightness-[0.7]"
         />
@@ -249,26 +267,24 @@ const BookingPage: React.FC = () => {
         <div className="mb-40 grid grid-cols-1 lg:grid-cols-2 gap-16 items-center experience-section">
           <div className="relative rounded-[3rem] overflow-hidden shadow-[0_50px_100px_-20px_rgba(0,0,0,0.3)] group border-[2rem] border-white">
             <img 
-              src="https://plus.unsplash.com/premium_photo-1681364365252-387c05c06c40?q=80&w=687&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" 
+              src={experienceImage} 
               alt="Sibs Experience" 
               className="w-full h-[540px] object-cover transition-transform duration-1000 group-hover:scale-110"
             />
           </div>
-          <div className="space-y-10">
+          <div className="flex justify-center lg:justify-start">
+            <div className="space-y-10 max-w-xl text-center lg:text-left">
             <h2 className="text-5xl md:text-6xl font-display italic text-[#F2529D] font-black mb-8 leading-none tracking-tighter">The Sibs Experience</h2>
             <p className="text-xl md:text-2xl text-gray-800 leading-relaxed font-black max-w-xl">
               Every visit is a curated journey through texture, scent, and scientific precision.
             </p>
-            <div className="grid grid-cols-1 gap-8">
-              <div className="p-8 md:p-10 bg-white rounded-[3rem] shadow-xl border-l-[10px] border-[#BF9C34] group hover:scale-[1.02] transition-all duration-500">
+            <div className="flex justify-center lg:justify-start">
+              <div className="max-w-2xl w-full p-8 md:p-10 bg-white rounded-[3rem] shadow-xl border-l-[10px] border-[#BF9C34] group hover:scale-[1.02] transition-all duration-500">
                 <h4 className="text-3xl md:text-4xl font-display text-[#BF9C34] italic font-black mb-4">Sustainable</h4>
                 <p className="text-base md:text-lg text-gray-700 font-semibold leading-relaxed">Eco-conscious packaging and 100% ethically sourced ingredients.</p>
               </div>
-              <div className="p-8 md:p-10 bg-white rounded-[3rem] shadow-xl border-l-[10px] border-[#F2529D] group hover:scale-[1.02] transition-all duration-500">
-                <h4 className="text-3xl md:text-4xl font-display text-[#F2529D] italic font-black mb-4">Artisanal</h4>
-                <p className="text-base md:text-lg text-gray-700 font-semibold leading-relaxed">Hand-mixed serums prepared moments before your service.</p>
-              </div>
             </div>
+          </div>
           </div>
         </div>
 
@@ -293,6 +309,28 @@ const BookingPage: React.FC = () => {
             </div>
           )}
 
+          {bookingSuccess && (
+            <div className="rounded-[2rem] sm:rounded-[3rem] bg-[#0A0E1A] text-white p-6 sm:p-8 border border-white/10 shadow-[0_30px_90px_-30px_rgba(0,0,0,0.35)] relative overflow-hidden">
+              <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(242,82,157,0.16),transparent_28%),radial-gradient(circle_at_bottom_left,rgba(191,156,52,0.1),transparent_22%)]" />
+              <div className="relative z-10 flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
+                <div className="space-y-2">
+                  <p className="text-[10px] sm:text-xs font-black uppercase tracking-[0.35em] text-[#F2529D]">Ritual booked</p>
+                  <h3 className="text-2xl sm:text-4xl font-display italic font-black">Your appointment is confirmed</h3>
+                  <p className="text-sm sm:text-lg text-white/70 leading-relaxed">
+                    {bookingSuccess.serviceName} has been booked for {bookingSuccess.date} at {bookingSuccess.time}.
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setBookingSuccess(null)}
+                  className="inline-flex items-center justify-center rounded-full border border-white/15 bg-white/5 px-5 py-3 text-[10px] sm:text-xs font-black uppercase tracking-[0.35em] text-white hover:bg-white hover:text-black transition-colors"
+                >
+                  Dismiss
+                </button>
+              </div>
+            </div>
+          )}
+
           {/* Step 1: Services */}
           <section className="bg-white p-4 sm:p-6 md:p-20 rounded-[2rem] sm:rounded-[3rem] md:rounded-[4rem] shadow-[0_50px_100px_-20px_rgba(0,0,0,0.1)] border border-gray-50 step-card relative overflow-hidden group/card">
             <div className="absolute top-0 right-0 w-96 h-96 bg-[#F2529D]/5 rounded-full blur-[100px] -mr-48 -mt-48 transition-colors duration-1000 group-hover/card:bg-[#BF9C34]/5"></div>
@@ -313,67 +351,66 @@ const BookingPage: React.FC = () => {
                 <p className="text-gray-500 text-lg font-semibold">Loading services...</p>
               </div>
             ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-2 gap-6 sm:gap-8 md:gap-12 relative z-10 max-w-full sm:max-w-[95%] mx-auto">
-                {services.map((service) => (
-                  <div 
-                    key={service.id} 
-                    onClick={() => {
-                      // Clicking a card both highlights it and opens the service detail overlay.
-                      // The same service id is reused later when the booking is finally submitted.
-                      setSelectedService(service.id);
-                      setViewingService(service.id);
-                    }}
-                    className={`group cursor-pointer transition-all duration-700 p-4 sm:p-6 md:p-16 rounded-[2rem] sm:rounded-[3rem] md:rounded-[4rem] border-4 relative overflow-hidden flex flex-col justify-between h-auto ${
-                      selectedService === service.id 
-                      ? 'bg-black border-black text-white scale-[1.02] shadow-[0_40px_80px_-15px_rgba(0,0,0,0.5)] z-20' 
-                      : 'bg-white border-white hover:border-[#F2529D]/20 hover:translate-y-[-10px] shadow-[0_20px_60px_-15px_rgba(0,0,0,0.05)] hover:shadow-2xl'
-                    }`}
-                  >
-                    <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-6 sm:gap-8 mb-8 sm:mb-10">
-                      <div className="space-y-3 sm:space-y-4 w-full sm:max-w-[75%]">
-                        <span className={`text-[0.65rem] sm:text-[0.75rem] md:text-[0.85rem] font-black tracking-[0.35em] sm:tracking-[0.5em] md:tracking-[0.6em] uppercase transition-colors duration-500 ${selectedService === service.id ? 'text-[#F2529D]' : 'text-[#BF9C34]'}`}>
-                          Treatment Ritual 0{service.sortOrder}
-                        </span>
-                        <h3 className={`text-2xl sm:text-3xl md:text-5xl font-display italic font-black leading-[1.1] transition-colors duration-500 ${selectedService === service.id ? 'text-white' : 'text-gray-900 group-hover:text-[#F2529D]'}`}>
-                          {service.name}
-                        </h3>
+              <div className="space-y-12 relative z-10 max-w-full mx-auto">
+                {groupedServices.map((section, sectionIndex) => (
+                  <div key={section.category} className="space-y-6 sm:space-y-8">
+                    <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+                      <div>
+                        <span className="text-[0.65rem] sm:text-xs font-black uppercase tracking-[0.35em] text-[#BF9C34] block mb-2">Section {String(sectionIndex + 1).padStart(2, '0')}</span>
+                        <h3 className="text-3xl sm:text-4xl md:text-6xl font-display italic font-black text-gray-900 leading-none">{section.category}</h3>
                       </div>
-                      <div className="text-right flex flex-col items-end">
-                        <span className={`text-2xl sm:text-3xl md:text-5xl font-black transition-colors duration-500 ${selectedService === service.id ? 'text-white' : 'text-[#333]'}`}>
-                          {formatPrice(service.priceCents).split(' ')[0]}
-                        </span>
-                        <span className={`text-[0.65rem] sm:text-sm font-black tracking-widest ${selectedService === service.id ? 'text-[#F2529D]' : 'text-[#BF9C34]'}`}>
-                           AED
-                        </span>
-                      </div>
+                      <p className="text-[10px] sm:text-xs font-black uppercase tracking-[0.35em] text-gray-400">{section.services.length} services</p>
                     </div>
 
-                    <div className={`h-1 w-20 sm:w-24 bg-gradient-to-r mb-8 sm:mb-10 transition-all duration-700 ${selectedService === service.id ? 'from-[#F2529D] to-transparent' : 'from-[#BF9C34]/20 to-transparent group-hover:w-48 group-hover:from-[#F2529D]'}`}></div>
+                    <div className="grid gap-4 sm:gap-5 md:gap-6">
+                      {section.services.map((service) => (
+                        <button
+                          key={service.id}
+                          type="button"
+                          onClick={() => {
+                            setSelectedService(service.id);
+                            setViewingService(service.id);
+                          }}
+                          className={`group text-left transition-all duration-700 p-4 sm:p-5 md:p-6 rounded-[2rem] border-2 relative overflow-hidden flex flex-col md:flex-row md:items-center gap-4 sm:gap-5 ${
+                            selectedService === service.id
+                              ? 'bg-black border-black text-white shadow-[0_30px_80px_-20px_rgba(0,0,0,0.5)]'
+                              : 'bg-white border-gray-100 hover:border-[#F2529D]/20 hover:shadow-2xl hover:-translate-y-1'
+                          }`}
+                        >
+                          <div className="flex items-center gap-4 min-w-0 flex-1">
+                            <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-[1.25rem] overflow-hidden flex-shrink-0 shadow-lg border border-white/70">
+                              <img src={service.imageUrl} alt={service.name} className="w-full h-full object-cover" />
+                            </div>
+                            <div className="min-w-0 space-y-2">
+                              <span className={`text-[0.6rem] sm:text-[0.7rem] font-black tracking-[0.35em] uppercase transition-colors duration-500 ${selectedService === service.id ? 'text-[#F2529D]' : 'text-[#BF9C34]'}`}>
+                                Treatment Ritual {String(service.sortOrder).padStart(2, '0')}
+                              </span>
+                              <h4 className={`text-xl sm:text-2xl md:text-3xl font-display italic font-black leading-tight transition-colors duration-500 ${selectedService === service.id ? 'text-white' : 'text-gray-900 group-hover:text-[#F2529D]'}`}>
+                                {service.name}
+                              </h4>
+                              <p className={`text-sm sm:text-base leading-relaxed transition-colors duration-500 ${selectedService === service.id ? 'text-white/75' : 'text-gray-600'}`}>
+                                {service.shortDescription}
+                              </p>
+                            </div>
+                          </div>
 
-                    <p className={`text-base sm:text-xl md:text-3xl leading-relaxed mb-8 sm:mb-12 font-bold italic transition-colors duration-500  ${selectedService === service.id ? 'text-white/90' : 'text-gray-700'}`}>
-                      "{service.shortDescription}"
-                    </p>
+                          <div className="flex w-full md:w-auto items-center justify-between md:justify-end gap-4 md:gap-6">
+                            <div className="text-left md:text-right">
+                              <span className={`block text-xl sm:text-2xl md:text-4xl font-black transition-colors duration-500 ${selectedService === service.id ? 'text-white' : 'text-[#333]'}`}>
+                                {service.priceLabel ?? formatPrice(service.priceCents)}
+                              </span>
+                              <span className={`text-[0.65rem] sm:text-xs font-black tracking-widest uppercase ${selectedService === service.id ? 'text-[#F2529D]' : 'text-[#BF9C34]'}`}>
+                                {formatDuration(service.durationMinutes)}
+                              </span>
+                            </div>
 
-                    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mt-auto">
-                      <div className={`flex items-center space-x-3 sm:space-x-6 px-4 sm:px-6 md:px-10 py-3 sm:py-5 md:py-6 rounded-full transition-all duration-700 ${
-                        selectedService === service.id ? 'bg-[#F2529D] text-white shadow-lg' : 'bg-[#FAF9F6] text-gray-700 border-2 border-gray-100 group-hover:shadow-md'
-                      }`}>
-                        <Clock size={20} className={selectedService === service.id ? "animate-pulse" : ""} />
-                        <span className="text-[0.65rem] sm:text-xs md:text-lg font-black tracking-[0.18em] sm:tracking-[0.25em] md:tracking-[0.3em] uppercase">{formatDuration(service.durationMinutes)}</span>
-                      </div>
-                      
-                      <div className={`flex items-center gap-3 sm:gap-6 group-hover:translate-x-2 transition-transform duration-500 ${selectedService === service.id ? 'text-[#F2529D]' : 'text-gray-400'}`}>
-                        <span className="text-[0.6rem] sm:text-[0.8rem] font-black uppercase tracking-[0.2em] sm:tracking-widest">Select Treatment</span>
-                        <div className={`w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 rounded-full flex items-center justify-center transition-all duration-500 ${selectedService === service.id ? 'bg-white shadow-xl' : 'bg-white border-2 border-gray-50'}`}>
-                          <ArrowRight size={20} className={selectedService === service.id ? 'text-black' : 'text-gray-200'} />
-                        </div>
-                      </div>
+                            <div className={`w-12 h-12 sm:w-14 sm:h-14 rounded-full flex items-center justify-center transition-all duration-500 shrink-0 ${selectedService === service.id ? 'bg-white shadow-xl' : 'bg-[#FAF9F6] border border-gray-100 group-hover:bg-[#F2529D] group-hover:text-white'}`}>
+                              <ArrowRight size={20} className={selectedService === service.id ? 'text-black' : 'text-gray-400 group-hover:text-white'} />
+                            </div>
+                          </div>
+                        </button>
+                      ))}
                     </div>
-
-                    {/* Decorative Background Element */}
-                    <span className={`hidden sm:block absolute -right-4 -bottom-4 sm:-right-8 sm:-bottom-8 text-[5rem] sm:text-[8rem] md:text-[12rem] font-display font-black opacity-[0.02] italic pointer-events-none transition-all duration-1000 ${selectedService === service.id ? 'opacity-[0.08] scale-110 -rotate-12' : 'group-hover:opacity-[0.05] group-hover:rotate-6'}`}>
-                      0{service.sortOrder}
-                    </span>
                   </div>
                 ))}
               </div>
@@ -525,7 +562,7 @@ const BookingPage: React.FC = () => {
                           <h4 className="text-[0.55rem] sm:text-[0.8rem] font-bold text-gray-400 uppercase tracking-[0.35em] sm:tracking-[0.8em]">Essential Ritual Preparation</h4>
                           <div className="flex flex-col md:flex-row md:items-baseline gap-3 sm:gap-6 justify-center md:justify-start">
                             <p className="text-[#333] text-4xl sm:text-5xl md:text-7xl font-black tracking-tighter">
-                              {formatDuration(services.find(s => s.id === selectedService)?.durationMinutes || 0)}
+                                    {formatDuration(services.find(s => s.id === selectedService)?.durationMinutes || 0)}
                             </p>
                             <span className="text-base sm:text-xl font-display italic text-[#F2529D] font-black tracking-widest">Total Ritual Time</span>
                           </div>
@@ -655,7 +692,7 @@ const BookingPage: React.FC = () => {
                       {selectedService ? services.find(s => s.id === selectedService)?.name : 'Awaiting Selection'}
                     </p>
                     <span className="text-4xl sm:text-6xl md:text-7xl font-display italic text-[#F2529D] font-black drop-shadow-lg leading-none pt-2 sm:pt-4">
-                      {selectedService ? formatPrice(services.find(s => s.id === selectedService)?.priceCents || 0) : '$0'}
+                      {selectedService ? (services.find(s => s.id === selectedService)?.priceLabel ?? formatPrice(services.find(s => s.id === selectedService)?.priceCents || 0)) : '$0'}
                     </span>
                   </div>
 
