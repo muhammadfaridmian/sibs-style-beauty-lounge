@@ -251,8 +251,6 @@ const OffersPage = () => {
 
   useEffect(() => {
     if (isPanelOpen) {
-      document.body.style.overflow = 'hidden';
-
       const tl = gsap.timeline();
       tl.fromTo('.panel-overlay',
         { opacity: 0 },
@@ -342,7 +340,7 @@ const OffersPage = () => {
             <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-[#BF9C34] rounded-full blur-[180px] animate-pulse delay-1000"></div>
           </div>
 
-          <div className='bg-white w-[calc(100vw-1rem)] sm:w-[95%] max-w-7xl h-[calc(100dvh-1rem)] sm:h-[85vh] rounded-[2rem] sm:rounded-[3rem] md:rounded-[4rem] overflow-hidden overflow-x-hidden shadow-[0_0_100px_rgba(0,0,0,0.5)] relative flex flex-col selection-panel'>
+          <div className='bg-white w-[calc(100vw-1rem)] sm:w-[95%] max-w-7xl max-h-[calc(100dvh-1rem)] sm:max-h-[85vh] rounded-[2rem] sm:rounded-[3rem] md:rounded-[4rem] overflow-visible overflow-x-visible shadow-[0_0_100px_rgba(0,0,0,0.5)] relative flex flex-col selection-panel'>
             <div className='flex-none flex justify-between items-center px-5 sm:px-8 md:px-12 py-4 sm:py-5 md:py-6 border-b border-gray-100 bg-white relative z-10'>
               <div className="flex items-center gap-4 min-w-0">
                 <div className="w-1 h-8 bg-[#F2529D] rounded-full"></div>
@@ -360,7 +358,7 @@ const OffersPage = () => {
               </button>
             </div>
 
-            <div className='flex-1 overflow-y-auto px-4 sm:px-8 md:px-12 py-4 sm:py-10 md:py-16 bg-white custom-scrollbar'>
+            <div className='flex-1 px-4 sm:px-8 md:px-12 py-4 sm:py-10 md:py-16 bg-white'>
               {limitedExclusivePromotions.length > 0 ? (
                 <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-8 md:gap-12'>
                   {limitedExclusivePromotions.map((promotion, idx) => (

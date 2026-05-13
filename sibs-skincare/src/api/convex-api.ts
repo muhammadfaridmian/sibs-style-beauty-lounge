@@ -641,9 +641,10 @@ export async function getAdminPromotions(authToken: string | null = getStoredAut
 
   try {
     // Try the admin-only endpoint first (requires a valid token).
-    // requestJson automatically unwraps the { ok, data } envelope and returns just the data.
-    const promotions = await requestJson<Promotion[]>("/api/admin/promotions", { method: "GET" }, authToken);
-    return (promotions || []) as Promotion[];
+    // `requestJson` already unwraps the Convex envelope and returns the data payload.
+    // So requestJson<Promotion[]> returns the array of promotions directly.
+    const items = await requestJson<Promotion[]>("/api/admin/promotions", { method: "GET" }, authToken);
+    return items || [];
   } catch (adminErr) {
     // If the admin endpoint fails (CORS, 404, network), fall back to the public promotions list so the admin UI can still display items read-only.
     // This avoids a hard crash in the browser when the backend isn't deployed or CORS blocks the admin route.
