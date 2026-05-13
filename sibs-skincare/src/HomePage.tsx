@@ -4,6 +4,8 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { ArrowRight, ShoppingBag, X } from 'lucide-react';
 import silkyCoolProductsImage from './assets/Silkycoolproducts.jpeg';
 import goldProductsImage from './assets/Goldproducts.jpeg';
+import { getCollections, getCurrentAuthUser, getStoredAuthToken, type CollectionItem } from './api/convex-api';
+import availableProductAssets from './availableProductAssets';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -12,6 +14,8 @@ const HomePage = () => {
   const revealRefs = useRef<(HTMLDivElement | null)[]>([]);
   const containerRef = useRef<HTMLDivElement>(null);
   const [isCollectionOpen, setIsCollectionOpen] = useState(false);
+  const [isAdminViewer, setIsAdminViewer] = useState(false);
+  const [products, setProducts] = useState<Array<{ id: string; name: string; imageUrl: string; description: string; price: string }>>([]);
 
   // A couple of animation branches depend on whether the screen is small.
   // The modal moves differently on mobile because there is less room for the product grid.
@@ -134,6 +138,55 @@ const HomePage = () => {
     }
   };
 
+  useEffect(() => {
+    let cancelled = false;
+
+    const loadCollectionsAndRole = async () => {
+      try {
+        const items = await getCollections();
+        if (cancelled) return;
+
+        const mapped = (items as CollectionItem[])
+          .map((item) => {
+            const mappedAsset = item.assetKey ? availableProductAssets[item.assetKey] : undefined;
+            const imageUrl = item.imageUrl || mappedAsset?.src || '';
+            if (!imageUrl) return null;
+
+            return {
+              id: item.id,
+              name: item.title,
+              imageUrl,
+              description: item.description || 'Botanical luxury for your ritual.',
+              price: item.priceLabel || (typeof item.priceCents === 'number' ? `${item.priceCents}` : 'Price on request'),
+            };
+          })
+          .filter((item): item is { id: string; name: string; imageUrl: string; description: string; price: string } => Boolean(item));
+
+        setProducts(mapped);
+      } catch {
+        if (!cancelled) setProducts([]);
+      }
+
+      const token = getStoredAuthToken();
+      if (!token) {
+        if (!cancelled) setIsAdminViewer(false);
+        return;
+      }
+
+      try {
+        const user = await getCurrentAuthUser(token);
+        if (!cancelled) setIsAdminViewer(Boolean(user && user.role === 'admin'));
+      } catch {
+        if (!cancelled) setIsAdminViewer(false);
+      }
+    };
+
+    loadCollectionsAndRole();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
   
 
   return (
@@ -208,14 +261,42 @@ const HomePage = () => {
                     </button>
                 </div>
 
-                <div className="flex-1 overflow-y-auto p-4 sm:p-6 md:p-20 custom-scrollbar relative flex items-center justify-center">
-                      <div className="max-w-2xl text-center space-y-4 sm:space-y-6">
-                        <p className="text-[10px] sm:text-xs font-black uppercase tracking-[0.4em] text-[#F2529D]">Discover Collection</p>
-                        <h3 className="text-3xl sm:text-5xl font-display italic font-black text-black">Collection hidden for now</h3>
-                        <p className="text-sm sm:text-lg text-gray-500 leading-relaxed">
-                          The container is intentionally empty until you want to bring the product cards back.
-                        </p>
-                      </div>
+                <div className="flex-1 overflow-y-auto p-4 sm:p-6 md:p-20 custom-scrollbar relative">
+                  {products.length > 0 ? (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-10">
+                      {products.map((product) => (
+                        <article key={product.id} className="product-card-anim rounded-[1.5rem] bg-white border border-gray-100 overflow-hidden shadow-[0_20px_50px_-25px_rgba(0,0,0,0.2)]">
+                          <div className="aspect-[4/3] overflow-hidden bg-[#FAF9F6]">
+                            <img src={product.imageUrl} alt={product.name} className="w-full h-full object-cover" />
+                          </div>
+                          <div className="p-4 md:p-6 space-y-2">
+                            <h4 className="text-xl md:text-2xl font-display italic font-black text-black">{product.name}</h4>
+                            <p className="text-sm text-gray-500 leading-relaxed">{product.description}</p>
+                            <p className="text-sm md:text-base font-black text-[#F2529D]">{product.price}</p>
+                          </div>
+                        </article>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="max-w-2xl text-center space-y-4 sm:space-y-6 mx-auto">
+                      <p className="text-[10px] sm:text-xs font-black uppercase tracking-[0.4em] text-[#F2529D]">Discover Collection</p>
+                      {isAdminViewer ? (
+                        <>
+                          <h3 className="text-3xl sm:text-5xl font-display italic font-black text-black">Collection hidden for now</h3>
+                          <p className="text-sm sm:text-lg text-gray-500 leading-relaxed">
+                            The container is intentionally empty until you want to bring the product cards back.
+                          </p>
+                        </>
+                      ) : (
+                        <>
+                          <h3 className="text-3xl sm:text-5xl font-display italic font-black text-black">No products available right now</h3>
+                          <p className="text-sm sm:text-lg text-gray-500 leading-relaxed">
+                            Please check back soon for our latest curated collection.
+                          </p>
+                        </>
+                      )}
+                    </div>
+                  )}
                 </div>
 
                 {/* Footer Section */}

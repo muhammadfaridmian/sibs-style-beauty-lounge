@@ -528,6 +528,45 @@ export const deleteCollection = internalMutation({
   },
 });
 
+export const updateCollection = internalMutation({
+  args: {
+    collectionId: v.id("collections"),
+    title: v.optional(v.string()),
+    description: v.optional(v.string()),
+    assetKey: v.optional(v.string()),
+    imageUrl: v.optional(v.string()),
+    priceCents: v.optional(v.number()),
+    priceLabel: v.optional(v.string()),
+    active: v.optional(v.boolean()),
+    featured: v.optional(v.boolean()),
+    sortOrder: v.optional(v.number()),
+    updatedAt: v.number(),
+  },
+  handler: async (ctx, args) => {
+    const existing = await ctx.db.get(args.collectionId);
+    if (!existing) {
+      throw new Error("Collection not found");
+    }
+
+    const patch: Record<string, unknown> = {
+      updatedAt: args.updatedAt,
+    };
+
+    if (args.title !== undefined) patch.title = args.title;
+    if (args.description !== undefined) patch.description = args.description;
+    if (args.assetKey !== undefined) patch.assetKey = args.assetKey;
+    if (args.imageUrl !== undefined) patch.imageUrl = args.imageUrl;
+    if (args.priceCents !== undefined) patch.priceCents = args.priceCents;
+    if (args.priceLabel !== undefined) patch.priceLabel = args.priceLabel;
+    if (args.active !== undefined) patch.active = args.active;
+    if (args.featured !== undefined) patch.featured = args.featured;
+    if (args.sortOrder !== undefined) patch.sortOrder = args.sortOrder;
+
+    await ctx.db.patch(args.collectionId, patch as any);
+    return { collectionId: args.collectionId };
+  },
+});
+
 export const listPromotionsForAdmin = internalQuery({
   args: {},
   handler: async (ctx) => {

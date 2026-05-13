@@ -29,6 +29,7 @@ import {
   updateAppointmentStatus,
   uploadGalleryItem,
   createCollection,
+  updateCollection,
   type AdminAppointment,
   type AdminReview,
   type AuthUser,
@@ -154,6 +155,33 @@ const AdminPage: React.FC = () => {
       await refreshDashboard();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Unable to delete collection.');
+    }
+  };
+
+  const handleEditCollection = async (collection: any) => {
+    if (!authToken) return;
+
+    const nextTitle = window.prompt('Update title', collection.title ?? '');
+    if (nextTitle === null) return;
+    const nextDescription = window.prompt('Update description', collection.description ?? '');
+    if (nextDescription === null) return;
+    const nextPriceLabel = window.prompt('Update price label', collection.priceLabel ?? '');
+    if (nextPriceLabel === null) return;
+
+    try {
+      await updateCollection({
+        collectionId: collection.id,
+        updates: {
+          title: nextTitle.trim(),
+          description: nextDescription.trim(),
+          priceLabel: nextPriceLabel.trim(),
+        },
+        authToken,
+      });
+      setActionMessage('Collection updated');
+      await refreshDashboard();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Unable to update collection.');
     }
   };
 
@@ -862,6 +890,7 @@ const AdminPage: React.FC = () => {
                     <p className="text-sm text-gray-500">{c.description}</p>
                   </div>
                   <div className="flex flex-col gap-2">
+                    <button onClick={() => handleEditCollection(c)} className="rounded-full bg-blue-50 text-blue-700 px-4 py-2 text-sm font-black">Edit</button>
                     <button onClick={() => handleDeleteCollection(c.id)} className="rounded-full bg-red-50 text-red-700 px-4 py-2 text-sm font-black">Delete</button>
                   </div>
                 </div>

@@ -761,6 +761,30 @@ export async function deleteCollection(params: { collectionId: string; authToken
   return await requestJson<{ collectionId: string }>(`/api/admin/collections/${params.collectionId}`, { method: 'DELETE' }, authToken);
 }
 
+export async function updateCollection(params: {
+  collectionId: string;
+  updates: Partial<{
+    title: string;
+    description: string;
+    assetKey: string;
+    imageUrl: string;
+    priceCents: number;
+    priceLabel: string;
+    active: boolean;
+    featured: boolean;
+    sortOrder: number;
+  }>;
+  authToken?: string | null;
+}): Promise<{ collectionId: string }> {
+  const authToken = params.authToken ?? getStoredAuthToken();
+  if (!authToken) throw new Error('Please sign in as admin before updating collections.');
+
+  return await requestJson<{ collectionId: string }>(`/api/admin/collections/${params.collectionId}`, {
+    method: 'PUT',
+    body: JSON.stringify(params.updates),
+  }, authToken);
+}
+
 export async function updatePromotion(params: {
   promotionId: string;
   updates: Partial<{

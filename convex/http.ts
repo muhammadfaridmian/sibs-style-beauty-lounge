@@ -438,6 +438,56 @@ http.route({
 });
 
 http.route({
+  pathPrefix: "/api/admin/collections/",
+  method: "PUT",
+  handler: httpAction(async (ctx, request) => {
+    const admin = await requireAdmin(ctx, request);
+    if (!admin) {
+      return jsonResponse({ ok: false, error: "Admin access required." }, 403);
+    }
+
+    try {
+      const pathname = new URL(request.url).pathname;
+      const collectionId = getPathSuffix(pathname, "/api/admin/collections/");
+      if (!collectionId) {
+        return jsonResponse({ ok: false, error: "Collection id is required." }, 400);
+      }
+
+      const body = await readJson<{
+        title?: string;
+        description?: string;
+        assetKey?: string;
+        imageUrl?: string;
+        priceCents?: number;
+        priceLabel?: string;
+        active?: boolean;
+        featured?: boolean;
+        sortOrder?: number;
+      }>(request);
+
+      const result = await (ctx as any).runMutation(internal.data.updateCollection, {
+        collectionId: collectionId as Id<"collections">,
+        title: body.title?.trim(),
+        description: body.description?.trim(),
+        assetKey: body.assetKey?.trim(),
+        imageUrl: body.imageUrl?.trim(),
+        priceCents: typeof body.priceCents === "number" ? body.priceCents : undefined,
+        priceLabel: body.priceLabel?.trim(),
+        active: typeof body.active === "boolean" ? body.active : undefined,
+        featured: typeof body.featured === "boolean" ? body.featured : undefined,
+        sortOrder: typeof body.sortOrder === "number" ? body.sortOrder : undefined,
+        updatedAt: Date.now(),
+      });
+
+      return jsonResponse({ ok: true, data: result });
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Unable to update collection.";
+      return jsonResponse({ ok: false, error: message }, statusFromError(message));
+    }
+  }),
+});
+
+http.route({
   path: "/api/admin/promotions",
   method: "GET",
   handler: httpAction(async (ctx, request) => {
