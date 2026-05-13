@@ -7,59 +7,72 @@ import Footer from './components/Footer';
 gsap.registerPlugin(ScrollTrigger);
 
 // The gallery is mostly a visual story page, so the motion work does most of the talking.
+// Import local gallery assets
+import nailsImage from './assets/Nails.jpeg';
+import cleanserImage from './assets/Cleanser.jpeg';
+import detoxImage from './assets/Detox.jpeg';
+import herbalImage from './assets/HerbalEssence.jpeg';
+import vitaminCImage from './assets/VitaminC.jpeg';
+import hairCreamImage from './assets/HairCream.jpeg';
+import mintpoxImage from './assets/mintpox.jpeg';
+import mijanImage from './assets/Mijan.jpeg';
+import himalayaImage from './assets/himalaya.jpeg';
+import btesnceImage from './assets/btesnce.png';
+import craftedImage from './assets/craftedprecision.png';
+
 const images = [
   {
-    url: 'https://i.pinimg.com/1200x/a3/43/df/a343dfb6e615e0e65a48411ab0ab833a.jpg', // Luxury Serum Bottle
-    title: 'Radiance Elixir',
-    category: 'Product Edit',
+    url: nailsImage,
+    title: 'Precision Beauty',
+    category: 'Nail Care',
     span: 'md:row-span-2'
   },
   {
-    url: 'https://i.pinimg.com/1200x/66/23/9a/66239a1485de08d7c9d73f52e4ca2408.jpg', // Cream Texture
-    title: 'Satin Touch',
-    category: 'Texture Study',
+    url: cleanserImage,
+    title: 'Pure Essence',
+    category: 'Skincare',
     span: 'col-span-1'
   },
   {
-    url: 'https://i.pinimg.com/736x/b8/ec/cb/b8eccbefb90d0b642f1152624fa09459.jpg', // Aesthetic Spa Interior
-    title: 'The Sanctuary',
-    category: 'Space',
+    url: detoxImage,
+    title: 'Detox Ritual',
+    category: 'Treatment',
     span: 'col-span-1'
   },
   {
-    url: 'https://i.pinimg.com/1200x/a3/20/48/a320481f501bec266ffc9c8c494cff69.jpg', // Face Oil / Amber Glass
-    title: 'Golden Hour',
-    category: 'Oil Infusion',
+    url: herbalImage,
+    title: 'Herbal Infusion',
+    category: 'Botanical',
     span: 'md:row-span-1'
   },
   {
-    url: 'https://i.pinimg.com/736x/26/8d/22/268d22a96e65f8e21b6ea4836e1a3644.jpg', // Spa Lounge dark velvet
-    title: 'Velvet Lounge',
-    category: 'Interior',
+    url: vitaminCImage,
+    title: 'Radiant Glow',
+    category: 'Product',
     span: 'col-span-1'
   },
   {
-    url: 'https://i.pinimg.com/1200x/67/fb/63/67fb63d99a2ea5fce9cb0a074d6b73ba.jpg', // Woman applying cream
-    title: 'The Ritual',
-    category: 'Self Care',
+    url: hairCreamImage,
+    title: 'Hair Luxe',
+    category: 'Hair Care',
     span: 'md:row-span-2'
   },
   {
-    url: 'https://i.pinimg.com/736x/5c/16/eb/5c16eb439f95a147912e87c8f4a297d1.jpg', // Collection of bottles
-    title: 'Curated Essentials',
-    category: 'Collection',
+    url: mintpoxImage,
+    title: 'Refresh & Revive',
+    category: 'Signature',
     span: 'md:col-span-2'
   },
   {
-    url: 'https://i.pinimg.com/736x/74/3e/7e/743e7e91713fd66db2f223afe5c2255e.jpg', // Abstract light/glow
-    title: 'Inner Glow',
-    category: 'Abstract',
+    url: mijanImage,
+    title: 'Artisan Blend',
+    category: 'Premium',
     span: 'col-span-1'
   },
   {
-    url: 'src/assets/btesnce.png', // Dropper/Oil
-    title: 'Botanical Essence',
-    category: 'Micro Edit',
+    url: himalayaImage,
+    title: 'Mountain Pure',
+    category: 'Natural',
     span: 'md:col-span-2'
   },
   {
@@ -69,13 +82,13 @@ const images = [
     span: 'col-span-1 aspect-square md:translate-y-12'
   },
   {
-    url: 'https://images.unsplash.com/photo-1608248597279-f99d160bfcbc?q=80&w=800&auto=format&fit=crop', // Close up skin
-    title: 'Raw Texture',
-    category: 'Skin Study',
+    url: btesnceImage, // Botanical Essence
+    title: 'Botanical Essence',
+    category: 'Micro Edit',
     span: 'col-span-1 rounded-full p-4 grayscale hover:grayscale-0 transition-all'
   },
   {
-    url: 'src/assets/craftedprecision.png', // Luxury spa tools
+    url: craftedImage, // Crafted Precision
     title: 'Crafted Precision',
     category: 'Tools',
     span: 'col-span-1'

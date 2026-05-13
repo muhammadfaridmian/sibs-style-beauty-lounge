@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import Footer from './components/Footer';
 import { Link } from 'react-router-dom';
-import { Clock, ChevronRight, Mail as MailIcon, Phone, MapPin, Calendar as CalendarIcon, User, ArrowRight, AlertCircle, Sparkles, Info } from 'lucide-react';
+import { Clock, ChevronRight, Mail as MailIcon, Phone, MapPin, Calendar as CalendarIcon, User, ArrowRight, AlertCircle, Sparkles, Info, Tag, Gift, X, Check } from 'lucide-react';
 import gsap from 'gsap';
-import { getServices, getAvailability, createAppointment, formatPrice, formatDuration, getStoredAuthToken, type Service } from './api/convex-api';
+import { getServices, getAvailability, createAppointment, formatPrice, formatDuration, getStoredAuthToken, type Service, getPromotions, type Promotion } from './api/convex-api';
 import bookingHeroImage from './assets/Sibshall.jpeg';
 import experienceImage from './assets/Jikai.jpeg';
 
@@ -27,6 +27,13 @@ const BookingPage: React.FC = () => {
     location: 'Downtown Sibs Lounge',
     info: ''
   });
+  // ======== Promotions & Discounts ========
+  const [promotions, setPromotions] = useState<Promotion[]>([]);
+  const [promoCode, setPromoCode] = useState('');
+  const [appliedDiscount, setAppliedDiscount] = useState<Promotion | null>(null);
+  const [claimedOffers, setClaimedOffers] = useState<Promotion[]>([]);
+  const [promoError, setPromoError] = useState<string | null>(null);
+  const [promoSuccess, setPromoSuccess] = useState<string | null>(null);
   const containerRef = React.useRef<HTMLDivElement>(null);
   // The calendar header uses the current month as the visual anchor for the booking flow.
   const currentMonth = new Date();
@@ -48,6 +55,19 @@ const BookingPage: React.FC = () => {
       }
     };
     loadServices();
+  }, []);
+
+  // ==================== LOAD PROMOTIONS ====================
+  useEffect(() => {
+    const loadPromotions = async () => {
+      try {
+        const data = await getPromotions();
+        setPromotions(data.filter((p: Promotion) => p.active));
+      } catch (error) {
+        console.error("Failed to load promotions:", error);
+      }
+    };
+    loadPromotions();
   }, []);
 
   // ==================== LOAD AVAILABILITY ====================
@@ -166,6 +186,72 @@ const BookingPage: React.FC = () => {
   // Availability only shows the slots that Convex marked as open for the selected day.
   // That makes the visible list match what the booking mutation will actually accept.
   const timeSlots = availability?.slots?.filter((slot: any) => slot.available) || [];
+
+  // ==================== DISCOUNT HANDLING ====================
+  const applyPromoCode = () => {
+    if (!promoCode.trim()) {
+      setPromoError('Please enter a discount code');
+      return;
+    }
+
+    const matchedPromo = promotions.find(
+      (p: Promotion) => p.code.toLowerCase() === promoCode.toLowerCase() && p.active
+    );
+
+    if (!matchedPromo) {
+      setPromoError('Invalid or expired discount code');
+      setPromoCode('');
+      return;
+    }
+
+    // Check if already claimed
+    if (claimedOffers.some(o => o.id === matchedPromo.id)) {
+      setPromoError('You have already redeemed this offer');
+      return;
+    }
+
+    // Check offer expiry
+    const endDate = new Date(matchedPromo.endDate);
+    if (new Date() > endDate) {
+      setPromoError('This offer has expired');
+      return;
+    }
+
+    if (matchedPromo.offerType === 'LIMITED_EXCLUSIVE') {
+      setAppliedDiscount(matchedPromo);
+      setPromoSuccess(`Great! Applied ${matchedPromo.discountText} to your services`);
+    } else {
+      setClaimedOffers([...claimedOffers, matchedPromo]);
+      setPromoSuccess(`Claimed: ${matchedPromo.discountText}`);
+    }
+
+    setPromoError(null);
+    setPromoCode('');
+    setTimeout(() => setPromoSuccess(null), 4000);
+  };
+
+  const removeAppliedDiscount = () => {
+    setAppliedDiscount(null);
+    setPromoError(null);
+  };
+
+  const removeClaimedOffer = (offerId: string) => {
+    setClaimedOffers(claimedOffers.filter(o => o.id !== offerId));
+  };
+
+  // Calculate discounted price
+  const getDiscountedPrice = (priceCents: number): number => {
+    if (!appliedDiscount) return priceCents;
+    
+    // Parse discount from discountText like "20% off select services"
+    const match = appliedDiscount.discountText.match(/(\d+)%/);
+    if (!match) return priceCents;
+    
+    const discountPercent = parseInt(match[1]);
+    const discountAmount = (priceCents * discountPercent) / 100;
+    return priceCents - discountAmount;
+  };
+
   const groupedServices = useMemo(() => {
     return serviceSectionOrder
       .map((category) => ({
@@ -324,10 +410,21 @@ const BookingPage: React.FC = () => {
                           </div>
 
                           <div className="flex w-full md:w-auto items-center justify-between md:justify-end gap-4 md:gap-6">
-                            <div className="text-left md:text-right">
-                              <span className={`block text-xl sm:text-2xl md:text-4xl font-black transition-colors duration-500 ${selectedService === service.id ? 'text-white' : 'text-[#333]'}`}>
-                                {service.priceLabel ?? formatPrice(service.priceCents)}
-                              </span>
+                            <div className="text-left md:text-right space-y-1">
+                              {appliedDiscount ? (
+                                <>
+                                  <span className={`block text-sm md:text-base font-black line-through opacity-50 ${selectedService === service.id ? 'text-white' : 'text-[#333]'}`}>
+                                    {service.priceLabel ?? formatPrice(service.priceCents)}
+                                  </span>
+                                  <span className={`block text-xl sm:text-2xl md:text-4xl font-black transition-colors duration-500 ${selectedService === service.id ? 'text-green-300' : 'text-green-600'}`}>
+                                    {formatPrice(getDiscountedPrice(service.priceCents))}
+                                  </span>
+                                </>
+                              ) : (
+                                <span className={`block text-xl sm:text-2xl md:text-4xl font-black transition-colors duration-500 ${selectedService === service.id ? 'text-white' : 'text-[#333]'}`}>
+                                  {service.priceLabel ?? formatPrice(service.priceCents)}
+                                </span>
+                              )}
                               <span className={`text-[0.65rem] sm:text-xs font-black tracking-widest uppercase ${selectedService === service.id ? 'text-[#F2529D]' : 'text-[#BF9C34]'}`}>
                                 {formatDuration(service.durationMinutes)}
                               </span>
@@ -506,6 +603,122 @@ const BookingPage: React.FC = () => {
               )}
             </div>
 
+            {/* Step 2.5: Offers & Discounts */}
+            <div className="bg-white p-4 sm:p-6 md:p-20 rounded-[2rem] sm:rounded-[3rem] md:rounded-[4rem] shadow-[0_50px_100px_-20px_rgba(0,0,0,0.1)] border border-gray-50 step-card relative overflow-hidden group/card">
+              <div className="absolute top-0 left-0 w-96 h-96 bg-[#BF9C34]/5 rounded-full blur-[100px] -ml-48 -mt-48 transition-colors duration-1000 group-hover/card:bg-[#F2529D]/5"></div>
+              
+              <div className="flex flex-col md:flex-row md:items-baseline justify-between gap-6 sm:gap-8 mb-10 sm:mb-14 md:mb-16 relative z-10">
+                <div className="flex flex-col md:flex-row md:items-baseline space-y-2 md:space-y-0 space-x-0 md:space-x-8">
+                  <span className="text-3xl sm:text-4xl md:text-9xl font-display text-[#F2529D]/10 font-black leading-none">02+</span>
+                  <div>
+                    <h2 className="text-2xl sm:text-3xl md:text-5xl font-black uppercase tracking-[0.12em] sm:tracking-[0.16em] md:tracking-[0.2em] text-gray-900 mb-2 md:mb-3">OFFERS & PROMOTIONS</h2>
+                    <p className="text-[#BF9C34] font-display italic text-lg sm:text-xl md:text-3xl font-bold">Unlock exclusive savings</p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="space-y-8 relative z-10">
+                {/* Discount Code Input */}
+                <div className="bg-gradient-to-r from-[#F2529D]/5 to-[#BF9C34]/5 p-6 sm:p-8 rounded-[1.5rem] sm:rounded-[2rem] border-2 border-[#F2529D]/10">
+                  <label className="text-[0.7rem] sm:text-[0.85rem] font-black text-[#BF9C34] flex items-center tracking-[0.3em] sm:tracking-[0.45em] uppercase mb-4">
+                    <Tag className="w-4 h-4 sm:w-5 sm:h-5 mr-2 sm:mr-3" />
+                    APPLY DISCOUNT CODE
+                  </label>
+                  <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
+                    <input 
+                      type="text"
+                      value={promoCode}
+                      onChange={(e) => {
+                        setPromoCode(e.target.value.toUpperCase());
+                        setPromoError(null);
+                      }}
+                      placeholder="Enter code (e.g., GLOW20)" 
+                      className="flex-1 bg-white px-4 sm:px-6 py-3 sm:py-4 rounded-full text-base sm:text-lg font-black text-gray-900 border-2 border-[#F2529D]/20 focus:border-[#F2529D] outline-none transition-all placeholder:text-gray-300"
+                    />
+                    <button
+                      type="button"
+                      onClick={applyPromoCode}
+                      className="px-6 sm:px-10 py-3 sm:py-4 bg-[#F2529D] hover:bg-[#F2529D]/90 text-white rounded-full text-[11px] sm:text-xs font-black uppercase tracking-[0.2em] transition-all hover:scale-105 active:scale-95 whitespace-nowrap"
+                    >
+                      Apply Code
+                    </button>
+                  </div>
+                  {promoError && (
+                    <div className="mt-3 flex items-center gap-2 text-red-600 text-xs sm:text-sm font-semibold">
+                      <AlertCircle size={16} />
+                      {promoError}
+                    </div>
+                  )}
+                  {promoSuccess && (
+                    <div className="mt-3 flex items-center gap-2 text-green-600 text-xs sm:text-sm font-semibold">
+                      <Check size={16} />
+                      {promoSuccess}
+                    </div>
+                  )}
+                </div>
+
+                {/* Applied Discount Display */}
+                {appliedDiscount && (
+                  <div className="bg-gradient-to-r from-[#F2529D]/10 to-[#BF9C34]/10 p-6 sm:p-8 rounded-[1.5rem] sm:rounded-[2rem] border-2 border-[#F2529D]/20 relative overflow-hidden">
+                    <div className="absolute top-0 right-0 w-20 h-20 bg-[#F2529D]/20 rounded-full blur-lg -mr-10 -mt-10"></div>
+                    <div className="relative z-10 flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+                      <div className="space-y-2 flex-1">
+                        <span className="text-[0.65rem] sm:text-xs font-black uppercase tracking-[0.35em] text-[#F2529D] block">✨ ACTIVE DISCOUNT</span>
+                        <h4 className="text-lg sm:text-2xl font-display italic text-gray-900 font-black">{appliedDiscount.title}</h4>
+                        <p className="text-sm sm:text-base text-gray-600 leading-relaxed">{appliedDiscount.description}</p>
+                        <div className="pt-2 space-y-1">
+                          <p className="text-xs sm:text-sm font-black text-[#BF9C34]">{appliedDiscount.discountText}</p>
+                          <p className="text-[0.7rem] sm:text-xs text-gray-500">Valid until {new Date(appliedDiscount.endDate).toLocaleDateString()}</p>
+                        </div>
+                      </div>
+                      <button
+                        onClick={removeAppliedDiscount}
+                        className="p-2 sm:p-3 rounded-full bg-white hover:bg-red-50 transition-colors"
+                      >
+                        <X size={20} className="text-gray-400 hover:text-red-500" />
+                      </button>
+                    </div>
+                  </div>
+                )}
+
+                {/* Claimed Offers Display */}
+                {claimedOffers.length > 0 && (
+                  <div className="space-y-4">
+                    <h3 className="text-sm sm:text-base font-black uppercase tracking-[0.2em] text-[#BF9C34]">
+                      <Gift className="inline w-4 h-4 sm:w-5 sm:h-5 mr-2 mb-0.5" />
+                      Claimed Offers ({claimedOffers.length})
+                    </h3>
+                    <div className="space-y-3">
+                      {claimedOffers.map((offer) => (
+                        <div key={offer.id} className="bg-gradient-to-r from-green-50 to-emerald-50 p-4 sm:p-6 rounded-[1.25rem] border-2 border-green-200 flex items-start justify-between gap-4">
+                          <div className="flex-1 min-w-0">
+                            <h4 className="text-base sm:text-lg font-display italic text-gray-900 font-black mb-1">{offer.title}</h4>
+                            <p className="text-xs sm:text-sm text-gray-600 font-semibold">{offer.discountText}</p>
+                            <p className="text-[0.65rem] sm:text-xs text-green-700 font-black mt-1">
+                              Expires {new Date(offer.endDate).toLocaleDateString()}
+                            </p>
+                          </div>
+                          <button
+                            onClick={() => removeClaimedOffer(offer.id)}
+                            className="flex-shrink-0 p-2 hover:bg-red-100 rounded-full transition-colors"
+                          >
+                            <X size={18} className="text-gray-400 hover:text-red-500" />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Help Text */}
+                {promotions.length > 0 && !appliedDiscount && claimedOffers.length === 0 && (
+                  <div className="text-center py-4 text-gray-500 text-xs sm:text-sm italic">
+                    Have a promo code? Enter it above to unlock exclusive savings or special offers.
+                  </div>
+                )}
+              </div>
+            </div>
+
             {/* Step 3: Details */}
             <div className="bg-[#FAF9F6] p-4 sm:p-8 md:p-32 rounded-[2rem] sm:rounded-[3rem] md:rounded-[4rem] shadow-[inset_0_2px_10px_rgba(0,0,0,0.03)] border-2 border-white step-card relative overflow-hidden">
               <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-[#BF9C34]/5 rounded-bl-full blur-[100px]"></div>
@@ -620,9 +833,25 @@ const BookingPage: React.FC = () => {
                     <p className="text-[#333] font-black text-lg sm:text-xl md:text-2xl italic tracking-tighter text-center px-4">
                       {selectedService ? services.find(s => s.id === selectedService)?.name : 'Awaiting Selection'}
                     </p>
-                    <span className="text-4xl sm:text-6xl md:text-7xl font-display italic text-[#F2529D] font-black drop-shadow-lg leading-none pt-2 sm:pt-4">
-                      {selectedService ? (services.find(s => s.id === selectedService)?.priceLabel ?? formatPrice(services.find(s => s.id === selectedService)?.priceCents || 0)) : '$0'}
-                    </span>
+                    <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-4 pt-2 sm:pt-4">
+                      {appliedDiscount && selectedService && (
+                        <>
+                          <span className="text-2xl sm:text-4xl font-display italic text-gray-400 font-black line-through opacity-60">
+                            {services.find(s => s.id === selectedService)?.priceLabel ?? formatPrice(services.find(s => s.id === selectedService)?.priceCents || 0)}
+                          </span>
+                          <span className="text-sm sm:text-base font-black text-green-600 bg-green-50 px-3 py-1 rounded-full">
+                            {appliedDiscount.discountText}
+                          </span>
+                        </>
+                      )}
+                      <span className={`text-4xl sm:text-6xl md:text-7xl font-display italic font-black drop-shadow-lg leading-none ${appliedDiscount ? 'text-green-600' : 'text-[#F2529D]'}`}>
+                        {selectedService ? (
+                          appliedDiscount 
+                            ? formatPrice(getDiscountedPrice(services.find(s => s.id === selectedService)?.priceCents || 0))
+                            : (services.find(s => s.id === selectedService)?.priceLabel ?? formatPrice(services.find(s => s.id === selectedService)?.priceCents || 0))
+                        ) : '$0'}
+                      </span>
+                    </div>
                   </div>
 
                   <div className="relative z-10 w-full flex justify-center">
