@@ -366,11 +366,14 @@ http.route({
         sortOrder?: number;
         startDate?: string;
         endDate?: string;
+        offerType?: string;
       }>(request);
 
       if (!body.title || !body.description || !body.code || !body.imageUrl) {
         return jsonResponse({ ok: false, error: "Title, description, code, and image are required." }, 400);
       }
+
+      const offerType = (body.offerType === "LIMITED_EXCLUSIVE" || body.offerType === "CURRENT_SPECIAL") ? body.offerType : "CURRENT_SPECIAL";
 
       const promotionId = await (ctx as any).runMutation(internal.data.createPromotion, {
         title: body.title.trim(),
@@ -384,6 +387,7 @@ http.route({
         sortOrder: Number(body.sortOrder ?? Date.now()),
         startDate: (body.startDate ?? "2025-01-01").trim(),
         endDate: (body.endDate ?? "2026-12-31").trim(),
+        offerType,
         createdAt: Date.now(),
         updatedAt: Date.now(),
       });
@@ -426,7 +430,10 @@ http.route({
         sortOrder?: number;
         startDate?: string;
         endDate?: string;
+        offerType?: string;
       }>(request);
+
+      const offerType = (body.offerType === "LIMITED_EXCLUSIVE" || body.offerType === "CURRENT_SPECIAL") ? body.offerType : undefined;
 
       await (ctx as any).runMutation(internal.data.updatePromotion, {
         promotionId: promotionId as Id<"promotions">,
@@ -441,6 +448,7 @@ http.route({
         sortOrder: typeof body.sortOrder === "number" ? body.sortOrder : undefined,
         startDate: body.startDate?.trim(),
         endDate: body.endDate?.trim(),
+        offerType,
         updatedAt: Date.now(),
       });
 

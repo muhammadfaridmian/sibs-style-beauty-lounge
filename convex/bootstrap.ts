@@ -238,9 +238,11 @@ export const seedDefaults = mutation({
     const existingPromotions = await ctx.db.query("promotions").take(100);
     if (existingPromotions.length === 0) {
       // The seed data includes both marketing copy and the code the UI displays.
-      for (const promotion of defaultPromotions) {
+      for (let i = 0; i < defaultPromotions.length; i++) {
+        const promotion = defaultPromotions[i];
         await ctx.db.insert("promotions", {
           ...promotion,
+          offerType: i < 2 ? "LIMITED_EXCLUSIVE" : "CURRENT_SPECIAL",
           createdAt: now,
           updatedAt: now,
         });
@@ -249,7 +251,8 @@ export const seedDefaults = mutation({
     } else if (overwriteSeedContent) {
       // Codes act as the lookup key so the same offer keeps the same identity after reseeding.
       const promotionsByCode = new Map(existingPromotions.map((promotion) => [promotion.code, promotion]));
-      for (const promotion of defaultPromotions) {
+      for (let i = 0; i < defaultPromotions.length; i++) {
+        const promotion = defaultPromotions[i];
         const existingPromotion = promotionsByCode.get(promotion.code);
         if (existingPromotion) {
           await ctx.db.patch(existingPromotion._id, {
@@ -264,11 +267,13 @@ export const seedDefaults = mutation({
             sortOrder: promotion.sortOrder,
             startDate: promotion.startDate,
             endDate: promotion.endDate,
+            offerType: i < 2 ? "LIMITED_EXCLUSIVE" : "CURRENT_SPECIAL",
             updatedAt: now,
           });
         } else {
           await ctx.db.insert("promotions", {
             ...promotion,
+            offerType: i < 2 ? "LIMITED_EXCLUSIVE" : "CURRENT_SPECIAL",
             createdAt: now,
             updatedAt: now,
           });

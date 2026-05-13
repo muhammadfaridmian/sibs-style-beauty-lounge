@@ -169,12 +169,14 @@ export default defineSchema({
     sortOrder: v.number(),
     startDate: v.string(),
     endDate: v.string(),
+    offerType: v.union(v.literal("LIMITED_EXCLUSIVE"), v.literal("CURRENT_SPECIAL")),
     createdAt: v.number(),
     updatedAt: v.number(),
   })
     .index("by_active_and_sortOrder", ["active", "sortOrder"])
     .index("by_featured_and_sortOrder", ["featured", "sortOrder"])
-    .index("by_code", ["code"]),
+    .index("by_code", ["code"])
+    .index("by_offerType_and_sortOrder", ["offerType", "sortOrder"]),
 
   // Appointments are the booked time slots that drive the whole booking flow.
   appointments: defineTable({

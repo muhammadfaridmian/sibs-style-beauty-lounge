@@ -928,6 +928,7 @@ export const createPromotion = internalMutation({
     sortOrder: v.number(),
     startDate: v.string(),
     endDate: v.string(),
+    offerType: v.union(v.literal("LIMITED_EXCLUSIVE"), v.literal("CURRENT_SPECIAL")),
     createdAt: v.number(),
     updatedAt: v.number(),
   },
@@ -952,6 +953,7 @@ export const createPromotion = internalMutation({
       sortOrder: args.sortOrder,
       startDate: args.startDate,
       endDate: args.endDate,
+      offerType: args.offerType,
       createdAt: args.createdAt,
       updatedAt: args.updatedAt,
     });
@@ -972,6 +974,7 @@ export const updatePromotion = internalMutation({
     sortOrder: v.optional(v.number()),
     startDate: v.optional(v.string()),
     endDate: v.optional(v.string()),
+    offerType: v.optional(v.union(v.literal("LIMITED_EXCLUSIVE"), v.literal("CURRENT_SPECIAL"))),
     updatedAt: v.number(),
   },
   handler: async (ctx, args) => {
@@ -1002,6 +1005,7 @@ export const updatePromotion = internalMutation({
       sortOrder: args.sortOrder ?? promotion.sortOrder,
       startDate: args.startDate ?? promotion.startDate,
       endDate: args.endDate ?? promotion.endDate,
+      offerType: args.offerType ?? promotion.offerType,
       updatedAt: args.updatedAt,
     });
 

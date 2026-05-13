@@ -1,12 +1,12 @@
 ﻿/**
  * Convex API Configuration & Helpers
  * Central hub for all backend API calls
- * Base URL: https://proficient-akita-599.convex.site
+ * Base URL: https://stoic-ferret-447.convex.site
  */
 
 // This file is the bridge between React and Convex.
 // It keeps the login token in localStorage and sends it when the route needs protection.
-const API_BASE = "https://proficient-akita-599.convex.site";
+const API_BASE = "https://stoic-ferret-447.convex.site";
 const AUTH_TOKEN_KEY = "sibs-style-auth-token";
 const AUTH_USER_KEY = "sibs-style-auth-user";
 
@@ -139,6 +139,7 @@ export interface Promotion {
   sortOrder: number;
   startDate: string;
   endDate: string;
+  offerType: "LIMITED_EXCLUSIVE" | "CURRENT_SPECIAL";
   createdAt: number;
   updatedAt: number;
 }
