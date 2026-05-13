@@ -1,11 +1,9 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { ArrowRight, X, Heart, Star, ShoppingBag } from 'lucide-react';
+import { ArrowRight, X } from 'lucide-react';
 import silkyCoolProductsImage from './assets/Silkycoolproducts.jpeg';
 import goldProductsImage from './assets/Goldproducts.jpeg';
-import { getCollections } from './api/convex-api';
-import availableProductAssets from './availableProductAssets';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -136,63 +134,7 @@ const HomePage = () => {
     }
   };
 
-  // The collection grid is populated from Convex collections. Fallback to a small local list.
-  const [products, setProducts] = useState<Array<{ name: string; price: string; img: string; note: string; rating: string }>>([
-    { name: 'Aurora Serum', price: '$89', img: './assets/ShampooShiver.jpeg', note: 'Hyaluronic Infusion', rating: '5.0' },
-    { name: 'Orchid Cleanser', price: '$54', img: './assets/Cleanser.jpeg', note: 'Botanical Base', rating: '4.9' },
-  ]);
-
-  useEffect(() => {
-    let cancelled = false;
-    // Image preloading happens only when the browser has spare time.
-    const supportsIdleCallback = typeof window.requestIdleCallback === 'function';
-
-    const preloadImages = () => {
-      // These images get loaded in the background so the collection opens faster.
-      if (cancelled) return;
-
-      products.forEach((product) => {
-        const image = new Image();
-        image.decoding = 'async';
-        image.src = product.img;
-      });
-    };
-
-    // Fetch live collections and map assetKey to imported asset src.
-    (async () => {
-      try {
-        const items = await getCollections();
-        if (cancelled) return;
-        const mapped = items.map((item) => {
-          const asset = availableProductAssets[item.assetKey];
-          return {
-            name: item.title,
-            price: item.priceCents ? `$${Math.round((item.priceCents||0)/100)}` : (item.priceLabel || ''),
-            img: asset ? asset.src : './assets/ShampooShiver.jpeg',
-            note: item.description || (asset ? asset.label : ''),
-            rating: '5.0',
-          };
-        });
-        if (mapped.length) setProducts(mapped);
-      } catch (err) {
-        // Keep fallback products if network fails.
-        console.warn('Unable to load collections, using fallback products', err);
-      }
-    })();
-
-    const idleCallback = window.requestIdleCallback
-      ? window.requestIdleCallback(preloadImages, { timeout: 1500 })
-      : window.setTimeout(preloadImages, 600);
-
-    return () => {
-      cancelled = true;
-      if (supportsIdleCallback) {
-        window.cancelIdleCallback(idleCallback as number);
-      } else {
-        window.clearTimeout(idleCallback as number);
-      }
-    };
-  }, []);
+  
 
   return (
     <div ref={containerRef} className="bg-[#FAF9F6] selection:bg-[#F2529D] selection:text-white pb-16 md:pb-32 opacity-100 overflow-x-hidden">
@@ -266,36 +208,14 @@ const HomePage = () => {
                     </button>
                 </div>
 
-                {/* Grid View */}
-                    <div className="flex-1 overflow-y-auto p-4 sm:p-6 md:p-20 custom-scrollbar relative">
-                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-8 md:gap-16">
-                        {products.map((product, idx) => (
-                            <div key={idx} className="product-card-anim group">
-                            <div className="aspect-[4/5] rounded-[1.5rem] sm:rounded-[2rem] md:rounded-[3rem] overflow-hidden bg-white shadow-xl mb-4 sm:mb-6 md:mb-8 relative group-hover:shadow-[0_30px_70px_-15px_rgba(0,0,0,0.15)] transition-all duration-700">
-                                  <img src={product.img} loading="eager" decoding="async" className="w-full h-full object-cover grayscale-[0.2] md:group-hover:grayscale-0 md:group-hover:scale-110 transition-all duration-1000" alt={product.name} />
-                              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-all duration-500 flex flex-col justify-end p-4 sm:p-6 md:p-10">
-                                <button className="w-full py-3 sm:py-4 md:py-5 bg-white/90 md:bg-white text-black text-[10px] md:text-xs font-black tracking-[0.2em] uppercase rounded-xl hover:bg-[#F2529D] hover:text-white transition-all transform translate-y-0 md:translate-y-4 md:group-hover:translate-y-0 duration-500">
-                                            Quick View
-                                        </button>
-                                    </div>
-                              <div className="absolute top-4 right-4 md:top-8 md:right-8 p-2 md:p-3 bg-white/20 backdrop-blur-md rounded-full text-white opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity">
-                                        <Heart size={16} fill="white" className="md:w-5 md:h-5" />
-                                    </div>
-                                </div>
-                            <div className="space-y-1.5 sm:space-y-2 md:space-y-3">
-                                    <div className="flex flex-col sm:flex-row justify-between sm:items-center text-[10px] md:text-xs font-black tracking-[0.2em] md:tracking-[0.3em] text-[#F2529D] uppercase gap-2 sm:gap-0">
-                                        <span>{product.note}</span>
-                                        <div className="flex items-center gap-1.5 bg-[#BF9C34]/5 px-2 py-1 md:px-3 md:py-1 rounded-full w-fit">
-                                            <Star size={10} fill="#BF9C34" color="#BF9C34" className="md:w-3 md:h-3" />
-                                            <span className="text-[#BF9C34] font-black">{product.rating}</span>
-                                        </div>
-                                    </div>
-                                    <h4 className="text-xl md:text-3xl font-display italic font-black text-black group-hover:text-[#F2529D] transition-colors leading-tight">{product.name}</h4>
-                                    <p className="text-sm md:text-xl font-black text-gray-500 font-mono tracking-tighter">{product.price}</p>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
+                <div className="flex-1 overflow-y-auto p-4 sm:p-6 md:p-20 custom-scrollbar relative flex items-center justify-center">
+                      <div className="max-w-2xl text-center space-y-4 sm:space-y-6">
+                        <p className="text-[10px] sm:text-xs font-black uppercase tracking-[0.4em] text-[#F2529D]">Discover Collection</p>
+                        <h3 className="text-3xl sm:text-5xl font-display italic font-black text-black">Collection hidden for now</h3>
+                        <p className="text-sm sm:text-lg text-gray-500 leading-relaxed">
+                          The container is intentionally empty until you want to bring the product cards back.
+                        </p>
+                      </div>
                 </div>
 
                 {/* Footer Section */}
