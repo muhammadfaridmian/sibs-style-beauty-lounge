@@ -137,7 +137,7 @@ const HomePage = () => {
   // The larger product grid uses this data to build the shop-like display.
   // The images here are only presentation data, so the cards can stay purely decorative.
   const products = [
-    { name: 'Aurora Serum', price: '$89', img: 'https://images.unsplash.com/photo-1596462502278-27ec8229babb?q=80&w=800', note: 'Hyaluronic Infusion', rating: '5.0' },
+    { name: 'Aurora Serum', price: '$89', img: './assets/ShampooShiver.jpeg', note: 'Hyaluronic Infusion', rating: '5.0' },
     { name: 'Orchid Cleanser', price: '$54', img: 'https://images.unsplash.com/photo-1556228578-0d85b1a4d571?q=80&w=800', note: 'Botanical Base', rating: '4.9' },
     { name: 'Moonlight Mask', price: '$72', img: 'https://images.unsplash.com/photo-1620916566398-39f1143ab7be?q=80&w=800', note: 'Ethereal Clay', rating: '4.8' },
     { name: 'Solaris Mist', price: '$45', img: 'https://images.unsplash.com/photo-1608248597279-f99d160bfcbc?q=80&w=800', note: 'Rosewater Essence', rating: '5.0' },
