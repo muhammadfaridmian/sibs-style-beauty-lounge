@@ -334,6 +334,16 @@ export const seedDefaults = mutation({
       summary.adminUser = 1;
     }
 
+    // Migrate existing promotions to have offerType if missing
+    const allPromotions = await ctx.db.query("promotions").collect();
+    for (const promotion of allPromotions) {
+      const promotionDoc = promotion as any;
+      if (!promotionDoc.offerType) {
+        const offerType = promotionDoc.featured ? "LIMITED_EXCLUSIVE" : "CURRENT_SPECIAL";
+        await ctx.db.patch(promotion._id, { offerType });
+      }
+    }
+
     // Returning the counters makes it easy to confirm what the seed actually changed.
     return summary;
   },

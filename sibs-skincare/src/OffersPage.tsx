@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import Footer from './components/Footer';
 import { ArrowRight, X } from 'lucide-react';
 import gsap from 'gsap';
-import { getPromotions, type Promotion } from './api/convex-api';
+import { getPromotions, type Promotion, getCurrentAuthUser, getStoredAuthToken, updatePromotion } from './api/convex-api';
 
 const fallbackPromotions: Promotion[] = [
   {
@@ -130,6 +130,14 @@ const fallbackPromotions: Promotion[] = [
 const OffersPage = () => {
   const [isPanelOpen, setIsPanelOpen] = useState(false);
   const [promotions, setPromotions] = useState<Promotion[]>(fallbackPromotions);
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [heroOfferId, setHeroOfferId] = useState<string | null>(() => {
+    try {
+      return window.localStorage.getItem('heroOfferId');
+    } catch {
+      return null;
+    }
+  });
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -154,16 +162,28 @@ const OffersPage = () => {
     };
   }, []);
 
-  const activePromotions = useMemo(
-    () => [...promotions].filter((promotion) => promotion.active).sort((left, right) => left.sortOrder - right.sortOrder),
+  // Limited exclusive promotions (used in hero modal)
+  const limitedExclusivePromotions = useMemo(
+    () => [...promotions].filter((p) => p.offerType === 'LIMITED_EXCLUSIVE' && p.active).sort((a, b) => a.sortOrder - b.sortOrder),
     [promotions],
   );
+
+  // Featured current specials (shown in the Current Specials section)
   const featuredPromotions = useMemo(
-    () => activePromotions.filter((promotion) => promotion.featured),
-    [activePromotions],
+    () => [...promotions].filter((promotion) => promotion.offerType === 'CURRENT_SPECIAL' && promotion.active && promotion.featured),
+    [promotions],
   );
-  const heroPromotion = featuredPromotions[0] ?? activePromotions[0] ?? promotions[0];
-  const heroCount = featuredPromotions.length || activePromotions.length;
+
+  // Hero selection: prefer explicit heroOfferId, then first limited exclusive
+  const heroPromotion = useMemo(() => {
+    if (heroOfferId) {
+      const found = limitedExclusivePromotions.find((p) => p.id === heroOfferId);
+      if (found) return found;
+    }
+    return limitedExclusivePromotions[0] ?? promotions[0] ?? null;
+  }, [heroOfferId, limitedExclusivePromotions, promotions]);
+
+  const heroCount = limitedExclusivePromotions.length;
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -182,6 +202,47 @@ const OffersPage = () => {
       );
     }
   }, []);
+
+  useEffect(() => {
+    // Check if current user is admin for modal admin controls
+    (async () => {
+      try {
+        const token = getStoredAuthToken();
+        if (!token) return setIsAdmin(false);
+        const user = await getCurrentAuthUser(token);
+        setIsAdmin(Boolean(user && user.role === 'admin'));
+      } catch {
+        setIsAdmin(false);
+      }
+    })();
+  }, []);
+
+  const handleEditImage = async (promotion: Promotion) => {
+    if (!isAdmin) return;
+    const newUrl = window.prompt('Enter new image URL for this offer', promotion.imageUrl || '');
+    if (!newUrl) return;
+    try {
+      const token = getStoredAuthToken();
+      await updatePromotion({ promotionId: promotion.id, updates: { imageUrl: newUrl }, authToken: token });
+      const items = await getPromotions();
+      setPromotions(items.length > 0 ? items : fallbackPromotions);
+      window.alert('Image updated');
+    } catch (e) {
+      console.error(e);
+      window.alert('Failed to update image');
+    }
+  };
+
+  const handleSetAsHero = (promotion: Promotion) => {
+    try {
+      window.localStorage.setItem('heroOfferId', promotion.id);
+      setHeroOfferId(promotion.id);
+      window.alert('Set as hero image');
+    } catch (e) {
+      console.error(e);
+      window.alert('Unable to set hero image');
+    }
+  };
 
   useEffect(() => {
     if (isPanelOpen) {
@@ -245,22 +306,26 @@ const OffersPage = () => {
           <h2 className='text-5xl sm:text-6xl md:text-8xl font-display text-[#F2529D] italic font-black leading-none tracking-tighter'>Seasonal Rituals</h2>
 
           <div className='grid grid-cols-1 md:grid-cols-3 gap-8 sm:gap-10 md:gap-12 mt-16 sm:mt-20'>
-            {featuredPromotions.map((promotion) => (
-              <div key={promotion.id} className='bg-white rounded-[2rem] overflow-hidden shadow-2xl border border-gray-100 group transition-all hover:scale-[1.02]'>
-                <div className='aspect-square overflow-hidden relative'>
-                  <img src={promotion.imageUrl} className='w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110' alt={promotion.title} />
-                  <div className='absolute top-6 left-6 bg-[#F2529D] text-white px-4 py-2 rounded-full text-[8px] font-black tracking-widest uppercase'>
-                    {promotion.tag}
+            {featuredPromotions.length > 0 ? (
+              featuredPromotions.map((promotion) => (
+                <div key={promotion.id} className='bg-white rounded-[2rem] overflow-hidden shadow-2xl border border-gray-100 group transition-all hover:scale-[1.02]'>
+                  <div className='aspect-square overflow-hidden relative'>
+                    <img src={promotion.imageUrl} className='w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110' alt={promotion.title} />
+                    <div className='absolute top-6 left-6 bg-[#F2529D] text-white px-4 py-2 rounded-full text-[8px] font-black tracking-widest uppercase'>
+                      {promotion.tag}
+                    </div>
+                  </div>
+                  <div className='p-8 sm:p-10 space-y-5 sm:space-y-6 text-center'>
+                    <h3 className='text-3xl sm:text-4xl font-display italic font-black text-gray-900 leading-tight'>{promotion.title}</h3>
+                    <p className='text-gray-500 font-medium leading-relaxed'>{promotion.description}</p>
+                    <p className='text-[10px] font-black uppercase tracking-[0.35em] text-[#BF9C34]'>{promotion.discountText}</p>
+                    <Link to='/booking' className='block w-full py-4 sm:py-5 bg-[#F2529D] text-white text-[12px] sm:text-[14px] font-black tracking-[0.4em] rounded-xl hover:bg-black transition-all shadow-xl'>CLAIM OFFER</Link>
                   </div>
                 </div>
-                <div className='p-8 sm:p-10 space-y-5 sm:space-y-6 text-center'>
-                  <h3 className='text-3xl sm:text-4xl font-display italic font-black text-gray-900 leading-tight'>{promotion.title}</h3>
-                  <p className='text-gray-500 font-medium leading-relaxed'>{promotion.description}</p>
-                  <p className='text-[10px] font-black uppercase tracking-[0.35em] text-[#BF9C34]'>{promotion.discountText}</p>
-                  <Link to='/booking' className='block w-full py-4 sm:py-5 bg-[#F2529D] text-white text-[12px] sm:text-[14px] font-black tracking-[0.4em] rounded-xl hover:bg-black transition-all shadow-xl'>CLAIM OFFER</Link>
-                </div>
-              </div>
-            ))}
+              ))
+            ) : (
+              <div className='col-span-1 md:col-span-3 text-center py-16 text-gray-500'>No current specials yet. Customers will see offers here once an admin adds them.</div>
+            )}
           </div>
         </div>
       </div>
@@ -291,32 +356,42 @@ const OffersPage = () => {
             </div>
 
             <div className='flex-1 overflow-y-auto px-4 sm:px-8 md:px-12 py-4 sm:py-10 md:py-16 bg-white custom-scrollbar'>
-              <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-8 md:gap-12'>
-                {activePromotions.map((promotion, idx) => (
-                  <div key={promotion.id} className='offer-card-anim group cursor-pointer bg-[#FAF9F6] p-5 sm:p-8 md:p-10 rounded-[2rem] sm:rounded-[2.5rem] md:rounded-[3rem] border border-gray-100 hover:bg-black transition-all duration-700 hover:shadow-2xl hover:-translate-y-2'>
-                    <div className='aspect-square rounded-[1.5rem] sm:rounded-[2rem] overflow-hidden shadow-2xl mb-5 sm:mb-8 group-hover:scale-105 transition-all duration-700 relative'>
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 z-10"></div>
-                      <img src={promotion.imageUrl} className='w-full h-full object-cover transition-all duration-1000' alt={promotion.title} />
-                    </div>
-                    <div className='space-y-3 sm:space-y-4'>
-                      <div className='flex justify-between items-start gap-3'>
-                        <h4 className='text-2xl sm:text-3xl font-display italic font-black text-gray-900 group-hover:text-[#F2529D] mb-2 uppercase tracking-tight transition-colors duration-500 line-clamp-2'>{promotion.title}</h4>
-                        <span className='px-3 py-1 bg-[#F2529D] text-white text-[10px] font-black tracking-widest rounded-full shrink-0 uppercase'>{String(idx + 1).padStart(2, '0')}</span>
-                      </div>
-                      <p className='text-sm sm:text-base text-gray-500 group-hover:text-white/60 mb-4 sm:mb-6 font-medium leading-relaxed transition-colors duration-500 line-clamp-3'>{promotion.description}</p>
-                      <div className='flex items-center justify-between pt-3 sm:pt-4 border-t border-gray-100 group-hover:border-white/10 gap-3'>
-                        <div className='flex flex-col min-w-0'>
-                          <span className='text-[10px] font-black tracking-widest text-gray-400 group-hover:text-[#F2529D] uppercase mb-1'>Discount Code</span>
-                          <span className='text-lg sm:text-xl font-black text-black group-hover:text-white transition-colors duration-500 truncate'>{promotion.code}</span>
+              {limitedExclusivePromotions.length > 0 ? (
+                <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-8 md:gap-12'>
+                  {limitedExclusivePromotions.map((promotion, idx) => (
+                    <div key={promotion.id} className='offer-card-anim group cursor-pointer bg-[#FAF9F6] p-5 sm:p-8 md:p-10 rounded-[2rem] sm:rounded-[2.5rem] md:rounded-[3rem] border border-gray-100 hover:bg-black transition-all duration-700 hover:shadow-2xl hover:-translate-y-2 relative'>
+                      {isAdmin && (
+                        <div className='absolute top-3 right-3 z-20 flex gap-2'>
+                          <button onClick={() => handleEditImage(promotion)} className='bg-white text-xs px-3 py-1 rounded-full shadow-sm border'>Edit Image</button>
+                          <button onClick={() => handleSetAsHero(promotion)} className='bg-[#F2529D] text-white text-xs px-3 py-1 rounded-full shadow-sm'>Set Hero</button>
                         </div>
-                        <div className='w-10 h-10 sm:w-12 sm:h-12 rounded-2xl bg-white group-hover:bg-[#F2529D] flex items-center justify-center transition-all duration-500 shadow-sm shrink-0'>
-                          <div className='w-2 h-2 rounded-full bg-[#F2529D] group-hover:bg-white' />
+                      )}
+                      <div className='aspect-square rounded-[1.5rem] sm:rounded-[2rem] overflow-hidden shadow-2xl mb-5 sm:mb-8 group-hover:scale-105 transition-all duration-700 relative'>
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 z-10"></div>
+                        <img src={promotion.imageUrl} className='w-full h-full object-cover transition-all duration-1000' alt={promotion.title} />
+                      </div>
+                      <div className='space-y-3 sm:space-y-4'>
+                        <div className='flex justify-between items-start gap-3'>
+                          <h4 className='text-2xl sm:text-3xl font-display italic font-black text-gray-900 group-hover:text-[#F2529D] mb-2 uppercase tracking-tight transition-colors duration-500 line-clamp-2'>{promotion.title}</h4>
+                          <span className='px-3 py-1 bg-[#F2529D] text-white text-[10px] font-black tracking-widest rounded-full shrink-0 uppercase'>{String(idx + 1).padStart(2, '0')}</span>
+                        </div>
+                        <p className='text-sm sm:text-base text-gray-500 group-hover:text-white/60 mb-4 sm:mb-6 font-medium leading-relaxed transition-colors duration-500 line-clamp-3'>{promotion.description}</p>
+                        <div className='flex items-center justify-between pt-3 sm:pt-4 border-t border-gray-100 group-hover:border-white/10 gap-3'>
+                          <div className='flex flex-col min-w-0'>
+                            <span className='text-[10px] font-black tracking-widest text-gray-400 group-hover:text-[#F2529D] uppercase mb-1'>Discount Code</span>
+                            <span className='text-lg sm:text-xl font-black text-black group-hover:text-white transition-colors duration-500 truncate'>{promotion.code}</span>
+                          </div>
+                          <div className='w-10 h-10 sm:w-12 sm:h-12 rounded-2xl bg-white group-hover:bg-[#F2529D] flex items-center justify-center transition-all duration-500 shadow-sm shrink-0'>
+                            <div className='w-2 h-2 rounded-full bg-[#F2529D] group-hover:bg-white' />
+                          </div>
                         </div>
                       </div>
                     </div>
-                  </div>
-                ))}
-              </div>
+                  ))}
+                </div>
+              ) : (
+                <div className='text-center py-20 text-gray-500'>No limited exclusives yet. Customers will see offers here once an admin adds them.</div>
+              )}
             </div>
 
             <div className='px-5 sm:px-8 md:px-12 py-4 sm:py-8 md:py-10 bg-white border-t border-gray-100 text-center z-[110] relative'>

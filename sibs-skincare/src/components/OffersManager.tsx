@@ -24,6 +24,7 @@ type PromotionDraft = {
   sortOrder: number;
   startDate: string;
   endDate: string;
+  useAsHero?: boolean;
 };
 
 const quickTags = ['Most Popular', 'Best Value', 'Limited Time', 'Featured'];
@@ -40,6 +41,7 @@ const emptyDraft = (): PromotionDraft => ({
   sortOrder: 1,
   startDate: '2025-01-01',
   endDate: '2026-12-31',
+  useAsHero: false,
 });
 
 const OffersManager: React.FC<OffersManagerProps> = ({ authToken }) => {
@@ -165,9 +167,16 @@ const OffersManager: React.FC<OffersManagerProps> = ({ authToken }) => {
       if (editingId && editingType === offerType) {
         await updatePromotion({ promotionId: editingId, updates: payload, authToken });
         setMessage(`Updated ${payload.title}`);
+        // If admin flagged as hero, persist selection
+        if (offerType === 'LIMITED_EXCLUSIVE' && draft.useAsHero) {
+          try { localStorage.setItem('heroOfferId', editingId); } catch {}
+        }
       } else if (!editingId || editingType !== offerType) {
-        await createPromotion({ promotion: payload, authToken });
+        const created = await createPromotion({ promotion: payload, authToken });
         setMessage(`Added ${payload.title}`);
+        if (offerType === 'LIMITED_EXCLUSIVE' && draft.useAsHero) {
+          try { localStorage.setItem('heroOfferId', (created as any).id); } catch {}
+        }
       }
 
       setEditingId(null);
@@ -225,6 +234,8 @@ const OffersManager: React.FC<OffersManagerProps> = ({ authToken }) => {
     setLimitedDraft(emptyDraft());
     setCurrentDraft(emptyDraft());
   };
+
+  
 
   if (isLoading) {
     return (
@@ -316,6 +327,35 @@ const OffersManager: React.FC<OffersManagerProps> = ({ authToken }) => {
               onClick={() => setLimitedDraft((current) => ({ ...current, active: !current.active }))}
               accent="#BF9C34"
             />
+          </div>
+
+          <div className="mt-4 flex items-center gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Upload image</label>
+              <input
+                type="file"
+                accept="image/*"
+                onChange={(e) => {
+                  const file = e.target.files && e.target.files[0];
+                  if (!file) return;
+                  const reader = new FileReader();
+                  reader.onload = () => {
+                    const result = reader.result as string | null;
+                    if (result) setLimitedDraft((cur) => ({ ...cur, imageUrl: result }));
+                  };
+                  reader.readAsDataURL(file);
+                }}
+              />
+            </div>
+
+            <div>
+              <ToggleButton
+                label="Use as hero image"
+                active={Boolean(limitedDraft.useAsHero)}
+                onClick={() => setLimitedDraft((cur) => ({ ...cur, useAsHero: !cur.useAsHero }))}
+                accent="#BF9C34"
+              />
+            </div>
           </div>
 
           <div className="flex flex-wrap gap-3">

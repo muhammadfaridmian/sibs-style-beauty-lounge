@@ -169,7 +169,7 @@ export default defineSchema({
     sortOrder: v.number(),
     startDate: v.string(),
     endDate: v.string(),
-    offerType: v.union(v.literal("LIMITED_EXCLUSIVE"), v.literal("CURRENT_SPECIAL")),
+    offerType: v.optional(v.union(v.literal("LIMITED_EXCLUSIVE"), v.literal("CURRENT_SPECIAL"))),
     createdAt: v.number(),
     updatedAt: v.number(),
   })

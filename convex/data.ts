@@ -137,9 +137,11 @@ function asPromotionCard(doc: {
   tag: string;
   discountText: string;
   featured: boolean;
+  active: boolean;
   sortOrder: number;
   startDate: string;
   endDate: string;
+  offerType?: "LIMITED_EXCLUSIVE" | "CURRENT_SPECIAL";
 }) {
   // Promotions are reshaped into a compact card for the offers page and homepage blocks.
   return {
@@ -151,9 +153,11 @@ function asPromotionCard(doc: {
     tag: doc.tag,
     discountText: doc.discountText,
     featured: doc.featured,
+    active: doc.active,
     sortOrder: doc.sortOrder,
     startDate: doc.startDate,
     endDate: doc.endDate,
+    offerType: doc.offerType ?? "CURRENT_SPECIAL",
   };
 }
 
@@ -1108,6 +1112,26 @@ export const moveAppointmentToCompleted = internalMutation({
   },
 });
 
+export const migratePromotionsOfferType = internalMutation({
+  args: {},
+  handler: async (ctx) => {
+    // Migrate all existing promotions to have offerType
+    // If offerType is missing, assign based on featured flag:
+    // - featured=true → LIMITED_EXCLUSIVE
+    // - featured=false → CURRENT_SPECIAL
+    
+    const allPromotions = await ctx.db.query("promotions").collect();
+    let migratedCount = 0;
 
+    for (const promotion of allPromotions) {
+      const promotionDoc = promotion as any;
+      if (!promotionDoc.offerType) {
+        const offerType = promotionDoc.featured ? "LIMITED_EXCLUSIVE" : "CURRENT_SPECIAL";
+        await ctx.db.patch(promotion._id, { offerType });
+        migratedCount++;
+      }
+    }
 
-
+    return { migratedCount, totalPromotions: allPromotions.length };
+  },
+});

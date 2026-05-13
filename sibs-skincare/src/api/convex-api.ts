@@ -641,7 +641,8 @@ export async function getAdminPromotions(authToken: string | null = getStoredAut
 
   try {
     // Try the admin-only endpoint first (requires a valid token).
-    return await requestJson<Promotion[]>("/api/admin/promotions", { method: "GET" }, authToken);
+    const response = await requestJson<{ ok: boolean; data: Promotion[] }>("/api/admin/promotions", { method: "GET" }, authToken);
+    return (response.data || []) as Promotion[];
   } catch (adminErr) {
     // If the admin endpoint fails (CORS, 404, network), fall back to the public promotions list so the admin UI can still display items read-only.
     // This avoids a hard crash in the browser when the backend isn't deployed or CORS blocks the admin route.
@@ -671,6 +672,7 @@ export async function createPromotion(params: {
     sortOrder: number;
     startDate: string;
     endDate: string;
+    offerType: "LIMITED_EXCLUSIVE" | "CURRENT_SPECIAL";
   };
   authToken?: string | null;
 }): Promise<Promotion> {
@@ -699,6 +701,7 @@ export async function updatePromotion(params: {
     sortOrder: number;
     startDate: string;
     endDate: string;
+    offerType: "LIMITED_EXCLUSIVE" | "CURRENT_SPECIAL";
   }>;
   authToken?: string | null;
 }): Promise<{ promotionId: string }> {
