@@ -199,8 +199,8 @@ const HomePage = () => {
               <div className="absolute inset-0 bg-white/20 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"></div>
             </button>
           </div>
-          <div className="hero-img-wrap relative block !opacity-100 !visible z-0 mt-10 md:mt-0">
-            <div className="aspect-square md:aspect-[3/4] shadow-2xl relative z-10 overflow-hidden rounded-[2rem] md:rounded-[3rem] border-4 md:border-8 border-white bg-white">
+          <div className="hero-img-wrap relative block !opacity-100 !visible z-0 mt-10 md:mt-0 lg:w-[520px] xl:w-[580px] lg:justify-self-end">
+            <div className="aspect-square md:aspect-[4/5] shadow-2xl relative z-10 overflow-hidden rounded-[2rem] md:rounded-[3rem] border-4 md:border-8 border-white bg-white">
               <img 
                 src={silkyCoolProductsImage}
                 className="w-full h-full object-cover parallax-img scale-105" 

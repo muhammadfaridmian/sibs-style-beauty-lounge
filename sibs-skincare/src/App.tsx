@@ -168,7 +168,7 @@ const Navigation = () => {
       <nav className="fixed top-0 w-full z-50 bg-[#FAF9F6]/95 md:bg-[#FAF9F6]/92 backdrop-blur-xl md:backdrop-blur-2xl border-b border-gray-100 shadow-sm">
         <div className="max-w-[1800px] mx-auto px-4 sm:px-8 h-20 sm:h-32 flex items-center justify-between gap-6">
           <Link to="/" className="flex items-center gap-3 shrink-0" aria-label="Sibs Style home">
-            <img src={logo} alt="Sibs Style logo" className="h-14 w-auto rounded-full border-2 border-transparent transition-transform duration-300 hover:scale-105 shadow-sm sm:h-16" />
+            <img src={logo} alt="Sibs Style logo" className="h-16 w-auto rounded-full border-2 border-transparent transition-transform duration-300 hover:scale-105 shadow-sm sm:h-20 lg:h-28 xl:h-32" />
           </Link>
 
           <div className="hidden lg:flex items-center px-4 flex-1 justify-center">
