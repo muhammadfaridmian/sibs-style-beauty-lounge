@@ -21,7 +21,6 @@
     /* Base page style before any page-specific section kicks in. */
     /* The default canvas stays warm and neutral so the pink and gold accents can stand out. */
     @apply font-body bg-[#FAFAFA] text-[#333];
-    /* Restore page-level scrollbar so the document (outer) scroll is used as the main scrollbar */
     overflow-x: hidden;
     overflow-y: auto;
     overscroll-behavior-y: auto;
@@ -36,7 +35,6 @@
     max-width: 100%;
     min-height: 100%;
     overflow-x: hidden;
-    /* Use the document scroll as the primary scrollbar */
     overflow-y: auto;
     overscroll-behavior-y: auto;
   }

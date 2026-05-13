@@ -375,7 +375,6 @@ http.route({
 
       const offerType = (body.offerType === "LIMITED_EXCLUSIVE" || body.offerType === "CURRENT_SPECIAL") ? body.offerType : "CURRENT_SPECIAL";
 
-      const now = Date.now();
       const promotionId = await (ctx as any).runMutation(internal.data.createPromotion, {
         title: body.title.trim(),
         description: body.description.trim(),
@@ -385,33 +384,16 @@ http.route({
         discountText: (body.discountText ?? "").trim(),
         featured: Boolean(body.featured ?? true),
         active: Boolean(body.active ?? true),
-        sortOrder: Number(body.sortOrder ?? now),
+        sortOrder: Number(body.sortOrder ?? Date.now()),
         startDate: (body.startDate ?? "2025-01-01").trim(),
         endDate: (body.endDate ?? "2026-12-31").trim(),
         offerType,
-        createdAt: now,
-        updatedAt: now,
+        createdAt: Date.now(),
+        updatedAt: Date.now(),
       });
 
-      // Construct the created promotion response directly
-      const created = {
-        id: promotionId,
-        title: body.title.trim(),
-        description: body.description.trim(),
-        code: body.code.trim().toUpperCase(),
-        imageUrl: body.imageUrl.trim(),
-        tag: (body.tag ?? "Featured").trim() || "Featured",
-        discountText: (body.discountText ?? "").trim(),
-        featured: Boolean(body.featured ?? true),
-        active: Boolean(body.active ?? true),
-        sortOrder: Number(body.sortOrder ?? now),
-        startDate: (body.startDate ?? "2025-01-01").trim(),
-        endDate: (body.endDate ?? "2026-12-31").trim(),
-        offerType: offerType,
-        createdAt: now,
-        updatedAt: now,
-      };
-
+      const promotions = await (ctx as any).runQuery(internal.data.listPromotionsForAdmin, {});
+      const created = (promotions as any[]).find((item: { id: string }) => item.id === promotionId) ?? null;
       return jsonResponse({ ok: true, data: created }, 201);
     } catch (error) {
       const message = error instanceof Error ? error.message : "Unable to create promotion.";

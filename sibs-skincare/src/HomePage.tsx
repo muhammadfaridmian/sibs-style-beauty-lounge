@@ -229,7 +229,7 @@ const HomePage = () => {
           <div className="hero-img-wrap relative block !opacity-100 !visible z-0 mt-10 md:mt-0">
             <div className="aspect-square md:aspect-[3/4] shadow-2xl relative z-10 overflow-hidden rounded-[2rem] md:rounded-[3rem] border-4 md:border-8 border-white bg-white">
               <img 
-                src="https://images.unsplash.com/photo-1612817288484-6f916006741a?q=80&w=2000" 
+                src="src/assets/Silkycoolproducts.jpeg"
                 className="w-full h-full object-cover parallax-img scale-105" 
                 alt="Hero" 
               />
