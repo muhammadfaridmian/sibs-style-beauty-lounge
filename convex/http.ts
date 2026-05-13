@@ -806,7 +806,9 @@ http.route({
       const serviceId = typeof body.serviceId === "string" && body.serviceId.trim() ? body.serviceId.trim() : null;
       const serviceName = typeof body.serviceName === "string" && body.serviceName.trim() ? body.serviceName.trim() : null;
 
-      if (!name || !email || !mainQuote || !subQuote1 || !subQuote2) {
+      // Only one detail block is required from the public form.
+      // subQuote2 remains optional and can be blank.
+      if (!name || !email || !mainQuote || !subQuote1) {
         return jsonResponse({ ok: false, error: "Name, email, and review text are required." }, 400);
       }
 

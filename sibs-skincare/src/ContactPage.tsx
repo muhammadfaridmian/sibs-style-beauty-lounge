@@ -1,7 +1,8 @@
 import { useEffect } from 'react';
-import { Mail, Phone, MapPin, Clock } from 'lucide-react';
+import { Mail, Phone, MapPin, Clock, MessageCircle } from 'lucide-react';
 import Footer from './components/Footer';
 import gsap from 'gsap';
+import contactHeroImage from './assets/Sibshall2.jpeg';
 
 const ContactPage = () => {
     // This screen is mostly a contact card and directions page, not a data-heavy flow.
@@ -35,7 +36,7 @@ const ContactPage = () => {
                     Contact & Location
                 </h1>
                 <p className="text-gray-600 text-base sm:text-xl font-body italic leading-relaxed max-w-2xl mx-auto">
-                    We would love to hear from you. Book an appointment or send us your inquiries.
+                    Connect with the lounge directly on WhatsApp for quick assistance.
                 </p>
             </div>
 
@@ -47,7 +48,7 @@ const ContactPage = () => {
                     {/* The banner doubles as the visual anchor and repeats the salon address in one place. */}
                     <div className="relative h-[300px] sm:h-[450px]">
                         <img 
-                            src="https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?q=80&w=2000&auto=format&fit=crop" 
+                            src={contactHeroImage}
                             className="w-full h-full object-cover brightness-75"
                             alt="Luxury Spa Lounge"
                         />
@@ -64,41 +65,24 @@ const ContactPage = () => {
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-8 sm:gap-12 md:gap-16 p-4 sm:p-8 lg:p-20">
-                        {/* Form Section */}
+                        {/* WhatsApp CTA */}
                         <div className="space-y-6 sm:space-y-10">
-                            <h3 className="text-2xl sm:text-3xl font-display text-[#BF9C34] italic font-black">Send us a Message</h3>
-                            {/* The form is here for layout and feel. The real contact details are below it. */}
-                            {/* Keeping the fields static avoids pretending there is a submission backend in this page. */}
-                            <form className="space-y-5 sm:space-y-8" onClick={(e) => e.preventDefault()}>
-                                <div className="space-y-2">
-                                    <label className="text-xs font-black uppercase tracking-widest text-gray-400">Full Name</label>
-                                    <input type="text" placeholder="Jane Doe" className="w-full px-4 sm:px-6 py-3 sm:py-4 bg-white border border-gray-200 rounded-xl focus:border-[#F2529D] focus:ring-1 focus:ring-[#F2529D] outline-none transition-all placeholder:text-gray-300" />
-                                </div>
-                                <div className="space-y-2">
-                                    <label className="text-xs font-black uppercase tracking-widest text-gray-400">Email Address</label>
-                                    <input type="email" placeholder="jane@example.com" className="w-full px-4 sm:px-6 py-3 sm:py-4 bg-white border border-gray-200 rounded-xl focus:border-[#F2529D] focus:ring-1 focus:ring-[#F2529D] outline-none transition-all placeholder:text-gray-300" />
-                                </div>
-                                <div className="space-y-2">
-                                    <label className="text-xs font-black uppercase tracking-widest text-gray-400">Phone Number</label>
-                                    <input type="tel" placeholder="052 906 3016" className="w-full px-4 sm:px-6 py-3 sm:py-4 bg-white border border-gray-200 rounded-xl focus:border-[#F2529D] focus:ring-1 focus:ring-[#F2529D] outline-none transition-all placeholder:text-gray-300" />
-                                </div>
-                                <div className="space-y-2">
-                                    <label className="text-xs font-black uppercase tracking-widest text-gray-400">Service Interested In</label>
-                                    <select className="w-full px-4 sm:px-6 py-3 sm:py-4 bg-white border border-gray-200 rounded-xl focus:border-[#F2529D] outline-none appearance-none">
-                                        <option>Hair Styling</option>
-                                        <option>Facial Ritual</option>
-                                        <option>Dermal Sculpting</option>
-                                        <option>Botanical Infusion</option>
-                                    </select>
-                                </div>
-                                <div className="space-y-2">
-                                    <label className="text-xs font-black uppercase tracking-widest text-gray-400">Message</label>
-                                    <textarea rows={4} placeholder="How can we help you?" className="w-full px-4 sm:px-6 py-3 sm:py-4 bg-white border border-gray-200 rounded-xl focus:border-[#F2529D] focus:ring-1 focus:ring-[#F2529D] outline-none transition-all placeholder:text-gray-300 resize-none"></textarea>
-                                </div>
-                                <button className="w-full py-4 sm:py-5 bg-[#F2529D] text-white text-[10px] font-black uppercase tracking-[0.35em] sm:tracking-[0.4em] rounded-full hover:bg-black transition-all shadow-xl shadow-pink-100 hover:shadow-none translate-y-0 active:scale-95">
-                                    SEND MESSAGE
-                                </button>
-                            </form>
+                            <h3 className="text-2xl sm:text-3xl font-display text-[#BF9C34] italic font-black">Message Us on WhatsApp</h3>
+                            <p className="text-gray-600 text-sm sm:text-base leading-relaxed">
+                                Tap below to chat with the lounge directly. We usually respond quickly during opening hours.
+                            </p>
+                            <a
+                                href="https://wa.me/971529063016"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="group inline-flex w-full items-center justify-center gap-3 rounded-full bg-[#25D366] px-6 py-4 text-white text-[11px] font-black uppercase tracking-[0.3em] shadow-xl hover:brightness-95 transition-all"
+                            >
+                                <MessageCircle className="w-5 h-5 group-hover:scale-110 transition-transform" />
+                                Open WhatsApp Chat
+                            </a>
+                            <p className="text-[11px] uppercase tracking-[0.25em] text-gray-400">
+                                WhatsApp: +971 52 906 3016
+                            </p>
                         </div>
 
                         {/* Information & Map Section */}

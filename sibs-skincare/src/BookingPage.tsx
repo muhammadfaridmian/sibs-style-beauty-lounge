@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import Footer from './components/Footer';
 import { Link } from 'react-router-dom';
-import { Clock, ChevronLeft, ChevronRight, Mail as MailIcon, Phone, MapPin, Calendar as CalendarIcon, User, ArrowRight, AlertCircle, Sparkles, Info } from 'lucide-react';
+import { Clock, ChevronRight, Mail as MailIcon, Phone, MapPin, Calendar as CalendarIcon, User, ArrowRight, AlertCircle, Sparkles, Info } from 'lucide-react';
 import gsap from 'gsap';
 import { getServices, getAvailability, createAppointment, formatPrice, formatDuration, getStoredAuthToken, type Service } from './api/convex-api';
 import bookingHeroImage from './assets/Sibshall.jpeg';
@@ -12,7 +12,6 @@ const BookingPage: React.FC = () => {
   // These state values keep the booking flow step by step and easy to follow.
   const [services, setServices] = useState<Service[]>([]);
   const [selectedService, setSelectedService] = useState<string | null>(null);
-  const [viewingService, setViewingService] = useState<string | null>(null);
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [selectedTime, setSelectedTime] = useState<string | null>(null);
   const [availability, setAvailability] = useState<any>(null);
@@ -164,7 +163,6 @@ const BookingPage: React.FC = () => {
   };
 
   // ==================== DATA ====================
-  const activeServiceData = services.find(s => s.id === viewingService);
   // Availability only shows the slots that Convex marked as open for the selected day.
   // That makes the visible list match what the booking mutation will actually accept.
   const timeSlots = availability?.slots?.filter((slot: any) => slot.available) || [];
@@ -182,70 +180,6 @@ const BookingPage: React.FC = () => {
   // ==================== RENDER ====================
   return (
     <div ref={containerRef} className="bg-[#FAF9F6] min-h-screen text-[#333] font-serif overflow-x-hidden opacity-100">
-      {/* Service Detail Overlay Panel */}
-      {viewingService && activeServiceData && (
-        // The overlay lets a visitor inspect a treatment before they commit to booking it.
-        <div className="fixed inset-0 z-[100] flex items-start md:items-center justify-center px-2 sm:px-4 py-4 overflow-y-auto">
-          <div 
-            className="absolute inset-0 bg-black/60 backdrop-blur-xl transition-opacity animate-in fade-in duration-500" 
-            onClick={() => setViewingService(null)}
-          ></div>
-          <div className="bg-white w-full max-w-4xl max-h-[92vh] overflow-y-auto rounded-[2rem] sm:rounded-[3rem] md:rounded-[4rem] shadow-[0_50px_100px_-20px_rgba(0,0,0,0.5)] relative z-10 animate-in zoom-in-95 slide-in-from-bottom-20 duration-700 ease-out border-4 sm:border-[1rem] border-white">
-            <div className="grid grid-cols-1 md:grid-cols-2">
-              <div className="relative h-[260px] sm:h-[320px] md:h-full overflow-hidden">
-                <img 
-                  src={activeServiceData.imageUrl}
-                  alt={activeServiceData.name}
-                  className="w-full h-full object-cover"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent flex flex-col justify-end p-4 sm:p-8 md:p-12">
-                   <div className="flex items-center space-x-3 bg-[#F2529D] text-white px-4 sm:px-6 py-2 sm:py-3 rounded-full w-fit mb-3 sm:mb-4">
-                      <Clock size={16} className="sm:w-5 sm:h-5" />
-                      <span className="text-[0.65rem] sm:text-sm font-black tracking-[0.25em] sm:tracking-widest uppercase whitespace-nowrap">{formatDuration(activeServiceData.durationMinutes)}</span>
-                   </div>
-                   <h2 className="text-2xl sm:text-4xl md:text-5xl font-display italic text-white font-black leading-tight max-w-[90%]">{activeServiceData.name}</h2>
-                </div>
-              </div>
-              <div className="p-5 sm:p-8 md:p-20 flex flex-col relative">
-                <button 
-                  onClick={() => setViewingService(null)}
-                  className="absolute top-4 sm:top-6 right-4 sm:right-6 w-10 h-10 sm:w-12 sm:h-12 bg-gray-100 rounded-full flex items-center justify-center hover:bg-black hover:text-white transition-all group"
-                >
-                  <ChevronLeft className="rotate-180 w-4 h-4 sm:w-5 sm:h-5 transition-transform group-hover:translate-x-1" />
-                </button>
-
-                <div className="mb-8 sm:mb-12 pt-10 sm:pt-0">
-                  <span className="text-[0.65rem] sm:text-xs font-black text-[#BF9C34] tracking-[0.3em] sm:tracking-[0.5em] uppercase mb-3 sm:mb-4 block">Service Ritual</span>
-                  <div className="h-1 w-16 sm:w-24 bg-[#BF9C34] mb-6 sm:mb-12"></div>
-                  <p className="text-base sm:text-xl md:text-2xl text-gray-800 leading-[1.6] font-medium italic mb-6 sm:mb-10">
-                    "{activeServiceData.shortDescription}"
-                  </p>
-                  <p className="text-sm sm:text-lg text-gray-600 leading-relaxed mb-8 sm:mb-12">
-                    {activeServiceData.fullDescription}
-                  </p>
-                </div>
-
-                <div className="mt-auto flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 border-t-2 border-gray-50 pt-6 sm:pt-10">
-                  <div className="flex flex-col">
-                    <span className="text-[0.65rem] sm:text-xs font-black text-gray-400 tracking-widest uppercase mb-1">Price Investment</span>
-                      <span className="text-3xl sm:text-5xl font-display italic text-[#F2529D] font-black">{activeServiceData.priceLabel ?? formatPrice(activeServiceData.priceCents)}</span>
-                  </div>
-                  <button 
-                    onClick={() => {
-                      setSelectedService(viewingService);
-                      setViewingService(null);
-                    }}
-                    className="bg-black text-white w-full sm:w-auto px-8 sm:px-12 py-4 sm:py-6 rounded-[1.5rem] sm:rounded-[2rem] text-xs sm:text-sm font-black uppercase tracking-[0.25em] sm:tracking-[0.4em] hover:scale-105 active:scale-95 transition-all shadow-xl"
-                  >
-                    SELECT RITUAL
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
       {/* Hero Section */}
       <div className="relative h-[700px] w-full overflow-hidden booking-header">
         <img 
@@ -319,6 +253,9 @@ const BookingPage: React.FC = () => {
                   <p className="text-sm sm:text-lg text-white/70 leading-relaxed">
                     {bookingSuccess.serviceName} has been booked for {bookingSuccess.date} at {bookingSuccess.time}.
                   </p>
+                  <p className="text-xs sm:text-sm text-white/60 leading-relaxed">
+                    Payment can be completed in the lounge after your service.
+                  </p>
                 </div>
                 <button
                   type="button"
@@ -367,31 +304,23 @@ const BookingPage: React.FC = () => {
                         <button
                           key={service.id}
                           type="button"
-                          onClick={() => {
-                            setSelectedService(service.id);
-                            setViewingService(service.id);
-                          }}
+                          onClick={() => setSelectedService(service.id)}
                           className={`group text-left transition-all duration-700 p-4 sm:p-5 md:p-6 rounded-[2rem] border-2 relative overflow-hidden flex flex-col md:flex-row md:items-center gap-4 sm:gap-5 ${
                             selectedService === service.id
                               ? 'bg-black border-black text-white shadow-[0_30px_80px_-20px_rgba(0,0,0,0.5)]'
                               : 'bg-white border-gray-100 hover:border-[#F2529D]/20 hover:shadow-2xl hover:-translate-y-1'
                           }`}
                         >
-                          <div className="flex items-center gap-4 min-w-0 flex-1">
-                            <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-[1.25rem] overflow-hidden flex-shrink-0 shadow-lg border border-white/70">
-                              <img src={service.imageUrl} alt={service.name} className="w-full h-full object-cover" />
-                            </div>
-                            <div className="min-w-0 space-y-2">
-                              <span className={`text-[0.6rem] sm:text-[0.7rem] font-black tracking-[0.35em] uppercase transition-colors duration-500 ${selectedService === service.id ? 'text-[#F2529D]' : 'text-[#BF9C34]'}`}>
-                                Treatment Ritual {String(service.sortOrder).padStart(2, '0')}
-                              </span>
-                              <h4 className={`text-xl sm:text-2xl md:text-3xl font-display italic font-black leading-tight transition-colors duration-500 ${selectedService === service.id ? 'text-white' : 'text-gray-900 group-hover:text-[#F2529D]'}`}>
-                                {service.name}
-                              </h4>
-                              <p className={`text-sm sm:text-base leading-relaxed transition-colors duration-500 ${selectedService === service.id ? 'text-white/75' : 'text-gray-600'}`}>
-                                {service.shortDescription}
-                              </p>
-                            </div>
+                          <div className="min-w-0 space-y-2 flex-1">
+                            <span className={`text-[0.6rem] sm:text-[0.7rem] font-black tracking-[0.35em] uppercase transition-colors duration-500 ${selectedService === service.id ? 'text-[#F2529D]' : 'text-[#BF9C34]'}`}>
+                              Treatment Ritual {String(service.sortOrder).padStart(2, '0')}
+                            </span>
+                            <h4 className={`text-xl sm:text-2xl md:text-3xl font-display italic font-black leading-tight transition-colors duration-500 ${selectedService === service.id ? 'text-white' : 'text-gray-900 group-hover:text-[#F2529D]'}`}>
+                              {service.name}
+                            </h4>
+                            <p className={`text-sm sm:text-base leading-relaxed transition-colors duration-500 ${selectedService === service.id ? 'text-white/75' : 'text-gray-600'}`}>
+                              {service.shortDescription}
+                            </p>
                           </div>
 
                           <div className="flex w-full md:w-auto items-center justify-between md:justify-end gap-4 md:gap-6">
