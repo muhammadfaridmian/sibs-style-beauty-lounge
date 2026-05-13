@@ -1,7 +1,7 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { ArrowRight, X } from 'lucide-react';
+import { ArrowRight, ShoppingBag, X } from 'lucide-react';
 import silkyCoolProductsImage from './assets/Silkycoolproducts.jpeg';
 import goldProductsImage from './assets/Goldproducts.jpeg';
 
