@@ -139,7 +139,10 @@ export default defineSchema({
     title: v.string(),
     description: v.optional(v.string()),
     // store a key referencing an imported asset (see frontend mapping)
-    assetKey: v.string(),
+    assetKey: v.optional(v.string()),
+    // Optional image URL or storage reference for uploaded/custom assets
+    imageUrl: v.optional(v.string()),
+    storageId: v.optional(v.union(v.id("_storage"), v.null())),
     priceCents: v.optional(v.number()),
     priceLabel: v.optional(v.string()),
     active: v.boolean(),

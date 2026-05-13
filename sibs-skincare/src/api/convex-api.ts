@@ -742,6 +742,21 @@ export async function createCollection(params: {
   }, authToken);
 }
 
+export async function getAdminCollections(authToken: string | null = getStoredAuthToken()): Promise<CollectionItem[]> {
+  if (!authToken) {
+    throw new Error("Please sign in before opening the admin dashboard.");
+  }
+
+  return await requestJson<CollectionItem[]>('/api/admin/collections', { method: 'GET' }, authToken);
+}
+
+export async function deleteCollection(params: { collectionId: string; authToken?: string | null }): Promise<{ collectionId: string }> {
+  const authToken = params.authToken ?? getStoredAuthToken();
+  if (!authToken) throw new Error('Please sign in as admin before deleting collections.');
+
+  return await requestJson<{ collectionId: string }>(`/api/admin/collections/${params.collectionId}`, { method: 'DELETE' }, authToken);
+}
+
 export async function updatePromotion(params: {
   promotionId: string;
   updates: Partial<{

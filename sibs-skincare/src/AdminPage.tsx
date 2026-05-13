@@ -32,6 +32,8 @@ import {
   type AdminAppointment,
   type AdminReview,
   type AuthUser,
+  getAdminCollections,
+  deleteCollection,
 } from './api/convex-api';
 import availableProductAssets from './availableProductAssets';
 import OffersManager from './components/OffersManager';
@@ -82,30 +84,69 @@ const AdminPage: React.FC = () => {
     active: true,
     featured: false,
   });
+  const [collectionFile, setCollectionFile] = useState<File | null>(null);
+  const [collectionCustomUrl, setCollectionCustomUrl] = useState<string>('');
+  const [collectionsList, setCollectionsList] = useState<Array<any>>([]);
 
   const handleCollectionCreate = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!authToken) return;
     try {
       setActionMessage(null);
-      await createCollection({
-        item: {
-          title: collectionForm.title.trim(),
-          description: collectionForm.description.trim(),
-          assetKey: collectionForm.assetKey,
-          priceCents: collectionForm.priceCents,
-          priceLabel: collectionForm.priceLabel || undefined,
-          active: collectionForm.active,
-          featured: collectionForm.featured,
-          sortOrder: Date.now(),
-        },
-        authToken,
-      });
+      let imageUrl: string | undefined = undefined;
+
+      if (collectionFile) {
+        // Upload binary to gallery endpoint which stores file in Convex storage
+        const uploadUrl = `/api/gallery/upload?title=${encodeURIComponent(collectionForm.title || 'Collection Image')}&category=Collection`;
+        const resp = await fetch(uploadUrl, {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${authToken}`,
+          },
+          body: collectionFile,
+        });
+        if (!resp.ok) throw new Error('File upload failed');
+        const payload = await resp.json();
+        imageUrl = payload?.data?.imageUrl ?? undefined;
+      } else if (collectionCustomUrl && collectionCustomUrl.trim()) {
+        imageUrl = collectionCustomUrl.trim();
+      }
+
+      const itemPayload: any = {
+        title: collectionForm.title.trim(),
+        description: collectionForm.description.trim(),
+        priceCents: collectionForm.priceCents,
+        priceLabel: collectionForm.priceLabel || undefined,
+        active: collectionForm.active,
+        featured: collectionForm.featured,
+        sortOrder: Date.now(),
+      };
+
+      if (imageUrl) {
+        itemPayload.imageUrl = imageUrl;
+      } else {
+        itemPayload.assetKey = collectionForm.assetKey;
+      }
+
+      await createCollection({ item: itemPayload, authToken });
       setActionMessage(`Created ${collectionForm.title}`);
       setCollectionForm((prev) => ({ ...prev, title: '', description: '' }));
+      setCollectionFile(null);
+      setCollectionCustomUrl('');
       await refreshDashboard();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Unable to create collection item.');
+    }
+  };
+
+  const handleDeleteCollection = async (collectionId: string) => {
+    if (!authToken) return;
+    try {
+      await deleteCollection({ collectionId, authToken });
+      setActionMessage('Collection removed');
+      await refreshDashboard();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Unable to delete collection.');
     }
   };
 
@@ -126,13 +167,24 @@ const AdminPage: React.FC = () => {
         // A valid customer session still should not reveal the admin queues.
         setAppointments([]);
         setReviews([]);
+        setCollectionsList([]);
         return;
       }
-
+      
       const [appointmentData, reviewData] = await Promise.all([
         getAdminAppointments(authToken),
         getAdminReviews(authToken),
       ]);
+
+      // also load collections for admin
+      try {
+        const cols = await getAdminCollections(authToken);
+        setCollectionsList(cols);
+      } catch (err) {
+        // non-fatal
+        console.warn('Unable to load admin collections', err);
+        setCollectionsList([]);
+      }
 
       setAppointments(appointmentData);
       setReviews(reviewData);
@@ -521,6 +573,7 @@ const AdminPage: React.FC = () => {
             <Calendar className="text-[#F2529D]" size={20} />
             <h2 className="text-3xl sm:text-4xl font-display italic font-black text-[#0A0E1A]">Bookings queue</h2>
           </div>
+        
 
           <div className="grid gap-4 sm:gap-5 lg:grid-cols-2">
             {activeAppointments.length === 0 ? (
@@ -777,6 +830,34 @@ const AdminPage: React.FC = () => {
                     Remove
                   </button>
                 </article>
+              ))
+            )}
+          </div>
+        </section>
+
+        <section className="space-y-5 sm:space-y-6">
+          <div className="flex items-center gap-3">
+            <ImagePlus className="text-[#BF9C34]" size={20} />
+            <h3 className="text-2xl sm:text-3xl font-display italic font-black text-[#0A0E1A]">Collection items</h3>
+          </div>
+
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {collectionsList.length === 0 ? (
+              <div className="col-span-1 md:col-span-3 text-center py-10 text-gray-500">No collection items yet.</div>
+            ) : (
+              collectionsList.map((c) => (
+                <div key={c.id} className="rounded-[1.5rem] bg-white border border-gray-100 p-4 flex items-center gap-4">
+                  <div className="w-20 h-20 bg-[#FAF9F6] rounded-lg overflow-hidden flex-shrink-0">
+                    <img src={c.imageUrl ?? (availableProductAssets[c.assetKey]?.src ?? '')} className="w-full h-full object-cover" alt={c.title} />
+                  </div>
+                  <div className="flex-1">
+                    <h4 className="font-display font-black text-lg">{c.title}</h4>
+                    <p className="text-sm text-gray-500">{c.description}</p>
+                  </div>
+                  <div className="flex flex-col gap-2">
+                    <button onClick={() => handleDeleteCollection(c.id)} className="rounded-full bg-red-50 text-red-700 px-4 py-2 text-sm font-black">Delete</button>
+                  </div>
+                </div>
               ))
             )}
           </div>

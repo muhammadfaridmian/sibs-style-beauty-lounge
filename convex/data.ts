@@ -460,12 +460,13 @@ export const listCollections = internalQuery({
       .withIndex("by_active_and_sortOrder", (q) => q.eq("active", true))
       .order("asc")
       .take(100);
-
     return items.map((doc) => ({
       id: doc._id,
       title: doc.title,
       description: doc.description ?? null,
-      assetKey: doc.assetKey,
+      assetKey: doc.assetKey ?? null,
+      imageUrl: doc.imageUrl ?? null,
+      storageId: doc.storageId ?? null,
       priceCents: doc.priceCents ?? null,
       priceLabel: doc.priceLabel ?? null,
       active: doc.active,
@@ -481,7 +482,9 @@ export const createCollection = internalMutation({
   args: {
     title: v.string(),
     description: v.optional(v.string()),
-    assetKey: v.string(),
+    assetKey: v.optional(v.string()),
+    imageUrl: v.optional(v.string()),
+    storageId: v.optional(v.union(v.id("_storage"), v.null())),
     priceCents: v.optional(v.number()),
     priceLabel: v.optional(v.string()),
     active: v.boolean(),
@@ -494,7 +497,9 @@ export const createCollection = internalMutation({
     return await ctx.db.insert("collections", {
       title: args.title,
       description: args.description ?? null,
-      assetKey: args.assetKey,
+      assetKey: args.assetKey ?? null,
+      imageUrl: args.imageUrl ?? null,
+      storageId: args.storageId ?? null,
       priceCents: args.priceCents ?? null,
       priceLabel: args.priceLabel ?? null,
       active: args.active,
@@ -503,6 +508,18 @@ export const createCollection = internalMutation({
       createdAt: args.createdAt,
       updatedAt: args.updatedAt,
     });
+  },
+});
+
+export const deleteCollection = internalMutation({
+  args: { collectionId: v.id("collections") },
+  handler: async (ctx, args) => {
+    const existing = await ctx.db.get(args.collectionId);
+    if (!existing) {
+      throw new Error("Collection not found");
+    }
+    await ctx.db.delete(args.collectionId);
+    return { collectionId: args.collectionId };
   },
 });
 
