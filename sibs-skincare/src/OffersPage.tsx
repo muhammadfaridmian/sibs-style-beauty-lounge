@@ -146,8 +146,13 @@ const OffersPage = () => {
     const loadPromotions = async () => {
       try {
         const items = await getPromotions();
-        if (!cancelled && items.length > 0) {
-          setPromotions(items);
+        if (!cancelled) {
+          if (items.length > 0) {
+            setPromotions(items);
+          } else {
+            // No offers were returned from the API: show empty state instead of fallback
+            setPromotions([]);
+          }
         }
       } catch {
         if (!cancelled) {
