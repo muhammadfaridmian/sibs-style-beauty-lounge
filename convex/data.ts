@@ -494,19 +494,24 @@ export const createCollection = internalMutation({
     updatedAt: v.number(),
   },
   handler: async (ctx, args) => {
-    return await ctx.db.insert("collections", {
+    const doc: Record<string, unknown> = {
       title: args.title,
-      description: args.description ?? null,
-      assetKey: args.assetKey ?? null,
-      imageUrl: args.imageUrl ?? null,
-      storageId: args.storageId ?? null,
-      priceCents: args.priceCents ?? null,
-      priceLabel: args.priceLabel ?? null,
       active: args.active,
       featured: args.featured,
       sortOrder: args.sortOrder,
       createdAt: args.createdAt,
       updatedAt: args.updatedAt,
+    };
+
+    if (args.description !== undefined) doc.description = args.description;
+    if (args.assetKey !== undefined) doc.assetKey = args.assetKey;
+    if (args.imageUrl !== undefined) doc.imageUrl = args.imageUrl;
+    if (args.storageId !== undefined) doc.storageId = args.storageId;
+    if (args.priceCents !== undefined) doc.priceCents = args.priceCents;
+    if (args.priceLabel !== undefined) doc.priceLabel = args.priceLabel;
+
+    return await ctx.db.insert("collections", {
+      ...doc,
     });
   },
 });
