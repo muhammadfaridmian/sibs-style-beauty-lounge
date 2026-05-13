@@ -147,6 +147,8 @@ const ContactPage = () => {
                             </div>
                         </a>
                     </div>
+                </div>
+            </div>
 
             <div className="contact-footer">
               <Footer />
