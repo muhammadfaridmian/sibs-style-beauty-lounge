@@ -13,7 +13,7 @@ export default function Footer() {
           <div className="space-y-6">
             <div className="flex items-center gap-3 w-fit">
               <div className="rounded-full border-2 border-[#F2529D]/30 bg-white/8 p-2 shadow-[0_8px_24px_-12px_rgba(242,82,157,0.4)]">
-                <img src={logo} alt="Sibs Style logo" className="h-12 w-auto rounded-full" />
+                <img src={logo} alt="Sibs Style logo" className="h-16 w-auto rounded-full" />
               </div>
               <div>
                 <p className="text-sm font-black uppercase tracking-[0.4em] text-[#F2529D]">Sibs Style</p>
