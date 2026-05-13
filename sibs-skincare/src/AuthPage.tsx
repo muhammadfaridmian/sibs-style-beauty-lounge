@@ -7,6 +7,7 @@ import {
   login,
   register,
 } from './api/convex-api';
+import logo from './assets/Sibs Style BL logo.png';
 
 // The registration form stores comma-separated notes, so this turns them into arrays.
 const splitList = (value: string) =>
@@ -130,8 +131,8 @@ const AuthPage: React.FC = () => {
 
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10">
         <div className="flex items-center justify-between gap-4">
-          <Link to="/" className="text-3xl sm:text-4xl font-display italic font-black text-[#F2529D]">
-            Sibs Style
+          <Link to="/" className="flex items-center gap-3 shrink-0" aria-label="Sibs Style home">
+            <img src={logo} alt="Sibs Style logo" className="h-12 w-auto rounded-full sm:h-14" />
           </Link>
           <Link
             to="/"
