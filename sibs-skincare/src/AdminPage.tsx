@@ -79,13 +79,13 @@ const AdminPage: React.FC = () => {
     title: '',
     description: '',
     assetKey: Object.keys(availableProductAssets)[0] || '',
+    customAsset: '',
     priceLabel: '',
     priceCents: undefined as number | undefined,
     active: true,
     featured: false,
   });
   const [collectionFile, setCollectionFile] = useState<File | null>(null);
-  const [collectionCustomUrl, setCollectionCustomUrl] = useState<string>('');
   const [collectionsList, setCollectionsList] = useState<Array<any>>([]);
 
   const handleCollectionCreate = async (e: React.FormEvent) => {
@@ -108,8 +108,6 @@ const AdminPage: React.FC = () => {
         if (!resp.ok) throw new Error('File upload failed');
         const payload = await resp.json();
         imageUrl = payload?.data?.imageUrl ?? undefined;
-      } else if (collectionCustomUrl && collectionCustomUrl.trim()) {
-        imageUrl = collectionCustomUrl.trim();
       }
 
       const itemPayload: any = {
@@ -125,14 +123,18 @@ const AdminPage: React.FC = () => {
       if (imageUrl) {
         itemPayload.imageUrl = imageUrl;
       } else {
-        itemPayload.assetKey = collectionForm.assetKey;
+        const customValue = collectionForm.customAsset.trim();
+        if (customValue && (/^(https?:)?\/\//i.test(customValue) || customValue.startsWith('/') || customValue.startsWith('data:'))) {
+          itemPayload.imageUrl = customValue;
+        } else {
+          itemPayload.assetKey = customValue || collectionForm.assetKey;
+        }
       }
 
       await createCollection({ item: itemPayload, authToken });
       setActionMessage(`Created ${collectionForm.title}`);
-      setCollectionForm((prev) => ({ ...prev, title: '', description: '' }));
+      setCollectionForm((prev) => ({ ...prev, title: '', description: '', customAsset: '' }));
       setCollectionFile(null);
-      setCollectionCustomUrl('');
       await refreshDashboard();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Unable to create collection item.');
@@ -993,6 +995,28 @@ const AdminPage: React.FC = () => {
                     <option key={key} value={key}>{availableProductAssets[key].label}</option>
                   ))}
                 </select>
+              </label>
+            </div>
+
+            <div className="grid gap-4 sm:grid-cols-2">
+              <label className="space-y-2">
+                <span className="text-[10px] font-black uppercase tracking-[0.35em] text-gray-400">Upload image file</span>
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={(event) => setCollectionFile(event.target.files?.[0] ?? null)}
+                  className="w-full rounded-[1.25rem] border border-gray-200 bg-[#FAF9F6] px-4 py-4 text-base focus:outline-none focus:border-[#F2529D]"
+                />
+              </label>
+
+              <label className="space-y-2">
+                <span className="text-[10px] font-black uppercase tracking-[0.35em] text-gray-400">Custom asset URL or key</span>
+                <input
+                  value={collectionForm.customAsset}
+                  onChange={(e) => setCollectionForm((prev) => ({ ...prev, customAsset: e.target.value }))}
+                  className="w-full rounded-[1.25rem] border border-gray-200 bg-[#FAF9F6] px-4 py-4 text-base focus:outline-none focus:border-[#F2529D]"
+                  placeholder="https://... or myCustomAssetKey"
+                />
               </label>
             </div>
 

@@ -696,7 +696,9 @@ export interface CollectionItem {
   id: string;
   title: string;
   description?: string | null;
-  assetKey: string;
+  assetKey?: string | null;
+  imageUrl?: string | null;
+  storageId?: string | null;
   priceCents?: number | null;
   priceLabel?: string | null;
   active: boolean;
@@ -722,7 +724,9 @@ export async function createCollection(params: {
   item: {
     title: string;
     description?: string;
-    assetKey: string;
+    assetKey?: string;
+    imageUrl?: string;
+    storageId?: string | null;
     priceCents?: number;
     priceLabel?: string;
     active?: boolean;
