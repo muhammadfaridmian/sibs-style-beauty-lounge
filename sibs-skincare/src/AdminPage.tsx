@@ -30,6 +30,7 @@ import {
   uploadGalleryItem,
   createCollection,
   updateCollection,
+  API_BASE,
   type AdminAppointment,
   type AdminReview,
   type AuthUser,
@@ -88,6 +89,18 @@ const AdminPage: React.FC = () => {
   });
   const [collectionFile, setCollectionFile] = useState<File | null>(null);
   const [collectionsList, setCollectionsList] = useState<Array<any>>([]);
+  const [selectedCollectionId, setSelectedCollectionId] = useState<string>('');
+  const [editCollectionFile, setEditCollectionFile] = useState<File | null>(null);
+  const [editCollectionForm, setEditCollectionForm] = useState({
+    title: '',
+    description: '',
+    assetKey: '',
+    imageUrl: '',
+    priceLabel: '',
+    priceCents: undefined as number | undefined,
+    active: true,
+    featured: false,
+  });
 
   const handleCollectionCreate = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -98,7 +111,7 @@ const AdminPage: React.FC = () => {
 
       if (collectionFile) {
         // Upload binary to gallery endpoint which stores file in Convex storage
-        const uploadUrl = `/api/gallery/upload?title=${encodeURIComponent(collectionForm.title || 'Collection Image')}&category=Collection`;
+        const uploadUrl = `${API_BASE}/api/gallery/upload?title=${encodeURIComponent(collectionForm.title || 'Collection Image')}&category=Collection`;
         const resp = await fetch(uploadUrl, {
           method: 'POST',
           headers: {
@@ -158,31 +171,79 @@ const AdminPage: React.FC = () => {
     }
   };
 
-  const handleEditCollection = async (collection: any) => {
-    if (!authToken) return;
+  const populateEditFormFromCollection = (collection: any) => {
+    setEditCollectionForm({
+      title: collection.title ?? '',
+      description: collection.description ?? '',
+      assetKey: collection.assetKey ?? '',
+      imageUrl: collection.imageUrl ?? '',
+      priceLabel: collection.priceLabel ?? '',
+      priceCents: typeof collection.priceCents === 'number' ? collection.priceCents : undefined,
+      active: Boolean(collection.active),
+      featured: Boolean(collection.featured),
+    });
+  };
 
-    const nextTitle = window.prompt('Update title', collection.title ?? '');
-    if (nextTitle === null) return;
-    const nextDescription = window.prompt('Update description', collection.description ?? '');
-    if (nextDescription === null) return;
-    const nextPriceLabel = window.prompt('Update price label', collection.priceLabel ?? '');
-    if (nextPriceLabel === null) return;
+  const handleSelectCollectionForEdit = (collectionId: string) => {
+    setSelectedCollectionId(collectionId);
+    const selected = collectionsList.find((item) => item.id === collectionId);
+    if (selected) {
+      populateEditFormFromCollection(selected);
+      setEditCollectionFile(null);
+    }
+  };
+
+  const handleUpdateCollection = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!authToken || !selectedCollectionId) return;
 
     try {
+      let uploadedImageUrl: string | undefined;
+      if (editCollectionFile) {
+        const uploadUrl = `${API_BASE}/api/gallery/upload?title=${encodeURIComponent(editCollectionForm.title || 'Collection Image')}&category=Collection`;
+        const resp = await fetch(uploadUrl, {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${authToken}`,
+          },
+          body: editCollectionFile,
+        });
+        if (!resp.ok) throw new Error('File upload failed');
+        const responseText = await resp.text();
+        if (responseText.trim()) {
+          const payload = JSON.parse(responseText) as { data?: { imageUrl?: string } };
+          uploadedImageUrl = payload?.data?.imageUrl ?? undefined;
+        }
+      }
+
       await updateCollection({
-        collectionId: collection.id,
+        collectionId: selectedCollectionId,
         updates: {
-          title: nextTitle.trim(),
-          description: nextDescription.trim(),
-          priceLabel: nextPriceLabel.trim(),
+          title: editCollectionForm.title.trim(),
+          description: editCollectionForm.description.trim(),
+          assetKey: editCollectionForm.assetKey.trim() || undefined,
+          imageUrl: uploadedImageUrl ?? (editCollectionForm.imageUrl.trim() || undefined),
+          priceLabel: editCollectionForm.priceLabel.trim() || undefined,
+          priceCents: editCollectionForm.priceCents,
+          active: editCollectionForm.active,
+          featured: editCollectionForm.featured,
         },
         authToken,
       });
+
       setActionMessage('Collection updated');
+      setEditCollectionFile(null);
       await refreshDashboard();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Unable to update collection.');
     }
+  };
+
+  const handleRemoveSelectedCollection = async () => {
+    if (!selectedCollectionId) return;
+    await handleDeleteCollection(selectedCollectionId);
+    setSelectedCollectionId('');
+    setEditCollectionFile(null);
   };
 
   const loadDashboard = async () => {
@@ -237,6 +298,18 @@ const AdminPage: React.FC = () => {
     window.scrollTo(0, 0);
     loadDashboard();
   }, []);
+
+  useEffect(() => {
+    if (collectionsList.length === 0) {
+      setSelectedCollectionId('');
+      return;
+    }
+
+    const current = collectionsList.find((item) => item.id === selectedCollectionId);
+    const target = current ?? collectionsList[0];
+    setSelectedCollectionId(target.id);
+    populateEditFormFromCollection(target);
+  }, [collectionsList]);
 
   // Auto-remove completed bookings and approved reviews after 60 minutes
   useEffect(() => {
@@ -890,7 +963,6 @@ const AdminPage: React.FC = () => {
                     <p className="text-sm text-gray-500">{c.description}</p>
                   </div>
                   <div className="flex flex-col gap-2">
-                    <button onClick={() => handleEditCollection(c)} className="rounded-full bg-blue-50 text-blue-700 px-4 py-2 text-sm font-black">Edit</button>
                     <button onClick={() => handleDeleteCollection(c.id)} className="rounded-full bg-red-50 text-red-700 px-4 py-2 text-sm font-black">Delete</button>
                   </div>
                 </div>
@@ -1112,6 +1184,147 @@ const AdminPage: React.FC = () => {
               Create collection item
               <ArrowButtonIcon />
             </button>
+          </form>
+        </section>
+
+        <section className="space-y-5 sm:space-y-6">
+          <div className="flex items-center gap-3">
+            <ImagePlus className="text-[#0A0E1A]" size={20} />
+            <h3 className="text-2xl sm:text-3xl font-display italic font-black text-[#0A0E1A]">Edit collection item</h3>
+          </div>
+
+          <form onSubmit={handleUpdateCollection} className="rounded-[2rem] sm:rounded-[3rem] bg-white border border-gray-100 p-6 sm:p-8 lg:p-10 space-y-5 sm:space-y-6">
+            <label className="block space-y-2">
+              <span className="text-[10px] font-black uppercase tracking-[0.35em] text-gray-400">Select collection</span>
+              <select
+                value={selectedCollectionId}
+                onChange={(e) => handleSelectCollectionForEdit(e.target.value)}
+                className="w-full rounded-[1.25rem] border border-gray-200 bg-[#FAF9F6] px-4 py-4 text-base focus:outline-none focus:border-[#F2529D]"
+              >
+                {collectionsList.map((item) => (
+                  <option key={item.id} value={item.id}>{item.title}</option>
+                ))}
+              </select>
+            </label>
+
+            <div className="grid gap-4 sm:grid-cols-2">
+              <label className="space-y-2">
+                <span className="text-[10px] font-black uppercase tracking-[0.35em] text-gray-400">Title</span>
+                <input
+                  value={editCollectionForm.title}
+                  onChange={(e) => setEditCollectionForm((prev) => ({ ...prev, title: e.target.value }))}
+                  className="w-full rounded-[1.25rem] border border-gray-200 bg-[#FAF9F6] px-4 py-4 text-base focus:outline-none focus:border-[#F2529D]"
+                  placeholder="Product title"
+                />
+              </label>
+
+              <label className="space-y-2">
+                <span className="text-[10px] font-black uppercase tracking-[0.35em] text-gray-400">Asset</span>
+                <input
+                  value={editCollectionForm.assetKey}
+                  onChange={(e) => setEditCollectionForm((prev) => ({ ...prev, assetKey: e.target.value }))}
+                  className="w-full rounded-[1.25rem] border border-gray-200 bg-[#FAF9F6] px-4 py-4 text-base focus:outline-none focus:border-[#F2529D]"
+                  placeholder="Asset key"
+                />
+              </label>
+            </div>
+
+            <div className="grid gap-4 sm:grid-cols-2">
+              <label className="space-y-2">
+                <span className="text-[10px] font-black uppercase tracking-[0.35em] text-gray-400">Upload image file</span>
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={(event) => setEditCollectionFile(event.target.files?.[0] ?? null)}
+                  className="w-full rounded-[1.25rem] border border-gray-200 bg-[#FAF9F6] px-4 py-4 text-base focus:outline-none focus:border-[#F2529D]"
+                />
+              </label>
+
+              <label className="space-y-2">
+                <span className="text-[10px] font-black uppercase tracking-[0.35em] text-gray-400">Image URL</span>
+                <input
+                  value={editCollectionForm.imageUrl}
+                  onChange={(e) => setEditCollectionForm((prev) => ({ ...prev, imageUrl: e.target.value }))}
+                  className="w-full rounded-[1.25rem] border border-gray-200 bg-[#FAF9F6] px-4 py-4 text-base focus:outline-none focus:border-[#F2529D]"
+                  placeholder="https://..."
+                />
+              </label>
+            </div>
+
+            <label className="block space-y-2">
+              <span className="text-[10px] font-black uppercase tracking-[0.35em] text-gray-400">Description</span>
+              <textarea
+                value={editCollectionForm.description}
+                onChange={(e) => setEditCollectionForm((prev) => ({ ...prev, description: e.target.value }))}
+                rows={3}
+                className="w-full rounded-[1.25rem] border border-gray-200 bg-[#FAF9F6] px-4 py-4 text-base focus:outline-none focus:border-[#F2529D] resize-none"
+                placeholder="Short product description"
+              />
+            </label>
+
+            <div className="grid gap-4 sm:grid-cols-2">
+              <label className="space-y-2">
+                <span className="text-[10px] font-black uppercase tracking-[0.35em] text-gray-400">Price label</span>
+                <input
+                  value={editCollectionForm.priceLabel}
+                  onChange={(e) => setEditCollectionForm((prev) => ({ ...prev, priceLabel: e.target.value }))}
+                  className="w-full rounded-[1.25rem] border border-gray-200 bg-[#FAF9F6] px-4 py-4 text-base focus:outline-none focus:border-[#F2529D]"
+                  placeholder="e.g., 120 AED"
+                />
+              </label>
+
+              <label className="space-y-2">
+                <span className="text-[10px] font-black uppercase tracking-[0.35em] text-gray-400">Price</span>
+                <input
+                  type="number"
+                  value={editCollectionForm.priceCents ?? ''}
+                  onChange={(e) => setEditCollectionForm((prev) => ({ ...prev, priceCents: e.target.value ? Number(e.target.value) : undefined }))}
+                  className="w-full rounded-[1.25rem] border border-gray-200 bg-[#FAF9F6] px-4 py-4 text-base focus:outline-none focus:border-[#F2529D]"
+                  placeholder="120"
+                />
+              </label>
+            </div>
+
+            <label className="flex items-center gap-3 rounded-[1.25rem] bg-[#FAF9F6] border border-gray-200 px-4 py-4 text-sm font-medium text-gray-600">
+              <input
+                type="checkbox"
+                checked={editCollectionForm.featured}
+                onChange={(event) => setEditCollectionForm((prev) => ({ ...prev, featured: event.target.checked }))}
+                className="w-4 h-4 accent-[#F2529D]"
+              />
+              Mark as featured
+            </label>
+
+            <label className="flex items-center gap-3 rounded-[1.25rem] bg-[#FAF9F6] border border-gray-200 px-4 py-4 text-sm font-medium text-gray-600">
+              <input
+                type="checkbox"
+                checked={editCollectionForm.active}
+                onChange={(event) => setEditCollectionForm((prev) => ({ ...prev, active: event.target.checked }))}
+                className="w-4 h-4 accent-[#F2529D]"
+              />
+              Active
+            </label>
+
+            <div className="grid gap-4 sm:grid-cols-2">
+              <button
+                type="submit"
+                disabled={!selectedCollectionId}
+                className="inline-flex w-full items-center justify-center gap-3 rounded-full bg-black px-6 py-4 text-[10px] sm:text-xs font-black uppercase tracking-[0.35em] text-white hover:bg-[#0A0E1A] transition-colors disabled:opacity-50"
+              >
+                Save collection changes
+                <ArrowButtonIcon />
+              </button>
+
+              <button
+                type="button"
+                onClick={handleRemoveSelectedCollection}
+                disabled={!selectedCollectionId}
+                className="inline-flex w-full items-center justify-center gap-3 rounded-full bg-red-50 border border-red-200 px-6 py-4 text-[10px] sm:text-xs font-black uppercase tracking-[0.35em] text-red-700 hover:bg-red-100 transition-colors disabled:opacity-50"
+              >
+                Remove collection
+                <XCircle size={14} />
+              </button>
+            </div>
           </form>
         </section>
       </main>

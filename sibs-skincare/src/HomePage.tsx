@@ -146,21 +146,18 @@ const HomePage = () => {
         const items = await getCollections();
         if (cancelled) return;
 
-        const mapped = (items as CollectionItem[])
-          .map((item) => {
-            const mappedAsset = item.assetKey ? availableProductAssets[item.assetKey] : undefined;
-            const imageUrl = item.imageUrl || mappedAsset?.src || '';
-            if (!imageUrl) return null;
+        const mapped = (items as CollectionItem[]).map((item) => {
+          const mappedAsset = item.assetKey ? availableProductAssets[item.assetKey] : undefined;
+          const imageUrl = item.imageUrl || mappedAsset?.src || silkyCoolProductsImage;
 
-            return {
-              id: item.id,
-              name: item.title,
-              imageUrl,
-              description: item.description || 'Botanical luxury for your ritual.',
-              price: item.priceLabel || (typeof item.priceCents === 'number' ? `${item.priceCents}` : 'Price on request'),
-            };
-          })
-          .filter((item): item is { id: string; name: string; imageUrl: string; description: string; price: string } => Boolean(item));
+          return {
+            id: item.id,
+            name: item.title,
+            imageUrl,
+            description: item.description || 'Botanical luxury for your ritual.',
+            price: item.priceLabel || (typeof item.priceCents === 'number' ? `${item.priceCents}` : 'Price on request'),
+          };
+        });
 
         setProducts(mapped);
       } catch {
