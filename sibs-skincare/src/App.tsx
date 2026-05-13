@@ -2,7 +2,7 @@
 import { BrowserRouter as Router, Routes, Route, Link, useLocation, useNavigate } from 'react-router-dom';
 import { Menu, X, ChevronRight } from 'lucide-react';
 import gsap from 'gsap';
-import logo from './assets/sibs-logo.svg';
+import logo from './assets/Sibs Style BL logo.png';
 import HomeScreen from './HomePage.tsx';
 import BookingPage from './BookingPage.tsx';
 import TestimonialsPage from './TestimonialsPage.tsx';
@@ -166,7 +166,7 @@ const Navigation = () => {
   return (
     <>
       <nav className="fixed top-0 w-full z-50 bg-[#FAF9F6]/95 md:bg-[#FAF9F6]/92 backdrop-blur-xl md:backdrop-blur-2xl border-b border-gray-100 shadow-sm">
-        <div className="max-w-[1800px] mx-auto px-8 h-32 flex items-center gap-6">
+        <div className="max-w-[1800px] mx-auto px-4 sm:px-8 h-20 sm:h-32 flex items-center justify-between gap-6">
           <Link to="/" className="flex items-center gap-3 shrink-0" aria-label="Sibs Style home">
             <img src={logo} alt="Sibs Style logo" className="h-12 w-auto rounded-full border-2 border-transparent transition-transform duration-300 hover:scale-105 shadow-sm" />
           </Link>
@@ -237,9 +237,9 @@ const Navigation = () => {
             </button>
           </div>
 
-          <button className="lg:hidden text-black" onClick={() => setIsMenuOpen(true)}>
+          <button className="lg:hidden text-black ml-auto" onClick={() => setIsMenuOpen(true)} aria-label="Toggle menu">
             {/* The mobile icon opens the full-screen menu instead of squeezing links into the header. */}
-            <Menu size={32} />
+            <Menu size={28} />
           </button>
         </div>
       </nav>

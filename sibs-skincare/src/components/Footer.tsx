@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import logo from '../assets/sibs-logo.svg';
+import logo from '../assets/Sibs Style BL logo.png';
 
 export default function Footer() {
   return (

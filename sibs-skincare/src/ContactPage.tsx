@@ -31,8 +31,8 @@ const ContactPage = () => {
     return (
         <div className="bg-[#FAF9F6] min-h-screen font-body selection:bg-[#F2529D] selection:text-white pb-0">
             {/* Header Section */}
-            <div className="max-w-4xl mx-auto px-4 sm:px-6 pt-28 sm:pt-36 pb-8 sm:pb-12 text-center contact-header">
-                <h1 className="text-4xl sm:text-6xl md:text-8xl font-display text-[#BF9C34] italic font-black mb-3 sm:mb-4 leading-none">
+            <div className="max-w-4xl mx-auto px-4 sm:px-6 pt-20 sm:pt-28 md:pt-36 pb-8 sm:pb-12 text-center contact-header mt-16 sm:mt-0">
+                <h1 className="text-3xl sm:text-5xl md:text-8xl font-display text-[#BF9C34] italic font-black mb-2 sm:mb-4 leading-tight">
                     Get in Touch
                 </h1>
                 <p className="text-gray-600 text-sm sm:text-lg font-body italic leading-relaxed max-w-2xl mx-auto">

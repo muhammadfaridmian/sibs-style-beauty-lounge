@@ -707,6 +707,38 @@ const BookingPage: React.FC = () => {
                         </div>
                       ))}
                     </div>
+
+                    {/* Proof of Claims - Receipt Style */}
+                    <div className="mt-6 bg-white p-5 sm:p-8 rounded-[1.5rem] border-2 border-dashed border-green-300 relative overflow-hidden">
+                      <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-green-200 to-transparent"></div>
+                      <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-green-200 to-transparent"></div>
+                      
+                      <div className="text-center space-y-3 mb-6">
+                        <h4 className="text-[0.65rem] sm:text-xs font-black uppercase tracking-[0.4em] text-gray-400">📋 PROOF OF CLAIMS</h4>
+                        <p className="font-display italic text-sm sm:text-base text-gray-700 font-black">Show this at the lounge</p>
+                      </div>
+
+                      <div className="space-y-3 bg-gradient-to-b from-green-50/50 to-transparent p-4 rounded-lg">
+                        {claimedOffers.map((offer, idx) => (
+                          <div key={offer.id} className="flex items-start justify-between pb-3 border-b border-green-200 last:border-0">
+                            <div className="flex-1 min-w-0">
+                              <p className="text-xs sm:text-sm font-black text-gray-900">{idx + 1}. {offer.title}</p>
+                              <p className="text-[0.65rem] sm:text-xs text-gray-600 mt-1">{offer.discountText}</p>
+                            </div>
+                            <div className="flex-shrink-0 ml-4 text-right">
+                              <div className="text-[10px] sm:text-xs font-black text-green-700 bg-green-100 px-3 py-1 rounded-full">
+                                CLAIMED
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+
+                      <div className="text-center text-[0.65rem] sm:text-xs text-gray-500 font-medium mt-4 pt-4 border-t border-green-200">
+                        <p>Valid until {claimedOffers.length > 0 ? new Date(claimedOffers[0].endDate).toLocaleDateString() : 'N/A'}</p>
+                        <p className="mt-1">Present this proof when visiting Sibs Style Beauty Lounge</p>
+                      </div>
+                    </div>
                   </div>
                 )}
 
