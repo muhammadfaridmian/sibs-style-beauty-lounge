@@ -452,6 +452,60 @@ export const listPromotions = internalQuery({
   },
 });
 
+export const listCollections = internalQuery({
+  args: {},
+  handler: async (ctx) => {
+    const items = await ctx.db
+      .query("collections")
+      .withIndex("by_active_and_sortOrder", (q) => q.eq("active", true))
+      .order("asc")
+      .take(100);
+
+    return items.map((doc) => ({
+      id: doc._id,
+      title: doc.title,
+      description: doc.description ?? null,
+      assetKey: doc.assetKey,
+      priceCents: doc.priceCents ?? null,
+      priceLabel: doc.priceLabel ?? null,
+      active: doc.active,
+      featured: doc.featured,
+      sortOrder: doc.sortOrder,
+      createdAt: doc.createdAt,
+      updatedAt: doc.updatedAt,
+    }));
+  },
+});
+
+export const createCollection = internalMutation({
+  args: {
+    title: v.string(),
+    description: v.optional(v.string()),
+    assetKey: v.string(),
+    priceCents: v.optional(v.number()),
+    priceLabel: v.optional(v.string()),
+    active: v.boolean(),
+    featured: v.boolean(),
+    sortOrder: v.number(),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  },
+  handler: async (ctx, args) => {
+    return await ctx.db.insert("collections", {
+      title: args.title,
+      description: args.description ?? null,
+      assetKey: args.assetKey,
+      priceCents: args.priceCents ?? null,
+      priceLabel: args.priceLabel ?? null,
+      active: args.active,
+      featured: args.featured,
+      sortOrder: args.sortOrder,
+      createdAt: args.createdAt,
+      updatedAt: args.updatedAt,
+    });
+  },
+});
+
 export const listPromotionsForAdmin = internalQuery({
   args: {},
   handler: async (ctx) => {

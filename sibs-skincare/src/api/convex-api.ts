@@ -690,6 +690,58 @@ export async function createPromotion(params: {
   }, authToken);
 }
 
+// ==================== COLLECTIONS ====================
+
+export interface CollectionItem {
+  id: string;
+  title: string;
+  description?: string | null;
+  assetKey: string;
+  priceCents?: number | null;
+  priceLabel?: string | null;
+  active: boolean;
+  featured: boolean;
+  sortOrder: number;
+  createdAt: number;
+  updatedAt: number;
+}
+
+export async function getCollections(): Promise<CollectionItem[]> {
+  try {
+    const response = await fetch(`${API_BASE}/api/collections`);
+    if (!response.ok) throw new Error("Failed to fetch collections");
+    const data = await response.json();
+    return data.data || [];
+  } catch (error) {
+    console.error("Error fetching collections:", error);
+    throw error;
+  }
+}
+
+export async function createCollection(params: {
+  item: {
+    title: string;
+    description?: string;
+    assetKey: string;
+    priceCents?: number;
+    priceLabel?: string;
+    active?: boolean;
+    featured?: boolean;
+    sortOrder?: number;
+  };
+  authToken?: string | null;
+}): Promise<CollectionItem> {
+  const authToken = params.authToken ?? getStoredAuthToken();
+  if (!authToken) {
+    throw new Error("Please sign in as admin before creating collections.");
+  }
+
+  return await requestJson<CollectionItem>('/api/admin/collections', {
+    method: 'POST',
+    body: JSON.stringify(params.item),
+  }, authToken);
+}
+
 export async function updatePromotion(params: {
   promotionId: string;
   updates: Partial<{

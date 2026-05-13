@@ -4,6 +4,8 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { ArrowRight, X, Heart, Star, ShoppingBag } from 'lucide-react';
 import silkyCoolProductsImage from './assets/Silkycoolproducts.jpeg';
 import goldProductsImage from './assets/Goldproducts.jpeg';
+import { getCollections } from './api/convex-api';
+import availableProductAssets from './availableProductAssets';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -134,20 +136,11 @@ const HomePage = () => {
     }
   };
 
-  // The larger product grid uses this data to build the shop-like display.
-  // The images here are only presentation data, so the cards can stay purely decorative.
-  const products = [
+  // The collection grid is populated from Convex collections. Fallback to a small local list.
+  const [products, setProducts] = useState<Array<{ name: string; price: string; img: string; note: string; rating: string }>>([
     { name: 'Aurora Serum', price: '$89', img: './assets/ShampooShiver.jpeg', note: 'Hyaluronic Infusion', rating: '5.0' },
-    { name: 'Orchid Cleanser', price: '$54', img: 'https://images.unsplash.com/photo-1556228578-0d85b1a4d571?q=80&w=800', note: 'Botanical Base', rating: '4.9' },
-    { name: 'Moonlight Mask', price: '$72', img: 'https://images.unsplash.com/photo-1620916566398-39f1143ab7be?q=80&w=800', note: 'Ethereal Clay', rating: '4.8' },
-    { name: 'Solaris Mist', price: '$45', img: 'https://images.unsplash.com/photo-1608248597279-f99d160bfcbc?q=80&w=800', note: 'Rosewater Essence', rating: '5.0' },
-    { name: 'Velvet Elixir', price: '$126', img: 'https://images.unsplash.com/photo-1611080626919-7cf5a9dbab5c?q=80&w=800', note: 'Bakuchiol Blend', rating: '4.9' },
-    { name: 'Crystal Toner', price: '$38', img: 'https://images.unsplash.com/photo-1556228720-195a672e8a03?q=80&w=800', note: 'Crystal Infused', rating: '4.7' },
-    { name: 'Glow Nectar', price: '$94', img: 'https://images.unsplash.com/photo-1621607512214-68297480165e?q=80&w=800', note: 'Vitamin C Complex', rating: '5.0' },
-    { name: 'Sage Ritual', price: '$65', img: 'https://images.unsplash.com/photo-1571781926291-c477ebfd024b?q=80&w=800', note: 'Detoxifying Oil', rating: '4.8' },
-    { name: 'Lumiere Creme', price: '$110', img: 'https://images.unsplash.com/photo-1601049541289-9b1b7bbbfe19?q=80&w=800', note: 'Silk Peptide', rating: '4.9' },
-    { name: 'Prism Polish', price: '$58', img: 'https://images.unsplash.com/photo-1556227834-09f19db7875e?q=80&w=800', note: 'Fine Sand Enzyme', rating: '4.8' }
-  ];
+    { name: 'Orchid Cleanser', price: '$54', img: './assets/Cleanser.jpeg', note: 'Botanical Base', rating: '4.9' },
+  ]);
 
   useEffect(() => {
     let cancelled = false;
@@ -164,6 +157,28 @@ const HomePage = () => {
         image.src = product.img;
       });
     };
+
+    // Fetch live collections and map assetKey to imported asset src.
+    (async () => {
+      try {
+        const items = await getCollections();
+        if (cancelled) return;
+        const mapped = items.map((item) => {
+          const asset = availableProductAssets[item.assetKey];
+          return {
+            name: item.title,
+            price: item.priceCents ? `$${Math.round((item.priceCents||0)/100)}` : (item.priceLabel || ''),
+            img: asset ? asset.src : './assets/ShampooShiver.jpeg',
+            note: item.description || (asset ? asset.label : ''),
+            rating: '5.0',
+          };
+        });
+        if (mapped.length) setProducts(mapped);
+      } catch (err) {
+        // Keep fallback products if network fails.
+        console.warn('Unable to load collections, using fallback products', err);
+      }
+    })();
 
     const idleCallback = window.requestIdleCallback
       ? window.requestIdleCallback(preloadImages, { timeout: 1500 })

@@ -134,6 +134,23 @@ export default defineSchema({
     .index("by_featured_and_sortOrder", ["featured", "sortOrder"])
     .index("by_category", ["category"]),
 
+  // Collections represent discoverable product items shown on the homepage.
+  collections: defineTable({
+    title: v.string(),
+    description: v.optional(v.string()),
+    // store a key referencing an imported asset (see frontend mapping)
+    assetKey: v.string(),
+    priceCents: v.optional(v.number()),
+    priceLabel: v.optional(v.string()),
+    active: v.boolean(),
+    featured: v.boolean(),
+    sortOrder: v.number(),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  })
+    .index("by_active_and_sortOrder", ["active", "sortOrder"])
+    .index("by_featured_and_sortOrder", ["featured", "sortOrder"]),
+
   // Reviews are the client stories shown as testimonials.
   reviews: defineTable({
     userId: v.union(v.id("users"), v.null()),

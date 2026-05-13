@@ -28,10 +28,12 @@ import {
   moderateReview,
   updateAppointmentStatus,
   uploadGalleryItem,
+  createCollection,
   type AdminAppointment,
   type AdminReview,
   type AuthUser,
 } from './api/convex-api';
+import availableProductAssets from './availableProductAssets';
 import OffersManager from './components/OffersManager';
 
 const statusTone: Record<AdminAppointment['status'], string> = {
@@ -71,6 +73,41 @@ const AdminPage: React.FC = () => {
     imageUrl: '',
     featured: false,
   });
+  const [collectionForm, setCollectionForm] = useState({
+    title: '',
+    description: '',
+    assetKey: Object.keys(availableProductAssets)[0] || '',
+    priceLabel: '',
+    priceCents: undefined as number | undefined,
+    active: true,
+    featured: false,
+  });
+
+  const handleCollectionCreate = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!authToken) return;
+    try {
+      setActionMessage(null);
+      await createCollection({
+        item: {
+          title: collectionForm.title.trim(),
+          description: collectionForm.description.trim(),
+          assetKey: collectionForm.assetKey,
+          priceCents: collectionForm.priceCents,
+          priceLabel: collectionForm.priceLabel || undefined,
+          active: collectionForm.active,
+          featured: collectionForm.featured,
+          sortOrder: Date.now(),
+        },
+        authToken,
+      });
+      setActionMessage(`Created ${collectionForm.title}`);
+      setCollectionForm((prev) => ({ ...prev, title: '', description: '' }));
+      await refreshDashboard();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Unable to create collection item.');
+    }
+  };
 
   const loadDashboard = async () => {
     if (!authToken) {
@@ -840,6 +877,103 @@ const AdminPage: React.FC = () => {
               className="inline-flex w-full items-center justify-center gap-3 rounded-full bg-black px-6 py-4 text-[10px] sm:text-xs font-black uppercase tracking-[0.35em] text-white hover:bg-[#F2529D] transition-colors disabled:opacity-70"
             >
               {isUploading ? 'Uploading...' : 'Upload frame'}
+              <ArrowButtonIcon />
+            </button>
+          </form>
+        </section>
+
+        <section className="space-y-5 sm:space-y-6">
+          <div className="flex items-center gap-3">
+            <ImagePlus className="text-[#BF9C34]" size={20} />
+            <h3 className="text-2xl sm:text-3xl font-display italic font-black text-[#0A0E1A]">Create collection item</h3>
+          </div>
+
+          <form onSubmit={handleCollectionCreate} className="rounded-[2rem] sm:rounded-[3rem] bg-white border border-gray-100 p-6 sm:p-8 lg:p-10 space-y-5 sm:space-y-6">
+            <div className="grid gap-4 sm:grid-cols-2">
+              <label className="space-y-2">
+                <span className="text-[10px] font-black uppercase tracking-[0.35em] text-gray-400">Title</span>
+                <input
+                  required
+                  value={collectionForm.title}
+                  onChange={(e) => setCollectionForm((prev) => ({ ...prev, title: e.target.value }))}
+                  className="w-full rounded-[1.25rem] border border-gray-200 bg-[#FAF9F6] px-4 py-4 text-base focus:outline-none focus:border-[#F2529D]"
+                  placeholder="Product title"
+                />
+              </label>
+
+              <label className="space-y-2">
+                <span className="text-[10px] font-black uppercase tracking-[0.35em] text-gray-400">Asset</span>
+                <select
+                  value={collectionForm.assetKey}
+                  onChange={(e) => setCollectionForm((prev) => ({ ...prev, assetKey: e.target.value }))}
+                  className="w-full rounded-[1.25rem] border border-gray-200 bg-[#FAF9F6] px-4 py-4 text-base focus:outline-none focus:border-[#F2529D]"
+                >
+                  {Object.keys(availableProductAssets).map((key) => (
+                    <option key={key} value={key}>{availableProductAssets[key].label}</option>
+                  ))}
+                </select>
+              </label>
+            </div>
+
+            <label className="block space-y-2">
+              <span className="text-[10px] font-black uppercase tracking-[0.35em] text-gray-400">Description</span>
+              <textarea
+                value={collectionForm.description}
+                onChange={(e) => setCollectionForm((prev) => ({ ...prev, description: e.target.value }))}
+                rows={3}
+                className="w-full rounded-[1.25rem] border border-gray-200 bg-[#FAF9F6] px-4 py-4 text-base focus:outline-none focus:border-[#F2529D] resize-none"
+                placeholder="Short product description"
+              />
+            </label>
+
+            <div className="grid gap-4 sm:grid-cols-2">
+              <label className="space-y-2">
+                <span className="text-[10px] font-black uppercase tracking-[0.35em] text-gray-400">Price label</span>
+                <input
+                  value={collectionForm.priceLabel}
+                  onChange={(e) => setCollectionForm((prev) => ({ ...prev, priceLabel: e.target.value }))}
+                  className="w-full rounded-[1.25rem] border border-gray-200 bg-[#FAF9F6] px-4 py-4 text-base focus:outline-none focus:border-[#F2529D]"
+                  placeholder="e.g., 120 AED"
+                />
+              </label>
+
+              <label className="space-y-2">
+                <span className="text-[10px] font-black uppercase tracking-[0.35em] text-gray-400">Price (cents)</span>
+                <input
+                  type="number"
+                  value={collectionForm.priceCents ?? ''}
+                  onChange={(e) => setCollectionForm((prev) => ({ ...prev, priceCents: e.target.value ? Number(e.target.value) : undefined }))}
+                  className="w-full rounded-[1.25rem] border border-gray-200 bg-[#FAF9F6] px-4 py-4 text-base focus:outline-none focus:border-[#F2529D]"
+                  placeholder="12000"
+                />
+              </label>
+            </div>
+
+            <label className="flex items-center gap-3 rounded-[1.25rem] bg-[#FAF9F6] border border-gray-200 px-4 py-4 text-sm font-medium text-gray-600">
+              <input
+                type="checkbox"
+                checked={collectionForm.featured}
+                onChange={(event) => setCollectionForm((prev) => ({ ...prev, featured: event.target.checked }))}
+                className="w-4 h-4 accent-[#F2529D]"
+              />
+              Mark as featured
+            </label>
+
+            <label className="flex items-center gap-3 rounded-[1.25rem] bg-[#FAF9F6] border border-gray-200 px-4 py-4 text-sm font-medium text-gray-600">
+              <input
+                type="checkbox"
+                checked={collectionForm.active}
+                onChange={(event) => setCollectionForm((prev) => ({ ...prev, active: event.target.checked }))}
+                className="w-4 h-4 accent-[#F2529D]"
+              />
+              Active
+            </label>
+
+            <button
+              type="submit"
+              className="inline-flex w-full items-center justify-center gap-3 rounded-full bg-black px-6 py-4 text-[10px] sm:text-xs font-black uppercase tracking-[0.35em] text-white hover:bg-[#BF9C34] transition-colors"
+            >
+              Create collection item
               <ArrowButtonIcon />
             </button>
           </form>

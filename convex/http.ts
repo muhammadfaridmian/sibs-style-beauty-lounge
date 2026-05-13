@@ -326,6 +326,88 @@ http.route({
 });
 
 http.route({
+  path: "/api/collections",
+  method: "GET",
+  handler: httpAction(async (ctx) => {
+    try {
+      const collections = await ctx.runQuery(internal.data.listCollections, {});
+      return jsonResponse({ ok: true, data: collections });
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Unable to load collections.";
+      return jsonResponse({ ok: false, error: message }, 500);
+    }
+  }),
+});
+
+http.route({
+  path: "/api/admin/collections",
+  method: "GET",
+  handler: httpAction(async (ctx, request) => {
+    const admin = await requireAdmin(ctx, request);
+    if (!admin) {
+      return jsonResponse({ ok: false, error: "Admin access required." }, 403);
+    }
+
+    try {
+      const collections = await ctx.runQuery(internal.data.listCollections, {});
+      return jsonResponse({ ok: true, data: collections });
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Unable to load collections.";
+      return jsonResponse({ ok: false, error: message }, 500);
+    }
+  }),
+});
+
+http.route({
+  path: "/api/admin/collections",
+  method: "POST",
+  handler: httpAction(async (ctx, request) => {
+    const admin = await requireAdmin(ctx, request);
+    if (!admin) {
+      return jsonResponse({ ok: false, error: "Admin access required." }, 403);
+    }
+
+    try {
+      const body = await readJson<{
+        title?: string;
+        description?: string;
+        assetKey?: string;
+        priceCents?: number;
+        priceLabel?: string;
+        active?: boolean;
+        featured?: boolean;
+        sortOrder?: number;
+      }>(request);
+
+      if (!body.title || !body.assetKey) {
+        return jsonResponse({ ok: false, error: "Title and assetKey are required." }, 400);
+      }
+
+      const now = Date.now();
+      const collectionId = await (ctx as any).runMutation(internal.data.createCollection, {
+        title: body.title.trim(),
+        description: body.description?.trim(),
+        assetKey: body.assetKey.trim(),
+        priceCents: typeof body.priceCents === 'number' ? body.priceCents : undefined,
+        priceLabel: body.priceLabel?.trim(),
+        active: typeof body.active === 'boolean' ? body.active : true,
+        featured: typeof body.featured === 'boolean' ? body.featured : false,
+        sortOrder: typeof body.sortOrder === 'number' ? body.sortOrder : Number(now),
+        createdAt: now,
+        updatedAt: now,
+      });
+
+      const collections = await (ctx as any).runQuery(internal.data.listCollections, {});
+      const created = (collections as any[]).find((c) => c.id === collectionId) ?? null;
+      return jsonResponse({ ok: true, data: created }, 201);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Unable to create collection.";
+      return jsonResponse({ ok: false, error: message }, statusFromError(message));
+    }
+  }),
+});
+
+http.route({
   path: "/api/admin/promotions",
   method: "GET",
   handler: httpAction(async (ctx, request) => {
