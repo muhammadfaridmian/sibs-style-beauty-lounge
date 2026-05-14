@@ -276,7 +276,7 @@ const GalleryPage = () => {
         <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
           {behindCanvasVideos.map((video, index) => (
             <div key={`video-${index}`} className={`${video.span} relative overflow-hidden rounded-[1.5rem] sm:rounded-[2rem] bg-black shadow-[0_20px_50px_-20px_rgba(0,0,0,0.35)]`}>
-              <video src={video.src} controls className="w-full h-full object-cover" />
+              <video src={video.src} controls className="w-full h-auto" />
               <div className="absolute bottom-0 left-0 right-0 p-4 sm:p-6 bg-gradient-to-t from-black/80 to-transparent">
                 <p className="text-[0.55rem] sm:text-[0.7rem] font-black tracking-[0.35em] uppercase text-[#F2529D] mb-2">{video.title}</p>
                 <p className="text-white/80 text-xs sm:text-sm leading-relaxed">{video.copy}</p>
@@ -318,17 +318,17 @@ const GalleryPage = () => {
 
           {/* Video 1 */}
           <div className="lateral-item w-screen h-full flex items-center justify-center bg-[#0d1321] shrink-0 p-4 sm:p-8 md:p-20">
-            <video src={sibsvideo} controls className="w-full h-full object-cover rounded-sm" />
+            <video src={sibsvideo} controls className="max-w-[90vw] max-h-[80vh] rounded-sm" />
           </div>
 
           {/* Video 2 */}
           <div className="lateral-item w-screen h-full flex items-center justify-center bg-[#0b0f1a] shrink-0 p-4 sm:p-8 md:p-20">
-            <video src={sibsvideo2} controls className="w-full h-full object-cover rounded-sm" />
+            <video src={sibsvideo2} controls className="max-w-[90vw] max-h-[80vh] rounded-sm" />
           </div>
 
           {/* Video 3 */}
           <div className="lateral-item w-screen h-full flex items-center justify-center bg-[#0d1321] shrink-0 p-4 sm:p-8 md:p-20">
-            <video src={sibsvideo3} controls className="w-full h-full object-cover rounded-sm" />
+            <video src={sibsvideo3} controls className="max-w-[90vw] max-h-[80vh] rounded-sm" />
           </div>
 
           <div className="lateral-item w-screen h-full flex items-center justify-center p-20 text-[#FAF9F6] shrink-0">
