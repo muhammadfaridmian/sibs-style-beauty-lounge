@@ -19,11 +19,9 @@ import mijanImage from './assets/Mijan.jpeg';
 import himalayaImage from './assets/himalaya.jpeg';
 import btesnceImage from './assets/btesnce.png';
 import craftedImage from './assets/craftedprecision.png';
-
-// Behind the Canvas videos
-const sibsvideo = '/assets/sibsvideo.mp4';
-const sibsvideo2 = '/assets/sibsvideo2.mp4';
-const sibsvideo3 = '/assets/sibsvideo3.mp4';
+import sibshall1 from './assets/Sibshall.jpeg';
+import sibshall2 from './assets/Sibshall2.jpeg';
+import sibshall3 from './assets/sibshall3.jpeg';
 
 const images = [
   {
@@ -100,28 +98,35 @@ const images = [
   }
 ];
 
-// Behind the Canvas section with 3 videos
-const behindCanvasVideos = [
+// Behind the Canvas: show four curated images from assets
+const behindCanvasImages = [
   {
-    kind: 'video',
-    src: sibsvideo,
-    title: 'Sibs Video 1',
-    copy: 'Behind the canvas moment one.',
-    span: 'sm:col-span-2 aspect-video'
+    kind: 'image',
+    src: sibshall1,
+    title: 'Studio Frame 1',
+    copy: 'A quiet behind-the-scenes moment.',
+    span: 'sm:col-span-2'
   },
   {
-    kind: 'video',
-    src: sibsvideo2,
-    title: 'Sibs Video 2',
-    copy: 'Behind the canvas moment two.',
-    span: 'col-span-1 aspect-video'
+    kind: 'image',
+    src: sibshall2,
+    title: 'Studio Frame 2',
+    copy: 'Lighting study and texture.',
+    span: 'col-span-1'
   },
   {
-    kind: 'video',
-    src: sibsvideo3,
-    title: 'Sibs Video 3',
-    copy: 'Behind the canvas moment three.',
-    span: 'col-span-1 aspect-video'
+    kind: 'image',
+    src: sibshall3,
+    title: 'Studio Frame 3',
+    copy: 'Gesture and motion captured.',
+    span: 'col-span-1'
+  },
+  {
+    kind: 'image',
+    src: craftedImage,
+    title: 'Tools & Craft',
+    copy: 'Precision and thoughtful tools.',
+    span: 'sm:col-span-2'
   }
 ];
 
@@ -274,12 +279,12 @@ const GalleryPage = () => {
         </div>
 
         <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-          {behindCanvasVideos.map((video, index) => (
-            <div key={`video-${index}`} className={`${video.span} relative overflow-hidden rounded-[1.5rem] sm:rounded-[2rem] bg-black shadow-[0_20px_50px_-20px_rgba(0,0,0,0.35)]`}>
-              <video src={video.src} controls className="w-full h-auto" />
+          {behindCanvasImages.map((frame, index) => (
+            <div key={`frame-${index}`} className={`${frame.span} relative overflow-hidden rounded-[1.5rem] sm:rounded-[2rem] bg-black shadow-[0_20px_50px_-20px_rgba(0,0,0,0.35)]`}>
+              <img src={frame.src} alt={frame.title} className="w-full h-full object-cover" />
               <div className="absolute bottom-0 left-0 right-0 p-4 sm:p-6 bg-gradient-to-t from-black/80 to-transparent">
-                <p className="text-[0.55rem] sm:text-[0.7rem] font-black tracking-[0.35em] uppercase text-[#F2529D] mb-2">{video.title}</p>
-                <p className="text-white/80 text-xs sm:text-sm leading-relaxed">{video.copy}</p>
+                <p className="text-[0.55rem] sm:text-[0.7rem] font-black tracking-[0.35em] uppercase text-[#F2529D] mb-2">{frame.title}</p>
+                <p className="text-white/80 text-xs sm:text-sm leading-relaxed">{frame.copy}</p>
               </div>
             </div>
           ))}
@@ -316,19 +321,24 @@ const GalleryPage = () => {
             </div>
           </div>
 
-          {/* Video 1 */}
-          <div className="lateral-item w-screen h-full flex items-center justify-center bg-[#0d1321] shrink-0 p-4 sm:p-8 md:p-8">
-            <video src={sibsvideo} controls className="w-full max-h-[95vh] rounded-sm" />
+          {/* Frame 1 */}
+          <div className="lateral-item w-screen h-full flex items-center justify-center bg-[#0d1321] shrink-0 p-8">
+            <img src={sibshall1} alt="Studio Frame 1" className="w-full max-h-[95vh] object-cover rounded-sm shadow-2xl" />
           </div>
 
-          {/* Video 2 */}
-          <div className="lateral-item w-screen h-full flex items-center justify-center bg-[#0b0f1a] shrink-0 p-4 sm:p-8 md:p-8">
-            <video src={sibsvideo2} controls className="w-full max-h-[95vh] rounded-sm" />
+          {/* Frame 2 */}
+          <div className="lateral-item w-screen h-full flex items-center justify-center bg-[#0b0f1a] shrink-0 p-8">
+            <img src={sibshall2} alt="Studio Frame 2" className="w-full max-h-[95vh] object-cover rounded-sm shadow-2xl" />
           </div>
 
-          {/* Video 3 */}
-          <div className="lateral-item w-screen h-full flex items-center justify-center bg-[#0d1321] shrink-0 p-4 sm:p-8 md:p-8">
-            <video src={sibsvideo3} controls className="w-full max-h-[95vh] rounded-sm" />
+          {/* Frame 3 */}
+          <div className="lateral-item w-screen h-full flex items-center justify-center bg-[#0d1321] shrink-0 p-8">
+            <img src={sibshall3} alt="Studio Frame 3" className="w-full max-h-[95vh] object-cover rounded-sm shadow-2xl" />
+          </div>
+
+          {/* Frame 4 */}
+          <div className="lateral-item w-screen h-full flex items-center justify-center bg-[#0d1321] shrink-0 p-8">
+            <img src={craftedImage} alt="Tools & Craft" className="w-full max-h-[95vh] object-cover rounded-sm shadow-2xl" />
           </div>
 
           <div className="lateral-item w-screen h-full flex items-center justify-center p-20 text-[#FAF9F6] shrink-0">
