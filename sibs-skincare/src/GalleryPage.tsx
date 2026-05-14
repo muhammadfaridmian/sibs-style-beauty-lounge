@@ -19,6 +19,9 @@ import mijanImage from './assets/Mijan.jpeg';
 import himalayaImage from './assets/himalaya.jpeg';
 import btesnceImage from './assets/btesnce.png';
 import craftedImage from './assets/craftedprecision.png';
+import sibsvideo from './assets/sibsvideo.mp4';
+import sibsvideo2 from './assets/sibsvideo2.mp4';
+import sibsvideo3 from './assets/sibsvideo3.mp4';
 
 const images = [
   {
@@ -95,83 +98,28 @@ const images = [
   }
 ];
 
-// Mobile gets a lighter narrative stack so the story stays readable on smaller screens.
-const behindCanvasMobileFrames = [
+// Behind the Canvas section with 3 videos
+const behindCanvasVideos = [
   {
-    kind: 'text',
-    title: 'Behind The Canvas',
-    copy: 'Exploring the delicate intersection of chemistry and artistry. Every product we choose is a testament to purity.',
-    span: 'sm:col-span-2'
+    kind: 'video',
+    src: sibsvideo,
+    title: 'Sibs Video 1',
+    copy: 'Behind the canvas moment one.',
+    span: 'sm:col-span-2 aspect-video'
   },
   {
-    kind: 'image',
-    src: 'https://images.unsplash.com/photo-1540555700478-4be289fbecef?q=80&w=1200&auto=format&fit=crop',
-    title: 'Laboratory Aesthetic',
-    copy: 'Clean lines, soft light, and a clinical calm.',
-    span: 'sm:col-span-2 aspect-[4/5]'
+    kind: 'video',
+    src: sibsvideo2,
+    title: 'Sibs Video 2',
+    copy: 'Behind the canvas moment two.',
+    span: 'col-span-1 aspect-video'
   },
   {
-    kind: 'image',
-    src: 'https://images.unsplash.com/photo-1590439471364-192aa70c0b53?q=80&w=2000&auto=format&fit=crop',
-    title: 'Purity',
-    copy: 'Natural botanicals only.',
-    span: 'col-span-1 aspect-[4/5]'
-  },
-  {
-    kind: 'image',
-    src: 'https://images.unsplash.com/photo-1571781926291-c477ebfd024b?q=80&w=1200&auto=format',
-    title: 'Ritual Form',
-    copy: 'A precise, serene product study.',
-    span: 'col-span-1 aspect-[4/5]'
-  },
-  {
-    kind: 'image',
-    src: 'https://i.pinimg.com/736x/e8/0d/7a/e80d7a19a4f9af15c80092a051cc448a.jpg',
-    title: 'Texture Layer',
-    copy: 'Soft contrast and depth.',
-    span: 'col-span-1 aspect-square'
-  },
-  {
-    kind: 'image',
-    src: 'https://images.unsplash.com/photo-1620916566398-39f114387c9b?q=80&w=1200&auto=format',
-    title: 'Surface Study',
-    copy: 'A calm visual pause.',
-    span: 'col-span-1 aspect-square'
-  },
-  {
-    kind: 'image',
-    src: 'https://i.pinimg.com/1200x/6c/52/bc/6c52bccbcfb4a44f11d8813cca6ba059.jpg',
-    title: 'Botanical Macro',
-    copy: 'Close, luminous detail.',
-    span: 'sm:col-span-2 aspect-[16/10]'
-  },
-  {
-    kind: 'image',
-    src: 'https://i.pinimg.com/1200x/6a/b3/8d/6ab38d01a89bf76b5421a3256bf1062f.jpg',
-    title: 'Glow Texture',
-    copy: 'A soft visual veil.',
-    span: 'col-span-1 aspect-[4/5]'
-  },
-  {
-    kind: 'image',
-    src: 'https://images.unsplash.com/photo-1582213752795-ef2642d17ad8?q=80&w=1200&auto=format',
-    title: 'Molecular Perfection',
-    copy: 'Exploring the delicate intersection of chemistry and artistry.',
-    span: 'sm:col-span-2 aspect-[4/5]'
-  },
-  {
-    kind: 'image',
-    src: 'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?q=80&w=2000&auto=format&fit=crop',
-    title: 'Model Ritual',
-    copy: 'A softer cinematic finish.',
-    span: 'sm:col-span-2 aspect-[16/10]'
-  },
-  {
-    kind: 'image',
-    src: 'https://images.unsplash.com/photo-1512496011951-a62340ae4b22?q=80&w=1200&auto=format&fit=crop',
-    title: 'Final Portrait',
-    copy: 'The closing frame of the story.',
-    span: 'sm:col-span-2 aspect-[4/5]'
+    kind: 'video',
+    src: sibsvideo3,
+    title: 'Sibs Video 3',
+    copy: 'Behind the canvas moment three.',
+    span: 'col-span-1 aspect-video'
   }
 ];
 
@@ -324,18 +272,15 @@ const GalleryPage = () => {
         </div>
 
         <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-          {behindCanvasMobileFrames.map((frame, index) =>
-            frame.kind === 'text' ? null : (
-              <div key={`${frame.kind}-${index}`} className={`${frame.span} relative overflow-hidden rounded-[1.5rem] sm:rounded-[2rem] bg-black shadow-[0_20px_50px_-20px_rgba(0,0,0,0.35)]`}>
-                <img src={frame.src} alt={frame.title} className="w-full h-full object-cover" />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
-                <div className="absolute bottom-0 left-0 right-0 p-4 sm:p-6">
-                  <p className="text-[0.55rem] sm:text-[0.7rem] font-black tracking-[0.35em] uppercase text-[#F2529D] mb-2">{frame.title}</p>
-                  <p className="text-white/80 text-xs sm:text-sm leading-relaxed">{frame.copy}</p>
-                </div>
+          {behindCanvasVideos.map((video, index) => (
+            <div key={`video-${index}`} className={`${video.span} relative overflow-hidden rounded-[1.5rem] sm:rounded-[2rem] bg-black shadow-[0_20px_50px_-20px_rgba(0,0,0,0.35)]`}>
+              <video src={video.src} controls className="w-full h-full object-cover" />
+              <div className="absolute bottom-0 left-0 right-0 p-4 sm:p-6 bg-gradient-to-t from-black/80 to-transparent">
+                <p className="text-[0.55rem] sm:text-[0.7rem] font-black tracking-[0.35em] uppercase text-[#F2529D] mb-2">{video.title}</p>
+                <p className="text-white/80 text-xs sm:text-sm leading-relaxed">{video.copy}</p>
               </div>
-            )
-          )}
+            </div>
+          ))}
         </div>
 
         <div className="mt-4 sm:mt-6 rounded-[2rem] sm:rounded-[3rem] bg-[#FAF9F6] p-6 sm:p-8 border border-gray-100 shadow-xl text-center">
@@ -369,69 +314,19 @@ const GalleryPage = () => {
             </div>
           </div>
 
-          {/* New Lateral Section 1 - Macro Ritual */}
-          <div className="lateral-item w-screen h-full flex items-center justify-center bg-[#FAF9F6] shrink-0 p-4 sm:p-8 md:p-32">
-            <div className="relative w-full h-full border-[20px] border-white shadow-2xl">
-              <img 
-                src="https://images.unsplash.com/photo-1590439471364-192aa70c0b53?q=80&w=2000&auto=format&fit=crop" 
-                className="w-full h-full object-cover"
-                alt="Cream ritual"
-              />
-              <div className="absolute top-10 right-10 bg-black text-white p-8 max-w-xs">
-                 <p className="font-display italic text-3xl">Purity</p>
-                 <p className="text-xs uppercase tracking-widest mt-2">Natural botanicals only.</p>
-              </div>
-            </div>
+          {/* Video 1 */}
+          <div className="lateral-item w-screen h-full flex items-center justify-center bg-[#0d1321] shrink-0 p-4 sm:p-8 md:p-20">
+            <video src={sibsvideo} controls className="w-full h-full object-cover rounded-sm" />
           </div>
 
-          {/* New Lateral Section 2 - Product Array Split 1 */}
-           <div className="lateral-item w-screen h-full flex items-center justify-center bg-[#0d1321] shrink-0 p-4 sm:p-8 md:p-20">
-             <img src="https://images.unsplash.com/photo-1571781926291-c477ebfd024b?q=80&w=1200&auto=format" className="w-full h-full object-cover rounded-sm" />
+          {/* Video 2 */}
+          <div className="lateral-item w-screen h-full flex items-center justify-center bg-[#0b0f1a] shrink-0 p-4 sm:p-8 md:p-20">
+            <video src={sibsvideo2} controls className="w-full h-full object-cover rounded-sm" />
           </div>
 
-          {/* New Lateral Section 2 - Product Array Split 2 */}
-           <div className="lateral-item w-screen h-full flex items-center justify-center bg-[#0b0f1a] shrink-0 p-4 sm:p-8 md:p-20">
-             <img src="https://i.pinimg.com/736x/e8/0d/7a/e80d7a19a4f9af15c80092a051cc448a.jpg" className="w-full h-full object-cover rounded-sm" />
-          </div>
-
-          {/* New Lateral Section 2 - Product Array Split 3 */}
-           <div className="lateral-item w-screen h-full flex items-center justify-center bg-[#0d1321] shrink-0 p-4 sm:p-8 md:p-20">
-             <img src="https://images.unsplash.com/photo-1620916566398-39f114387c9b?q=80&w=1200&auto=format" className="w-full h-full object-cover rounded-sm" />
-          </div>
-
-          {/* New Lateral Section 5 - Botanical Macro */}
-           <div className="lateral-item w-screen h-full flex items-center justify-center bg-[#0d1321] shrink-0 p-4 sm:p-8 md:p-20">
-             <img src="https://i.pinimg.com/1200x/6c/52/bc/6c52bccbcfb4a44f11d8813cca6ba059.jpg" className="w-full h-full object-cover rounded-sm" />
-          </div>
-
-          {/* New Lateral Section 6 - Glow Texture */}
-           <div className="lateral-item w-screen h-full flex items-center justify-center bg-[#0b0f1a] shrink-0 p-4 sm:p-8 md:p-20">
-             <img src="https://i.pinimg.com/1200x/6a/b3/8d/6ab38d01a89bf76b5421a3256bf1062f.jpg" className="w-full h-full object-cover rounded-sm" />
-          </div>
-
-          {/* New Lateral Section 3 - The Lab */}
-          <div className="lateral-item w-screen h-full flex items-center justify-center bg-white shrink-0">
-             <div className="flex flex-col items-center px-4">
-               <img src="https://images.unsplash.com/photo-1582213752795-ef2642d17ad8?q=80&w=1200&auto=format" className="w-[70vw] sm:w-[50vw] grayscale blur-sm hover:blur-none transition-all duration-1000" />
-               <h3 className="text-2xl sm:text-4xl font-display italic mt-6 sm:mt-8 text-center">Molecular Perfection</h3>
-             </div>
-          </div>
-
-          {/* New Lateral Section 4 - Full Span Landscape */}
-          <div className="lateral-item w-screen h-full flex items-center justify-center shrink-0">
-            <img 
-              src="https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?q=80&w=2000&auto=format&fit=crop" 
-              className="w-full h-full object-cover brightness-50"
-              alt="Model ritual"
-            />
-          </div>
-
-          <div className="lateral-item w-screen h-full flex items-center justify-center bg-[#FAF9F6] shrink-0">
-            <img 
-              src="https://images.unsplash.com/photo-1512496011951-a62340ae4b22?q=80&w=1200&auto=format&fit=crop" 
-              className="w-[80vw] h-[70vh] object-cover shadow-2xl"
-              alt="Model ritual"
-            />
+          {/* Video 3 */}
+          <div className="lateral-item w-screen h-full flex items-center justify-center bg-[#0d1321] shrink-0 p-4 sm:p-8 md:p-20">
+            <video src={sibsvideo3} controls className="w-full h-full object-cover rounded-sm" />
           </div>
 
           <div className="lateral-item w-screen h-full flex items-center justify-center p-20 text-[#FAF9F6] shrink-0">
