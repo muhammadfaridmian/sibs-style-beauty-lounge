@@ -488,6 +488,33 @@ http.route({
 });
 
 http.route({
+  path: "/api/admin/collections/upload",
+  method: "POST",
+  handler: httpAction(async (ctx, request) => {
+    const admin = await requireAdmin(ctx, request);
+    if (!admin) {
+      return jsonResponse({ ok: false, error: "Admin access required." }, 403);
+    }
+
+    try {
+      // Collections file upload: store binary file in Convex storage and return the URL
+      const blob = await request.blob();
+      if (blob.size === 0) {
+        return jsonResponse({ ok: false, error: "File is empty." }, 400);
+      }
+
+      const storageId = await (ctx as any).storage.store(blob);
+      const imageUrl = await (ctx as any).storage.getUrl(storageId);
+
+      return jsonResponse({ ok: true, data: { imageUrl, storageId } }, 200);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Unable to upload collection image.";
+      return jsonResponse({ ok: false, error: message }, statusFromError(message));
+    }
+  }),
+});
+
+http.route({
   path: "/api/admin/promotions",
   method: "GET",
   handler: httpAction(async (ctx, request) => {

@@ -110,8 +110,8 @@ const AdminPage: React.FC = () => {
       let imageUrl: string | undefined = undefined;
 
       if (collectionFile) {
-        // Upload binary to gallery endpoint which stores file in Convex storage
-        const uploadUrl = `${API_BASE}/api/gallery/upload?title=${encodeURIComponent(collectionForm.title || 'Collection Image')}&category=Collection`;
+        // Upload binary to dedicated collections endpoint
+        const uploadUrl = `${API_BASE}/api/admin/collections/upload`;
         const resp = await fetch(uploadUrl, {
           method: 'POST',
           headers: {
@@ -205,7 +205,7 @@ const AdminPage: React.FC = () => {
     try {
       let uploadedImageUrl: string | undefined;
       if (editCollectionFile) {
-        const uploadUrl = `${API_BASE}/api/gallery/upload?title=${encodeURIComponent(editCollectionForm.title || 'Collection Image')}&category=Collection`;
+        const uploadUrl = `${API_BASE}/api/admin/collections/upload`;
         const resp = await fetch(uploadUrl, {
           method: 'POST',
           headers: {
