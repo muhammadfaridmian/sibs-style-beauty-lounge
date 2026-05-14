@@ -263,8 +263,8 @@ const HomePage = () => {
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-10">
                       {products.map((product) => (
                         <article key={product.id} className="product-card-anim rounded-[1.5rem] bg-white border border-gray-100 overflow-hidden shadow-[0_20px_50px_-25px_rgba(0,0,0,0.2)]">
-                          <div className="aspect-[4/3] overflow-hidden bg-[#FAF9F6]">
-                            <img src={product.imageUrl} alt={product.name} className="w-full h-full object-cover" />
+                          <div className="aspect-[3/2] overflow-hidden bg-[#FAF9F6] flex items-center justify-center p-4">
+                            <img src={product.imageUrl} alt={product.name} className="w-full h-full object-contain" />
                           </div>
                           <div className="p-4 md:p-6 space-y-2">
                             <h4 className="text-xl md:text-2xl font-display italic font-black text-black">{product.name}</h4>

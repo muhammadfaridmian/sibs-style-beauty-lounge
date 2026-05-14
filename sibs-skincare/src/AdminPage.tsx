@@ -135,7 +135,6 @@ const AdminPage: React.FC = () => {
       const itemPayload: any = {
         title: collectionForm.title.trim(),
         description: collectionForm.description.trim(),
-        priceCents: collectionForm.priceCents,
         priceLabel: collectionForm.priceLabel || undefined,
         active: collectionForm.active,
         featured: collectionForm.featured,
@@ -1146,23 +1145,12 @@ const AdminPage: React.FC = () => {
 
             <div className="grid gap-4 sm:grid-cols-2">
               <label className="space-y-2">
-                <span className="text-[10px] font-black uppercase tracking-[0.35em] text-gray-400">Price label</span>
+                <span className="text-[10px] font-black uppercase tracking-[0.35em] text-gray-400">Price</span>
                 <input
                   value={collectionForm.priceLabel}
                   onChange={(e) => setCollectionForm((prev) => ({ ...prev, priceLabel: e.target.value }))}
                   className="w-full rounded-[1.25rem] border border-gray-200 bg-[#FAF9F6] px-4 py-4 text-base focus:outline-none focus:border-[#F2529D]"
                   placeholder="e.g., 120 AED"
-                />
-              </label>
-
-              <label className="space-y-2">
-                <span className="text-[10px] font-black uppercase tracking-[0.35em] text-gray-400">Price</span>
-                <input
-                  type="number"
-                  value={collectionForm.priceCents ?? ''}
-                  onChange={(e) => setCollectionForm((prev) => ({ ...prev, priceCents: e.target.value ? Number(e.target.value) : undefined }))}
-                  className="w-full rounded-[1.25rem] border border-gray-200 bg-[#FAF9F6] px-4 py-4 text-base focus:outline-none focus:border-[#F2529D]"
-                  placeholder="120"
                 />
               </label>
             </div>
@@ -1274,23 +1262,12 @@ const AdminPage: React.FC = () => {
 
             <div className="grid gap-4 sm:grid-cols-2">
               <label className="space-y-2">
-                <span className="text-[10px] font-black uppercase tracking-[0.35em] text-gray-400">Price label</span>
+                <span className="text-[10px] font-black uppercase tracking-[0.35em] text-gray-400">Price</span>
                 <input
                   value={editCollectionForm.priceLabel}
                   onChange={(e) => setEditCollectionForm((prev) => ({ ...prev, priceLabel: e.target.value }))}
                   className="w-full rounded-[1.25rem] border border-gray-200 bg-[#FAF9F6] px-4 py-4 text-base focus:outline-none focus:border-[#F2529D]"
                   placeholder="e.g., 120 AED"
-                />
-              </label>
-
-              <label className="space-y-2">
-                <span className="text-[10px] font-black uppercase tracking-[0.35em] text-gray-400">Price</span>
-                <input
-                  type="number"
-                  value={editCollectionForm.priceCents ?? ''}
-                  onChange={(e) => setEditCollectionForm((prev) => ({ ...prev, priceCents: e.target.value ? Number(e.target.value) : undefined }))}
-                  className="w-full rounded-[1.25rem] border border-gray-200 bg-[#FAF9F6] px-4 py-4 text-base focus:outline-none focus:border-[#F2529D]"
-                  placeholder="120"
                 />
               </label>
             </div>
