@@ -19,9 +19,11 @@ import mijanImage from './assets/Mijan.jpeg';
 import himalayaImage from './assets/himalaya.jpeg';
 import btesnceImage from './assets/btesnce.png';
 import craftedImage from './assets/craftedprecision.png';
-import sibsvideo from './assets/sibsvideo.mp4';
-import sibsvideo2 from './assets/sibsvideo2.mp4';
-import sibsvideo3 from './assets/sibsvideo3.mp4';
+
+// Behind the Canvas videos - using Vite's URL pattern for static assets
+const sibsvideo = new URL('./assets/sibsvideo.mp4', import.meta.url).href;
+const sibsvideo2 = new URL('./assets/sibsvideo2.mp4', import.meta.url).href;
+const sibsvideo3 = new URL('./assets/sibsvideo3.mp4', import.meta.url).href;
 
 const images = [
   {
