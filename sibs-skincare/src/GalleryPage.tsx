@@ -20,10 +20,10 @@ import himalayaImage from './assets/himalaya.jpeg';
 import btesnceImage from './assets/btesnce.png';
 import craftedImage from './assets/craftedprecision.png';
 
-// Behind the Canvas videos - using Vite's URL pattern for static assets
-const sibsvideo = new URL('./assets/sibsvideo.mp4', import.meta.url).href;
-const sibsvideo2 = new URL('./assets/sibsvideo2.mp4', import.meta.url).href;
-const sibsvideo3 = new URL('./assets/sibsvideo3.mp4', import.meta.url).href;
+// Behind the Canvas videos
+const sibsvideo = '/assets/sibsvideo.mp4';
+const sibsvideo2 = '/assets/sibsvideo2.mp4';
+const sibsvideo3 = '/assets/sibsvideo3.mp4';
 
 const images = [
   {
@@ -317,18 +317,18 @@ const GalleryPage = () => {
           </div>
 
           {/* Video 1 */}
-          <div className="lateral-item w-screen h-full flex items-center justify-center bg-[#0d1321] shrink-0 p-4 sm:p-8 md:p-20">
-            <video src={sibsvideo} controls className="max-w-[90vw] max-h-[80vh] rounded-sm" />
+          <div className="lateral-item w-screen h-full flex items-center justify-center bg-[#0d1321] shrink-0 p-4 sm:p-8 md:p-8">
+            <video src={sibsvideo} controls className="w-full max-h-[95vh] rounded-sm" />
           </div>
 
           {/* Video 2 */}
-          <div className="lateral-item w-screen h-full flex items-center justify-center bg-[#0b0f1a] shrink-0 p-4 sm:p-8 md:p-20">
-            <video src={sibsvideo2} controls className="max-w-[90vw] max-h-[80vh] rounded-sm" />
+          <div className="lateral-item w-screen h-full flex items-center justify-center bg-[#0b0f1a] shrink-0 p-4 sm:p-8 md:p-8">
+            <video src={sibsvideo2} controls className="w-full max-h-[95vh] rounded-sm" />
           </div>
 
           {/* Video 3 */}
-          <div className="lateral-item w-screen h-full flex items-center justify-center bg-[#0d1321] shrink-0 p-4 sm:p-8 md:p-20">
-            <video src={sibsvideo3} controls className="max-w-[90vw] max-h-[80vh] rounded-sm" />
+          <div className="lateral-item w-screen h-full flex items-center justify-center bg-[#0d1321] shrink-0 p-4 sm:p-8 md:p-8">
+            <video src={sibsvideo3} controls className="w-full max-h-[95vh] rounded-sm" />
           </div>
 
           <div className="lateral-item w-screen h-full flex items-center justify-center p-20 text-[#FAF9F6] shrink-0">
