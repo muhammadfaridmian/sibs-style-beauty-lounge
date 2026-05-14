@@ -197,6 +197,7 @@ function readStoredJson<T>(key: string): T | null {
   }
 
   try {
+    // This keeps small session data usable after a refresh without asking the server again.
     return JSON.parse(rawValue) as T;
   } catch {
     return null;
@@ -269,6 +270,7 @@ async function requestJson<T>(path: string, init: RequestInit = {}, token?: stri
   // Convex sends a small { ok, data, error } envelope, so we unwrap that here.
   // That keeps the rest of the frontend code focused on the business data instead of transport details.
   const payload = await response.json().catch(() => null) as { ok?: boolean; data?: T; error?: string } | null;
+  // Convex answers with a tiny envelope, so the app only works with the useful part.
   if (!response.ok || payload?.ok === false) {
     throw new Error(payload?.error || "Request failed");
   }
@@ -710,6 +712,7 @@ export interface CollectionItem {
 
 export async function getCollections(): Promise<CollectionItem[]> {
   try {
+    // The public homepage reads collections from Convex and renders them as product cards.
     const response = await fetch(`${API_BASE}/api/collections`);
     if (!response.ok) throw new Error("Failed to fetch collections");
     const data = await response.json();
@@ -740,6 +743,7 @@ export async function createCollection(params: {
     throw new Error("Please sign in as admin before creating collections.");
   }
 
+  // Admin create goes through the protected Convex route so only staff can add products.
   return await requestJson<CollectionItem>('/api/admin/collections', {
     method: 'POST',
     body: JSON.stringify(params.item),

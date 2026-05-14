@@ -14,6 +14,7 @@ import AdminPage from './AdminPage.tsx';
 import { clearStoredAuthSession, getStoredAuthUser, type AuthUser } from './api/convex-api.ts';
 
 // This keeps every route change feeling like a fresh page instead of a hard jump.
+// It also gives the site one place to reset scroll and page animations.
 const ScrollToTop = () => {
   const { pathname } = useLocation();
 
@@ -154,6 +155,7 @@ const Navigation = () => {
   };
 
   // These are the main public sections shown in both desktop and mobile navigation.
+  // The app keeps the menu simple so guests can move around the salon site fast.
   const navLinks = [
     { name: 'Home', path: '/' },
     { name: 'Treatments', path: '/booking' },
@@ -194,6 +196,7 @@ const Navigation = () => {
 
           <div className="hidden lg:flex items-center gap-4 shrink-0">
             {currentUser && currentUser.role === 'admin' && (
+              // Only the real admin sees this link, so customers do not reach the dashboard by mistake.
               <Link
                 to="/admin"
                 className="rounded-xl border border-[#F2529D]/30 bg-[#F2529D]/5 px-6 py-4 text-[13px] font-black uppercase tracking-[0.3em] text-[#F2529D] hover:bg-[#F2529D]/10 hover:border-[#F2529D]/60 transition-all whitespace-nowrap"

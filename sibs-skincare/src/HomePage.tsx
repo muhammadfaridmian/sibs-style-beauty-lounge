@@ -146,6 +146,8 @@ const HomePage = () => {
         const items = await getCollections();
         if (cancelled) return;
 
+        // Each database row becomes one public product card here.
+        // If the row has a custom image or asset key, we use that first.
         const mapped = (items as CollectionItem[]).map((item) => {
           const mappedAsset = item.assetKey ? availableProductAssets[item.assetKey] : undefined;
           const imageUrl = item.imageUrl || mappedAsset?.src || silkyCoolProductsImage;
