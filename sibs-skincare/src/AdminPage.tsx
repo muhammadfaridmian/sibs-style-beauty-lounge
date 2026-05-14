@@ -116,12 +116,16 @@ const AdminPage: React.FC = () => {
           method: 'POST',
           headers: {
             Authorization: `Bearer ${authToken}`,
-            'Content-Type': collectionFile.type || 'application/octet-stream',
           },
           body: collectionFile,
         });
-        if (!resp.ok) throw new Error('File upload failed');
+        if (!resp.ok) {
+          const errorText = await resp.text().catch(() => 'unknown error');
+          console.error('Upload failed with status', resp.status, ':', errorText);
+          throw new Error(`File upload failed (${resp.status})`);
+        }
         const responseText = await resp.text();
+        console.log('Upload response:', responseText);
         if (responseText.trim()) {
           const payload = JSON.parse(responseText) as { data?: { imageUrl?: string } };
           imageUrl = payload?.data?.imageUrl ?? undefined;
@@ -206,12 +210,16 @@ const AdminPage: React.FC = () => {
           method: 'POST',
           headers: {
             Authorization: `Bearer ${authToken}`,
-            'Content-Type': editCollectionFile.type || 'application/octet-stream',
           },
           body: editCollectionFile,
         });
-        if (!resp.ok) throw new Error('File upload failed');
+        if (!resp.ok) {
+          const errorText = await resp.text().catch(() => 'unknown error');
+          console.error('Upload failed with status', resp.status, ':', errorText);
+          throw new Error(`File upload failed (${resp.status})`);
+        }
         const responseText = await resp.text();
+        console.log('Upload response:', responseText);
         if (responseText.trim()) {
           const payload = JSON.parse(responseText) as { data?: { imageUrl?: string } };
           uploadedImageUrl = payload?.data?.imageUrl ?? undefined;
