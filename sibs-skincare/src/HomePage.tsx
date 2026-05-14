@@ -303,10 +303,6 @@ const HomePage = () => {
                   <p className="text-xs sm:text-sm md:text-xl font-medium text-gray-500 italic max-w-2xl text-center md:text-left leading-relaxed">
                         Our botanical formulations are hand-crafted in small batches to preserve nutrient integrity and enzymatic activity.
                     </p>
-                  <button className="w-full md:w-auto flex justify-center items-center gap-3 sm:gap-4 md:gap-6 bg-black text-white px-6 sm:px-8 md:px-14 py-3 sm:py-4 md:py-6 rounded-xl md:rounded-2xl text-[10px] md:text-xs font-black tracking-[0.2em] md:tracking-[0.3em] uppercase hover:bg-[#BF9C34] transition-all shadow-xl active:scale-95 group shrink-0">
-                        EXPLORE FULL CATALOGUE
-                        <ShoppingBag size={18} className="md:w-[22px] md:h-[22px] group-hover:animate-bounce" />
-                    </button>
                 </div>
             </div>
         </div>
