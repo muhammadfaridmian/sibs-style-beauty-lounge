@@ -341,11 +341,11 @@ const GalleryPage = () => {
             <img src={craftedImage} alt="Tools & Craft" className="w-full max-h-[95vh] object-cover rounded-sm shadow-2xl" />
           </div>
 
-          <div className="lateral-item w-screen h-full flex items-center justify-center p-20 text-[#FAF9F6] shrink-0">
+          <div className="lateral-item w-screen h-full flex items-center justify-center p-20 bg-white shrink-0">
             <div className="text-center space-y-12">
-              <h3 className="text-3xl sm:text-5xl md:text-8xl lg:text-[12rem] font-display italic font-black leading-none opacity-20">Sibs Style</h3>
-              <p className="text-2xl font-body italic tracking-widest uppercase">The Essence of Eternity</p>
-              <Link to="/booking" className="inline-block px-12 py-5 bg-[#F2529D] text-white text-[12px] font-black uppercase tracking-[0.5em] rounded-full hover:bg-white hover:text-black transition-all">
+              <h3 className="text-3xl sm:text-5xl md:text-8xl lg:text-[12rem] font-display italic font-black leading-none text-[#0A0E1A] opacity-20">Sibs Style</h3>
+              <p className="text-2xl font-body italic tracking-widest uppercase text-[#0A0E1A]">The Essence of Eternity</p>
+              <Link to="/booking" className="inline-block px-12 py-5 bg-[#F2529D] text-white text-[12px] font-black uppercase tracking-[0.5em] rounded-full hover:bg-black hover:text-white transition-all">
                 BOOK THE EXPERIENCE
               </Link>
             </div>
