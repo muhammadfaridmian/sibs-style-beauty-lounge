@@ -116,6 +116,7 @@ const AdminPage: React.FC = () => {
           method: 'POST',
           headers: {
             Authorization: `Bearer ${authToken}`,
+            'Content-Type': collectionFile.type || 'application/octet-stream',
           },
           body: collectionFile,
         });
@@ -205,6 +206,7 @@ const AdminPage: React.FC = () => {
           method: 'POST',
           headers: {
             Authorization: `Bearer ${authToken}`,
+            'Content-Type': editCollectionFile.type || 'application/octet-stream',
           },
           body: editCollectionFile,
         });
