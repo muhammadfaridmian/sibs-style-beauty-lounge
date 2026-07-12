@@ -59,9 +59,11 @@ const AdminPage: React.FC = () => {
   const [recentlyApprovedReviews, setRecentlyApprovedReviews] = useState<(AdminReview & { approvedAt: number })[]>([]);
   const [pendingAction, setPendingAction] = useState<
     | { type: 'booking'; appointment: AdminAppointment }
+    | { type: 'bulk-booking'; appointmentIds: string[] }
     | { type: 'review'; review: AdminReview }
     | null
   >(null);
+  const [selectedAppointmentIds, setSelectedAppointmentIds] = useState<string[]>([]);
   const [removingAppointmentIds, setRemovingAppointmentIds] = useState<string[]>([]);
   const [removingReviewIds, setRemovingReviewIds] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -406,12 +408,63 @@ const AdminPage: React.FC = () => {
         }, 420);
       }
 
+      setSelectedAppointmentIds((currentIds) => currentIds.filter((id) => id !== appointmentId));
+
       await refreshDashboard();
     } catch (updateError) {
       if (status === 'cancelled') {
         setRemovingAppointmentIds((currentIds) => currentIds.filter((id) => id !== appointmentId));
       }
       setError(updateError instanceof Error ? updateError.message : 'Unable to update this booking.');
+    }
+  };
+
+  const toggleAppointmentSelection = (appointmentId: string) => {
+    setSelectedAppointmentIds((currentIds) =>
+      currentIds.includes(appointmentId)
+        ? currentIds.filter((id) => id !== appointmentId)
+        : [...currentIds, appointmentId]
+    );
+  };
+
+  const handleBulkComplete = async () => {
+    if (!authToken || selectedAppointmentIds.length === 0) {
+      return;
+    }
+
+    setActionMessage(null);
+    const idsToComplete = [...selectedAppointmentIds];
+
+    try {
+      // Same completeAppointment call the single Complete button uses, just fired for every selected booking.
+      await Promise.all(
+        idsToComplete.map(async (appointmentId) => {
+          const appointmentToComplete = appointments.find((a) => a.id === appointmentId);
+          await completeAppointment({ appointmentId, authToken });
+          if (appointmentToComplete) {
+            setRecentlyCompletedBookings((prev) => [...prev, { ...appointmentToComplete, completedAt: Date.now() }]);
+          }
+        })
+      );
+
+      setActionMessage(`Completed ${idsToComplete.length} booking${idsToComplete.length > 1 ? 's' : ''}`);
+
+      setAppointments((currentAppointments) =>
+        currentAppointments.map((appointment) =>
+          idsToComplete.includes(appointment.id) ? { ...appointment, status: 'completed' } : appointment
+        )
+      );
+
+      window.setTimeout(() => {
+        setAppointments((currentAppointments) =>
+          currentAppointments.filter((appointment) => !idsToComplete.includes(appointment.id))
+        );
+      }, 420);
+
+      setSelectedAppointmentIds([]);
+      await refreshDashboard();
+    } catch (updateError) {
+      setError(updateError instanceof Error ? updateError.message : 'Unable to update these bookings.');
     }
   };
 
@@ -453,32 +506,38 @@ const AdminPage: React.FC = () => {
   };
 
   const handleDeleteBookingConfirm = async () => {
-    if (!pendingAction || pendingAction.type !== 'booking') {
+    if (!pendingAction || (pendingAction.type !== 'booking' && pendingAction.type !== 'bulk-booking')) {
       return;
     }
 
-    const appointmentId = pendingAction.appointment.id;
+    const appointmentIds =
+      pendingAction.type === 'booking' ? [pendingAction.appointment.id] : pendingAction.appointmentIds;
     setPendingAction(null);
-    setRemovingAppointmentIds((currentIds) => [...currentIds, appointmentId]);
+    setRemovingAppointmentIds((currentIds) => [...currentIds, ...appointmentIds]);
 
     try {
-      // Hard delete the appointment from the database
-      await deleteAppointment({ appointmentId, authToken });
+      // Hard delete the appointment(s) from the database - same call the single Cancel button uses.
+      await Promise.all(appointmentIds.map((appointmentId) => deleteAppointment({ appointmentId, authToken })));
 
       window.setTimeout(() => {
         setAppointments((currentAppointments) =>
-          currentAppointments.filter((appointment) => appointment.id !== appointmentId)
+          currentAppointments.filter((appointment) => !appointmentIds.includes(appointment.id))
         );
         setRecentlyCompletedBookings((currentBookings) =>
-          currentBookings.filter((booking) => booking.id !== appointmentId)
+          currentBookings.filter((booking) => !appointmentIds.includes(booking.id))
         );
-        setRemovingAppointmentIds((currentIds) => currentIds.filter((id) => id !== appointmentId));
+        setRemovingAppointmentIds((currentIds) => currentIds.filter((id) => !appointmentIds.includes(id)));
       }, 420);
 
-      setActionMessage(`Deleted booking ${appointmentId.slice(0, 6).toUpperCase()}`);
+      setSelectedAppointmentIds((currentIds) => currentIds.filter((id) => !appointmentIds.includes(id)));
+      setActionMessage(
+        appointmentIds.length > 1
+          ? `Deleted ${appointmentIds.length} bookings`
+          : `Deleted booking ${appointmentIds[0].slice(0, 6).toUpperCase()}`
+      );
     } catch (deleteError) {
-      setRemovingAppointmentIds((currentIds) => currentIds.filter((id) => id !== appointmentId));
-      setError(deleteError instanceof Error ? deleteError.message : 'Unable to delete this booking.');
+      setRemovingAppointmentIds((currentIds) => currentIds.filter((id) => !appointmentIds.includes(id)));
+      setError(deleteError instanceof Error ? deleteError.message : 'Unable to delete these bookings.');
     }
   };
 
@@ -690,7 +749,43 @@ const AdminPage: React.FC = () => {
             <Calendar className="text-[#F2529D]" size={20} />
             <h2 className="text-3xl sm:text-4xl font-display italic font-black text-[#0A0E1A]">Bookings queue</h2>
           </div>
-        
+
+          {activeAppointments.length > 1 && (
+            <div className="flex flex-wrap items-center gap-3 rounded-[1.5rem] border border-gray-100 bg-white p-4">
+              <button
+                onClick={() =>
+                  setSelectedAppointmentIds((currentIds) =>
+                    currentIds.length === activeAppointments.length ? [] : activeAppointments.map((a) => a.id)
+                  )
+                }
+                className="text-[10px] font-black uppercase tracking-[0.35em] text-gray-500 hover:text-[#F2529D] transition-colors"
+              >
+                {selectedAppointmentIds.length === activeAppointments.length ? 'Deselect all' : 'Select all'}
+              </button>
+
+              {selectedAppointmentIds.length > 0 && (
+                <>
+                  <span className="text-[10px] font-black uppercase tracking-[0.35em] text-gray-400">
+                    {selectedAppointmentIds.length} selected
+                  </span>
+                  <button
+                    onClick={handleBulkComplete}
+                    className="inline-flex items-center gap-2 rounded-full border border-gray-200 bg-white px-4 py-3 text-[10px] font-black uppercase tracking-[0.35em] text-gray-500 hover:text-emerald-700 transition-colors"
+                  >
+                    <Clock3 size={14} />
+                    Complete selected
+                  </button>
+                  <button
+                    onClick={() => setPendingAction({ type: 'bulk-booking', appointmentIds: selectedAppointmentIds })}
+                    className="inline-flex items-center gap-2 rounded-full border border-gray-200 bg-white px-4 py-3 text-[10px] font-black uppercase tracking-[0.35em] text-gray-500 hover:text-red-700 transition-colors"
+                  >
+                    <XCircle size={14} />
+                    Cancel selected
+                  </button>
+                </>
+              )}
+            </div>
+          )}
 
           <div className="grid gap-4 sm:gap-5 lg:grid-cols-2">
             {activeAppointments.length === 0 ? (
@@ -706,10 +801,21 @@ const AdminPage: React.FC = () => {
                   }`}
                 >
                   <div className="flex items-start justify-between gap-4">
-                    <div className="space-y-2">
-                      <p className="text-[10px] font-black uppercase tracking-[0.35em] text-[#BF9C34]">{appointment.serviceName}</p>
-                      <h3 className="text-2xl font-display italic font-black text-[#0A0E1A]">{appointment.guestName}</h3>
-                      <p className="text-sm text-gray-500 leading-relaxed">{appointment.guestEmail} Â· {appointment.guestPhone}</p>
+                    <div className="flex items-start gap-3">
+                      {activeAppointments.length > 1 && (
+                        <input
+                          type="checkbox"
+                          checked={selectedAppointmentIds.includes(appointment.id)}
+                          onChange={() => toggleAppointmentSelection(appointment.id)}
+                          aria-label={`Select booking for ${appointment.guestName}`}
+                          className="mt-1.5 h-5 w-5 shrink-0 rounded border-gray-300 text-[#F2529D] focus:ring-[#F2529D]"
+                        />
+                      )}
+                      <div className="space-y-2">
+                        <p className="text-[10px] font-black uppercase tracking-[0.35em] text-[#BF9C34]">{appointment.serviceName}</p>
+                        <h3 className="text-2xl font-display italic font-black text-[#0A0E1A]">{appointment.guestName}</h3>
+                        <p className="text-sm text-gray-500 leading-relaxed">{appointment.guestEmail} Â· {appointment.guestPhone}</p>
+                      </div>
                     </div>
                     <span className={`inline-flex rounded-full border px-3 py-1 text-[10px] font-black uppercase tracking-[0.35em] ${statusTone[appointment.status]}`}>
                       {appointment.status}
@@ -1321,10 +1427,14 @@ const AdminPage: React.FC = () => {
           <div className="w-full max-w-lg rounded-[2rem] border border-white/10 bg-[#0A0E1A] p-6 sm:p-8 text-white shadow-[0_40px_100px_-30px_rgba(0,0,0,0.7)]">
             <p className="text-[10px] font-black uppercase tracking-[0.45em] text-[#F2529D]">Confirm action</p>
             <h3 className="mt-3 text-2xl sm:text-3xl font-display italic font-black leading-tight">
-              {pendingAction.type === 'booking' ? 'Are you sure you want to delete this booking?' : 'Are you sure you want to delete this review?'}
+              {pendingAction.type === 'booking'
+                ? 'Are you sure you want to delete this booking?'
+                : pendingAction.type === 'bulk-booking'
+                ? `Are you sure you want to delete ${pendingAction.appointmentIds.length} bookings?`
+                : 'Are you sure you want to delete this review?'}
             </h3>
             <p className="mt-4 text-sm sm:text-base leading-relaxed text-white/70">
-              {pendingAction.type === 'booking'
+              {pendingAction.type === 'booking' || pendingAction.type === 'bulk-booking'
                 ? 'This removes the booking from the dashboard after the fade animation and keeps the Convex status in sync.'
                 : 'This removes the rating from moderation and clears it from the dashboard after the fade animation.'}
             </p>
@@ -1337,7 +1447,11 @@ const AdminPage: React.FC = () => {
                 No
               </button>
               <button
-                onClick={pendingAction.type === 'booking' ? handleDeleteBookingConfirm : handleDeleteReviewConfirm}
+                onClick={
+                  pendingAction.type === 'booking' || pendingAction.type === 'bulk-booking'
+                    ? handleDeleteBookingConfirm
+                    : handleDeleteReviewConfirm
+                }
                 className="flex-1 rounded-full bg-[#F2529D] px-6 py-4 text-[10px] font-black uppercase tracking-[0.35em] text-white hover:bg-[#ff6fb0] transition-colors"
               >
                 Yes, delete
