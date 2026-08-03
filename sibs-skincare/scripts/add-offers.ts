@@ -137,11 +137,13 @@ async function login(email: string, password: string): Promise<string> {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ email, password }),
   });
-  const data = await res.json();
-  if (!data.token) {
-    throw new Error(`Login failed: ${data.error || res.statusText}`);
+  const json = await res.json();
+  // The Convex API wraps the payload in { ok, data: { token, user } }.
+  const token = json?.data?.token ?? json?.token;
+  if (!token) {
+    throw new Error(`Login failed: ${json?.error || json?.data?.error || res.statusText}`);
   }
-  return data.token as string;
+  return token as string;
 }
 
 async function listPromotions(): Promise<{ code: string }[]> {
