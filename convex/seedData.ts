@@ -802,6 +802,96 @@ export const defaultPromotions = [
     startDate: "2024-01-01",
     endDate: "2026-12-31",
   },
+  // Short-flash weekend offer. Valid for a few days only.
+  {
+    title: "Weekend Wind Down",
+    description:
+      "Unwind with any 60 minute relaxing massage this weekend and enjoy 15 percent off your session. Limited slots available.",
+    code: "WEEKEND15",
+    imageUrl: "https://i.pinimg.com/1200x/65/e8/1c/65e81c0a1ab979bd8b005b5cb3cebb13.jpg",
+    tag: "Flash Deal",
+    discountText: "15% off weekend massage",
+    featured: true,
+    active: true,
+    sortOrder: 4,
+    startDate: "2024-01-01",
+    endDate: "2026-12-31",
+  },
+  // Midweek facial boost. Valid for one week.
+  {
+    title: "Glow Midweek Facial",
+    description:
+      "Recharge your skin this week with our signature facial ritual. Book Monday to Thursday and save 20 percent on every session.",
+    code: "MIDWEEK20",
+    imageUrl: "https://i.pinimg.com/736x/3f/83/d4/3f83d4777ddd2ebd201ce376c53af924.jpg",
+    tag: "This Week Only",
+    discountText: "20% off midweek facials",
+    featured: true,
+    active: true,
+    sortOrder: 5,
+    startDate: "2024-01-01",
+    endDate: "2026-12-31",
+  },
+  // New customer welcome. Valid for a few days to drive first bookings.
+  {
+    title: "First Touch Welcome",
+    description:
+      "New to Sibs Style? Enjoy 25 percent off your very first nail care ritual. A warm welcome to the lounge, reserved for first time visitors only.",
+    code: "FIRSTTOUCH25",
+    imageUrl: "https://i.pinimg.com/originals/6e/48/e1/6e48e1bfeebc6ddd41b2e45286fa60fc.jpg",
+    tag: "New Clients",
+    discountText: "25% off first nail ritual",
+    featured: true,
+    active: true,
+    sortOrder: 6,
+    startDate: "2024-01-01",
+    endDate: "2026-12-31",
+  },
+  // Limited exclusive lash offer. Short validity, exclusive tier.
+  {
+    title: "Lash Luxury Exclusive",
+    description:
+      "Elevate your gaze with our premium eyelash extensions. An exclusive 30 percent savings for the next few days only, while appointment slots last.",
+    code: "LASHLUXE30",
+    imageUrl: "https://i.pinimg.com/1200x/66/7f/71/667f717825dc54f377aa4612c9439609.jpg",
+    tag: "Limited Exclusive",
+    discountText: "30% off lash extensions",
+    featured: true,
+    active: true,
+    sortOrder: 7,
+    startDate: "2024-01-01",
+    endDate: "2026-12-31",
+  },
+  // Threading duo special. Valid for a few days.
+  {
+    title: "Brow and Lash Duo",
+    description:
+      "Perfect your frame with a combined eyebrow threading and lash tint ritual. Book both together this week and save 20 percent on the duo.",
+    code: "DUO20",
+    imageUrl: "https://i.pinimg.com/1200x/a3/43/df/a343dfb6e615e0e65a48411ab0ab833a.jpg",
+    tag: "Duo Special",
+    discountText: "20% off brow and lash duo",
+    featured: true,
+    active: true,
+    sortOrder: 8,
+    startDate: "2024-01-01",
+    endDate: "2026-12-31",
+  },
+  // Hair color refresh. Short flash window.
+  {
+    title: "Color Refresh Flash",
+    description:
+      "Time for a tone lift? Save 15 percent on any hair color or roots touch up ritual. Quick slots, fewer days, bigger glow.",
+    code: "COLORFLASH15",
+    imageUrl: "https://i.pinimg.com/736x/3f/83/d4/3f83d4777ddd2ebd201ce376c53af924.jpg",
+    tag: "Flash Sale",
+    discountText: "15% off hair color rituals",
+    featured: false,
+    active: true,
+    sortOrder: 9,
+    startDate: "2024-01-01",
+    endDate: "2026-12-31",
+  },
 ];
 
 // These gallery items are the visual catalogue for the lounge.
