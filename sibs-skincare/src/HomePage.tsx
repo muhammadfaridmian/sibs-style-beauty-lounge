@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import Lenis from 'lenis';
 import { ArrowRight, X } from 'lucide-react';
 import silkyCoolProductsImage from './assets/Silkycoolproducts.jpeg';
 import goldProductsImage from './assets/Goldproducts.jpeg';
@@ -86,6 +87,21 @@ const HomePage = () => {
       document.body.style.overflow = 'unset';
     };
   }, [isCollectionOpen]);
+
+  // Smooth scroll (Lenis)
+  useEffect(() => {
+    const lenis = new Lenis();
+    let rafId: number;
+    const raf = (time: number) => {
+      lenis.raf(time);
+      rafId = requestAnimationFrame(raf);
+    };
+    rafId = requestAnimationFrame(raf);
+    return () => {
+      cancelAnimationFrame(rafId);
+      lenis.destroy();
+    };
+  }, []);
 
   useEffect(() => {
     window.scrollTo(0, 0);

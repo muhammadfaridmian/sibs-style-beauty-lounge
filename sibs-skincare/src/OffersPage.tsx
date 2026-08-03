@@ -6,6 +6,7 @@ import {
 } from 'lucide-react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import Lenis from 'lenis';
 import {
   getPromotions, type Promotion,
   getCurrentAuthUser, getStoredAuthToken, updatePromotion,
@@ -327,6 +328,21 @@ const OffersPage = () => {
     };
   }, [activePromotions, limitedExclusive, currentSpecials]);
 
+  // Smooth scroll (Lenis)
+  useEffect(() => {
+    const lenis = new Lenis();
+    let rafId: number;
+    const raf = (time: number) => {
+      lenis.raf(time);
+      rafId = requestAnimationFrame(raf);
+    };
+    rafId = requestAnimationFrame(raf);
+    return () => {
+      cancelAnimationFrame(rafId);
+      lenis.destroy();
+    };
+  }, []);
+
   // Entry animation — runs once on mount only (not when promotions load)
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -495,7 +511,7 @@ const OffersPage = () => {
   }, [activePromotions]);
 
   return (
-    <div ref={containerRef} className="bg-[#FAF9F6] min-h-screen pt-32 md:pt-40 opacity-0 overflow-x-hidden">
+    <div ref={containerRef} className="bg-[#FAF9F6] min-h-screen pt-32 md:pt-40 overflow-x-hidden">
       {/* ==================== HERO SECTION ==================== */}
       <section ref={heroRef} className="relative px-4 sm:px-6 md:px-8 mb-20 md:mb-32">
         <div className="max-w-7xl mx-auto">

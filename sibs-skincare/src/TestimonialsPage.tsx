@@ -7,6 +7,7 @@ import {
 } from 'lucide-react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import Lenis from 'lenis';
 import {
   getReviews, submitReview, getServices, getStoredAuthToken,
   type Review, type Service,
@@ -233,6 +234,21 @@ const TestimonialsPage: React.FC = () => {
     const satisfaction = Math.round((reviews.filter((r) => r.rating >= 4).length / total) * 100);
     return { avg, total, fiveStar, satisfaction };
   }, [reviews]);
+
+  // ======== Smooth scroll (Lenis) ========
+  useEffect(() => {
+    const lenis = new Lenis();
+    let rafId: number;
+    const raf = (time: number) => {
+      lenis.raf(time);
+      rafId = requestAnimationFrame(raf);
+    };
+    rafId = requestAnimationFrame(raf);
+    return () => {
+      cancelAnimationFrame(rafId);
+      lenis.destroy();
+    };
+  }, []);
 
   // ======== Entry + scroll animations ========
   useEffect(() => {

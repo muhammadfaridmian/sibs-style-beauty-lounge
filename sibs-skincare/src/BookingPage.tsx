@@ -8,6 +8,7 @@ import {
 } from 'lucide-react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import Lenis from 'lenis';
 import {
   getServices, getAvailability, createAppointment,
   formatPrice, formatDuration, formatDate,
@@ -172,6 +173,21 @@ const BookingPage: React.FC = () => {
       return () => clearTimeout(timer);
     }
   }, [selectedService]);
+
+  // ==================== SMOOTH SCROLL (Lenis) ====================
+  useEffect(() => {
+    const lenis = new Lenis();
+    let rafId: number;
+    const raf = (time: number) => {
+      lenis.raf(time);
+      rafId = requestAnimationFrame(raf);
+    };
+    rafId = requestAnimationFrame(raf);
+    return () => {
+      cancelAnimationFrame(rafId);
+      lenis.destroy();
+    };
+  }, []);
 
   // ==================== ANIMATIONS ====================
   useEffect(() => {
