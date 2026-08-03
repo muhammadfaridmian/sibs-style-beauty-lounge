@@ -173,12 +173,12 @@ const OfferCard: React.FC<OfferCardProps> = ({ promotion, index, isAdmin, onEdit
 
         {/* Discount badge */}
         {discountPercent > 0 && (
-          <div className="absolute top-4 right-4 mt-8 md:mt-10">
+          <div className="absolute top-3 right-3 mt-6 md:mt-10">
             <div className="relative">
-              <div className="w-16 h-16 md:w-20 md:h-20 rounded-full bg-[#F2529D] flex flex-col items-center justify-center text-white shadow-[0_8px_30px_rgba(242,82,157,0.5)] group-hover:scale-110 transition-transform duration-500">
-                <Percent className="w-3 h-3 md:w-4 md:h-4 absolute top-2 md:top-3" />
-                <span className="text-xl md:text-2xl font-black leading-none mt-2">{discountPercent}</span>
-                <span className="text-[0.5rem] md:text-[0.55rem] font-black uppercase tracking-wider">OFF</span>
+              <div className="w-12 h-12 sm:w-14 sm:h-14 md:w-20 md:h-20 rounded-full bg-[#F2529D] flex flex-col items-center justify-center text-white shadow-[0_8px_30px_rgba(242,82,157,0.5)] group-hover:scale-110 transition-transform duration-500">
+                <Percent className="w-2.5 h-2.5 sm:w-3 sm:h-3 md:w-4 md:h-4 absolute top-1.5 sm:top-2 md:top-3" />
+                <span className="text-base sm:text-lg md:text-2xl font-black leading-none mt-1.5 sm:mt-2">{discountPercent}</span>
+                <span className="text-[0.45rem] sm:text-[0.5rem] md:text-[0.55rem] font-black uppercase tracking-wider">OFF</span>
               </div>
             </div>
           </div>
@@ -523,7 +523,7 @@ const OffersPage = () => {
           </div>
 
           {/* Title */}
-          <h1 className="offers-hero-title text-center text-5xl sm:text-7xl md:text-9xl font-display italic font-black text-[#F2529D] leading-none tracking-tighter mb-6 md:mb-8">
+          <h1 className="offers-hero-title text-center text-4xl sm:text-6xl md:text-9xl font-display italic font-black text-[#F2529D] leading-none tracking-tighter mb-6 md:mb-8">
             Offers & Promotions
           </h1>
 
@@ -662,7 +662,7 @@ const OffersPage = () => {
               <span className="text-[10px] md:text-xs font-black uppercase tracking-[0.45em] text-[#BF9C34]">Browse All</span>
               <span className="h-px w-12 md:w-16 bg-[#BF9C34]" />
             </div>
-            <h2 className="text-4xl md:text-7xl font-display italic font-black text-gray-900 leading-none tracking-tighter mb-4">
+            <h2 className="text-3xl sm:text-5xl md:text-7xl font-display italic font-black text-gray-900 leading-none tracking-tighter mb-4">
               Every Ritual, <span className="text-[#F2529D]">Rewarded</span>
             </h2>
             <p className="text-sm md:text-base text-gray-500 max-w-xl mx-auto font-medium">
@@ -735,7 +735,7 @@ const OffersPage = () => {
               <span className="text-[10px] md:text-xs font-black uppercase tracking-[0.45em] text-[#BF9C34]">Simple Process</span>
               <span className="h-px w-12 md:w-16 bg-[#BF9C34]" />
             </div>
-            <h2 className="text-4xl md:text-7xl font-display italic font-black text-gray-900 leading-none tracking-tighter">
+            <h2 className="text-3xl sm:text-5xl md:text-7xl font-display italic font-black text-gray-900 leading-none tracking-tighter">
               How to <span className="text-[#F2529D]">Redeem</span>
             </h2>
           </div>

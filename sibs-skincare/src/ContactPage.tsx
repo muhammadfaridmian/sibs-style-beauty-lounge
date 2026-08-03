@@ -127,7 +127,7 @@ const ContactPage = () => {
           </div>
 
           {/* Title */}
-          <h1 className="contact-title text-center text-5xl sm:text-7xl md:text-9xl font-display italic font-black text-[#F2529D] leading-none tracking-tighter mb-6 md:mb-8">
+          <h1 className="contact-title text-center text-4xl sm:text-6xl md:text-9xl font-display italic font-black text-[#F2529D] leading-none tracking-tighter mb-6 md:mb-8">
             Get in Touch
           </h1>
 
@@ -243,7 +243,7 @@ const ContactPage = () => {
               <span className="text-[10px] md:text-xs font-black uppercase tracking-[0.45em] text-[#BF9C34]">Direct Lines</span>
               <span className="h-px w-10 md:w-14 bg-[#BF9C34]" />
             </div>
-            <h2 className="text-4xl md:text-7xl font-display italic font-black text-gray-900 leading-none tracking-tighter mb-3">
+            <h2 className="text-3xl sm:text-5xl md:text-7xl font-display italic font-black text-gray-900 leading-none tracking-tighter mb-3">
               Reach Us <span className="text-[#F2529D]">Directly</span>
             </h2>
             <p className="text-sm md:text-base text-gray-500 max-w-xl mx-auto font-medium">

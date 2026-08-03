@@ -365,7 +365,7 @@ const TestimonialsPage: React.FC = () => {
           <span className="text-[10px] md:text-xs font-black uppercase tracking-[0.45em] text-[#BF9C34]">Dubai Beauty Lounge</span>
           <span className="h-px w-12 md:w-16 bg-[#BF9C34]" />
         </div>
-        <h1 className="chron-title text-5xl sm:text-7xl md:text-9xl font-display text-[#F2529D] italic font-black mb-6 md:mb-8 leading-none tracking-tighter">
+        <h1 className="chron-title text-4xl sm:text-6xl md:text-9xl font-display text-[#F2529D] italic font-black mb-6 md:mb-8 leading-none tracking-tighter">
           Client Chronicles
         </h1>
         <p className="chron-sub text-gray-500 text-base md:text-xl font-medium italic max-w-2xl mx-auto leading-relaxed">
@@ -409,7 +409,7 @@ const TestimonialsPage: React.FC = () => {
                 </span>
                 <span className="h-px w-10 md:w-14 bg-[#BF9C34]" />
               </div>
-              <h2 className="text-4xl md:text-7xl font-display italic font-black text-gray-900 leading-none tracking-tighter mb-3">
+              <h2 className="text-3xl sm:text-5xl md:text-7xl font-display italic font-black text-gray-900 leading-none tracking-tighter mb-3">
                 Verified <span className="text-[#F2529D]">Voices</span>
               </h2>
               <p className="text-sm md:text-base text-gray-500 max-w-xl mx-auto font-medium">
@@ -473,7 +473,7 @@ const TestimonialsPage: React.FC = () => {
                 </span>
                 <span className="h-px w-10 md:w-14 bg-[#F2529D]" />
               </div>
-              <h2 className="text-4xl md:text-7xl font-display italic font-black text-gray-900 leading-none tracking-tighter mb-3">
+              <h2 className="text-3xl sm:text-5xl md:text-7xl font-display italic font-black text-gray-900 leading-none tracking-tighter mb-3">
                 More <span className="text-[#F2529D]">Chronicles</span>
               </h2>
               <p className="text-sm md:text-base text-gray-500 max-w-xl mx-auto font-medium">
@@ -675,7 +675,7 @@ const TestimonialsPage: React.FC = () => {
                       </div>
                       <textarea
                         required
-                        rows={5}
+                        rows={4}
                         maxLength={500}
                         placeholder="Describe the sensations, the service, and the transformation you experienced..."
                         className="w-full bg-white/[0.04] border-2 border-white/10 rounded-2xl px-5 py-4 text-base text-white placeholder-white/25 focus:outline-none focus:border-white focus:bg-white/[0.06] transition-all resize-none leading-relaxed"

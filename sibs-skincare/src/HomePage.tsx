@@ -240,7 +240,7 @@ const HomePage = () => {
                 Dubai · Beauty Lounge
               </span>
             </div>
-            <h1 className="hero-title text-5xl md:text-[8rem] leading-[1] md:leading-[0.85] text-black font-display font-black tracking-tighter !opacity-100 !visible mb-10 md:mb-30">
+            <h1 className="hero-title text-4xl sm:text-5xl md:text-[8rem] leading-[1.05] md:leading-[0.85] text-black font-display font-black tracking-tighter !opacity-100 !visible mb-8 md:mb-30 break-words">
               The Art <br className="hidden md:block"/> <span className="text-[#F2529D] italic font-black">of Radiant</span>
             </h1>
             <p className="hero-p text-black text-xl md:text-2xl max-w-md italic font-black leading-relaxed !opacity-100 !visible mb-10 md:mb-20">
@@ -381,7 +381,7 @@ const HomePage = () => {
               <span className="w-16 md:w-20 h-[2px] bg-[#BF9C34]" />
               <span className="text-[10px] md:text-xs font-black uppercase tracking-[0.45em] text-[#BF9C34]">Our Philosophy</span>
             </div>
-            <h2 className="text-4xl md:text-8xl italic leading-tight text-gray-900 font-light font-display">
+            <h2 className="text-3xl sm:text-4xl md:text-8xl italic leading-tight text-gray-900 font-light font-display">
               Our Philosophy <span className="text-[#BF9C34]">of Beauty</span>
             </h2>
             <div className="space-y-6 md:space-y-8 text-gray-500 leading-relaxed text-base md:text-xl font-light">
@@ -406,7 +406,7 @@ const HomePage = () => {
             <span className="text-[10px] md:text-xs font-black uppercase tracking-[0.45em] text-[#BF9C34]">The Lounge</span>
             <span className="h-px w-10 md:w-16 bg-[#BF9C34]" />
           </div>
-          <h2 className="text-4xl md:text-7xl font-display italic text-[#FAF9F6] leading-tight">
+          <h2 className="text-3xl sm:text-4xl md:text-7xl font-display italic text-[#FAF9F6] leading-tight">
             Explore the <span className="text-[#F2529D]">Experience</span>
           </h2>
           <p className="text-gray-400 text-sm md:text-lg max-w-xl mx-auto mt-4 md:mt-6 font-light">
@@ -436,7 +436,7 @@ const HomePage = () => {
               <span className="text-[10px] md:text-xs font-black uppercase tracking-[0.45em] text-[#BF9C34]">Begin Your Journey</span>
               <span className="h-px w-10 md:w-16 bg-[#BF9C34]" />
             </div>
-            <h2 className="text-4xl md:text-5xl lg:text-7xl font-display italic text-balance">Ready to Begin Your Ritual?</h2>
+            <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-7xl font-display italic text-balance">Ready to Begin Your Ritual?</h2>
             <p className="text-gray-400 text-base md:text-xl max-w-2xl font-light px-4">Experience the synergy of botanical science and artistic beauty at Sibs Style.</p>
             <button 
                 onClick={() => {

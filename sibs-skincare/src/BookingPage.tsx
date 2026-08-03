@@ -389,7 +389,7 @@ const BookingPage: React.FC = () => {
           <span className="text-[10px] md:text-xs font-black uppercase tracking-[0.45em] text-[#BF9C34] mb-4 md:mb-6 block">
             Dubai Beauty Lounge
           </span>
-          <h1 className="text-4xl sm:text-5xl md:text-8xl font-display text-white mb-6 md:mb-9 drop-shadow-xl font-bold">
+          <h1 className="text-3xl sm:text-5xl md:text-8xl font-display text-white mb-6 md:mb-9 drop-shadow-xl font-bold">
             Curate Your Glow
           </h1>
           <div className="bg-white/10 backdrop-blur-md px-8 md:px-10 py-3 md:py-4 rounded-full border border-white/20">

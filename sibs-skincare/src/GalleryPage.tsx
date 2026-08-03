@@ -108,7 +108,7 @@ const GalleryPage = () => {
           <span className="text-[10px] md:text-xs font-black uppercase tracking-[0.45em] text-[#BF9C34]">The Visual Edit</span>
           <span className="h-px w-12 md:w-16 bg-[#BF9C34]" />
         </div>
-        <h1 className="gallery-title text-5xl sm:text-7xl md:text-9xl font-display italic font-black text-[#F2529D] leading-none tracking-tighter mb-6 md:mb-8">
+        <h1 className="gallery-title text-4xl sm:text-6xl md:text-9xl font-display italic font-black text-[#F2529D] leading-none tracking-tighter mb-6 md:mb-8">
           The Gallery
         </h1>
         <p className="gallery-sub text-gray-500 text-base md:text-xl font-medium italic max-w-2xl mx-auto leading-relaxed">
@@ -135,7 +135,7 @@ const GalleryPage = () => {
           <span className="text-[10px] md:text-xs font-black uppercase tracking-[0.45em] text-[#BF9C34]">Interactive</span>
           <span className="h-px w-10 md:w-14 bg-[#BF9C34]" />
         </div>
-        <h2 className="text-4xl md:text-7xl font-display italic font-black text-gray-900 leading-none tracking-tighter mb-4">
+        <h2 className="text-3xl sm:text-5xl md:text-7xl font-display italic font-black text-gray-900 leading-none tracking-tighter mb-4">
           Step <span className="text-[#F2529D]">Inside</span>
         </h2>
         <p className="text-sm md:text-base text-gray-500 max-w-xl mx-auto font-medium">
@@ -150,18 +150,18 @@ const GalleryPage = () => {
         <div className="absolute top-0 left-1/4 w-96 h-96 bg-[#F2529D]/15 rounded-full blur-[120px] pointer-events-none" />
         <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-[#BF9C34]/15 rounded-full blur-[120px] pointer-events-none" />
 
-        <div className="relative z-10 h-[100vh] min-h-[600px] w-full">
+        <div className="relative z-10 h-[80vh] sm:h-[100vh] min-h-[500px] sm:min-h-[600px] w-full">
           <DomeGallery
             images={domeImagesMemo}
-            fit={0.7}
-            minRadius={600}
+            fit={0.85}
+            minRadius={350}
             maxVerticalRotationDeg={8}
             segments={26}
             dragDampening={3.4}
             grayscale={false}
             overlayBlurColor="#0A0E1A"
-            imageBorderRadius="16px"
-            openedImageBorderRadius="20px"
+            imageBorderRadius="12px"
+            openedImageBorderRadius="16px"
             openedImageWidth="300px"
             openedImageHeight="420px"
           />
@@ -184,7 +184,7 @@ const GalleryPage = () => {
               <span className="text-[10px] md:text-xs font-black uppercase tracking-[0.45em] text-[#F2529D]">Behind the Canvas</span>
               <span className="h-px w-10 md:w-14 bg-[#F2529D]" />
             </div>
-            <h2 className="text-4xl md:text-7xl font-display italic font-black text-gray-900 leading-none tracking-tighter mb-3">
+            <h2 className="text-3xl sm:text-5xl md:text-7xl font-display italic font-black text-gray-900 leading-none tracking-tighter mb-3">
               Studio <span className="text-[#F2529D]">Moments</span>
             </h2>
             <p className="text-sm md:text-base text-gray-500 max-w-xl mx-auto font-medium">
