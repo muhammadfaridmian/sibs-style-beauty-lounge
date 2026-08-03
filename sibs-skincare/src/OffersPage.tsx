@@ -327,7 +327,7 @@ const OffersPage = () => {
     };
   }, [activePromotions, limitedExclusive, currentSpecials]);
 
-  // Entry + scroll animations
+  // Entry animation — runs once on mount only (not when promotions load)
   useEffect(() => {
     window.scrollTo(0, 0);
 
@@ -351,15 +351,6 @@ const OffersPage = () => {
       });
     }
 
-    // Scroll reveals
-    const revealEls = gsap.utils.toArray<HTMLElement>('.offer-reveal');
-    revealEls.forEach((el) => {
-      gsap.fromTo(el, { y: 60, opacity: 0 }, {
-        y: 0, opacity: 1, duration: 1, ease: 'power3.out',
-        scrollTrigger: { trigger: el, start: 'top 88%' },
-      });
-    });
-
     // Parallax hero image
     if (heroRef.current) {
       gsap.to('.hero-parallax', {
@@ -370,7 +361,37 @@ const OffersPage = () => {
     }
 
     return () => { ScrollTrigger.getAll().forEach((t) => t.kill()); };
-  }, [promotions.length]);
+  }, []);
+
+  // Scroll reveals — set up whenever promotions change (cards render async).
+  // Uses onEnter so elements stay visible by default and only animate when
+  // the trigger actually fires. This prevents cards from being stuck invisible
+  // if the ScrollTrigger miscalculates its start position after async data loads.
+  useEffect(() => {
+    const createdTriggers: ScrollTrigger[] = [];
+    const revealEls = gsap.utils.toArray<HTMLElement>('.offer-reveal');
+    revealEls.forEach((el) => {
+      // Safety net: make sure every reveal element is visible by default.
+      gsap.set(el, { opacity: 1, y: 0 });
+      const st = ScrollTrigger.create({
+        trigger: el,
+        start: 'top 88%',
+        once: true,
+        onEnter: () => {
+          gsap.fromTo(el, { y: 60, opacity: 0 }, {
+            y: 0, opacity: 1, duration: 1, ease: 'power3.out',
+          });
+        },
+      });
+      createdTriggers.push(st);
+    });
+    // Refresh so ScrollTrigger recalculates positions after async data render.
+    ScrollTrigger.refresh();
+
+    return () => {
+      createdTriggers.forEach((t) => t.kill());
+    };
+  }, [promotions.length, activeTab]);
 
   // Modal animations
   useEffect(() => {
