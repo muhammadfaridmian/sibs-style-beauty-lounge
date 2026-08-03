@@ -331,7 +331,22 @@ const OffersPage = () => {
   useEffect(() => {
     window.scrollTo(0, 0);
 
-    const tl = gsap.timeline();
+    // Safety net: force the container and hero elements visible after a short
+    // delay so the page is never stuck invisible if the GSAP timeline is
+    // interrupted (React StrictMode remount, tab backgrounding, etc.).
+    const safetyNet = window.setTimeout(() => {
+      if (containerRef.current) {
+        gsap.set(containerRef.current, { opacity: 1, clearProps: 'all' });
+      }
+      gsap.set('.offers-hero-eyebrow, .offers-hero-title, .offers-hero-sub, .offers-hero-cta, .offers-hero-image', { opacity: 1, y: 0, scale: 1, clearProps: 'all' });
+    }, 2000);
+
+    const tl = gsap.timeline({
+      onComplete: () => {
+        gsap.set(containerRef.current, { opacity: 1, clearProps: 'all' });
+        gsap.set('.offers-hero-eyebrow, .offers-hero-title, .offers-hero-sub, .offers-hero-cta, .offers-hero-image', { opacity: 1, y: 0, scale: 1, clearProps: 'all' });
+      },
+    });
     tl.fromTo(containerRef.current, { opacity: 0 }, { opacity: 1, duration: 1, ease: 'power2.inOut' })
       .fromTo('.offers-hero-eyebrow', { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.8, ease: 'power3.out' }, '-=0.5')
       .fromTo('.offers-hero-title', { opacity: 0, y: 40 }, { opacity: 1, y: 0, duration: 1.2, ease: 'expo.out' }, '-=0.5')
@@ -360,7 +375,11 @@ const OffersPage = () => {
       });
     }
 
-    return () => { ScrollTrigger.getAll().forEach((t) => t.kill()); };
+    return () => {
+      window.clearTimeout(safetyNet);
+      tl.kill();
+      ScrollTrigger.getAll().forEach((t) => t.kill());
+    };
   }, []);
 
   // Scroll reveals — set up whenever promotions change (cards render async).

@@ -237,13 +237,35 @@ const TestimonialsPage: React.FC = () => {
   // ======== Entry + scroll animations ========
   useEffect(() => {
     window.scrollTo(0, 0);
-    const tl = gsap.timeline();
+
+    // Safety net: force the container visible after a short delay.
+    // This prevents the page from being stuck invisible if the GSAP
+    // entry animation is interrupted (e.g., React StrictMode remount,
+    // browser tab backgrounding, or any timing hiccup).
+    const safetyNet = window.setTimeout(() => {
+      if (containerRef.current) {
+        gsap.set(containerRef.current, { opacity: 1, clearProps: 'all' });
+      }
+      gsap.set('.chron-eyebrow, .chron-title, .chron-sub', { opacity: 1, y: 0, clearProps: 'all' });
+    }, 2000);
+
+    const tl = gsap.timeline({
+      onComplete: () => {
+        // Make absolutely sure everything is visible after the timeline finishes.
+        gsap.set(containerRef.current, { opacity: 1, clearProps: 'all' });
+        gsap.set('.chron-eyebrow, .chron-title, .chron-sub', { opacity: 1, y: 0, clearProps: 'all' });
+      },
+    });
     tl.fromTo(containerRef.current, { opacity: 0 }, { opacity: 1, duration: 1, ease: 'power2.inOut' })
       .fromTo('.chron-eyebrow', { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.8, ease: 'power3.out' }, '-=0.5')
       .fromTo('.chron-title', { opacity: 0, y: 40 }, { opacity: 1, y: 0, duration: 1.2, ease: 'expo.out' }, '-=0.5')
       .fromTo('.chron-sub', { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.8, ease: 'power3.out' }, '-=0.8');
 
-    return () => { ScrollTrigger.getAll().forEach((t) => t.kill()); };
+    return () => {
+      window.clearTimeout(safetyNet);
+      tl.kill();
+      ScrollTrigger.getAll().forEach((t) => t.kill());
+    };
   }, []);
 
   // Scroll reveals (safe pattern: elements visible by default, animate on enter).
@@ -319,7 +341,7 @@ const TestimonialsPage: React.FC = () => {
   }
 
   return (
-    <div ref={containerRef} className="bg-[#FAF9F6] min-h-screen text-[#333] font-serif overflow-x-hidden opacity-0">
+    <div ref={containerRef} className="bg-[#FAF9F6] min-h-screen text-[#333] font-serif overflow-x-hidden">
       {/* ==================== HEADER ==================== */}
       <div className="max-w-5xl mx-auto px-4 pt-32 md:pt-48 pb-16 md:pb-24 text-center">
         <div className="chron-eyebrow flex items-center justify-center gap-4 mb-6 md:mb-8">
