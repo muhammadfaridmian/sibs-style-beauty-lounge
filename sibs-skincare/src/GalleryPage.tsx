@@ -1,13 +1,14 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useMemo } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { Link } from 'react-router-dom';
 import Footer from './components/Footer';
+import { Skiper30 } from './components/Skiper30';
+import DomeGallery from './components/DomeGallery';
+import { ArrowRight } from 'lucide-react';
 
 gsap.registerPlugin(ScrollTrigger);
 
-// The gallery is mostly a visual story page, so the motion work does most of the talking.
-// Import local gallery assets
+// Gallery assets — reused across both components and the surrounding design.
 import nailsImage from './assets/Nails.jpeg';
 import cleanserImage from './assets/Cleanser.jpeg';
 import detoxImage from './assets/Detox.jpeg';
@@ -17,337 +18,232 @@ import hairCreamImage from './assets/HairCream.jpeg';
 import mintpoxImage from './assets/mintpox.jpeg';
 import mijanImage from './assets/Mijan.jpeg';
 import himalayaImage from './assets/himalaya.jpeg';
-import btesnceImage from './assets/btesnce.png';
-import craftedImage from './assets/craftedprecision.png';
 import sibshall1 from './assets/Sibshall.jpeg';
 import sibshall2 from './assets/Sibshall2.jpeg';
 import sibshall3 from './assets/sibshall3.jpeg';
 
-const images = [
-  {
-    url: nailsImage,
-    title: 'Precision Beauty',
-    category: 'Nail Care',
-    span: 'md:row-span-2'
-  },
-  {
-    url: cleanserImage,
-    title: 'Pure Essence',
-    category: 'Skincare',
-    span: 'col-span-1'
-  },
-  {
-    url: detoxImage,
-    title: 'Detox Ritual',
-    category: 'Treatment',
-    span: 'col-span-1'
-  },
-  {
-    url: herbalImage,
-    title: 'Herbal Infusion',
-    category: 'Botanical',
-    span: 'md:row-span-1'
-  },
-  {
-    url: vitaminCImage,
-    title: 'Radiant Glow',
-    category: 'Product',
-    span: 'col-span-1'
-  },
-  {
-    url: hairCreamImage,
-    title: 'Hair Luxe',
-    category: 'Hair Care',
-    span: 'md:row-span-2'
-  },
-  {
-    url: mintpoxImage,
-    title: 'Refresh & Revive',
-    category: 'Signature',
-    span: 'md:col-span-2'
-  },
-  {
-    url: mijanImage,
-    title: 'Artisan Blend',
-    category: 'Premium',
-    span: 'col-span-1'
-  },
-  {
-    url: himalayaImage,
-    title: 'Mountain Pure',
-    category: 'Natural',
-    span: 'md:col-span-2'
-  },
-  {
-    url: 'https://images.unsplash.com/photo-1552046122-03184de85e08?q=80&w=800&auto=format&fit=crop', // Minimalist bathroom/skincare
-    title: 'The Shelfie',
-    category: 'Minimalism',
-    span: 'col-span-1 aspect-square md:translate-y-12'
-  },
-  {
-    url: btesnceImage, // Botanical Essence
-    title: 'Botanical Essence',
-    category: 'Micro Edit',
-    span: 'col-span-1 rounded-full p-4 grayscale hover:grayscale-0 transition-all'
-  },
-  {
-    url: craftedImage, // Crafted Precision
-    title: 'Crafted Precision',
-    category: 'Tools',
-    span: 'col-span-1'
-  }
+// The DomeGallery needs a flat list of image URLs (strings).
+const domeImages: string[] = [
+  nailsImage, cleanserImage, detoxImage, herbalImage, vitaminCImage,
+  hairCreamImage, mintpoxImage, mijanImage, himalayaImage,
+  sibshall1, sibshall2, sibshall3,
 ];
 
-// Behind the Canvas: show four curated images from assets
+// A small editorial grid used in the closing "Behind the Canvas" section.
 const behindCanvasImages = [
-  {
-    kind: 'image',
-    src: sibshall1,
-    title: 'Studio Frame 1',
-    copy: 'A quiet behind-the-scenes moment.',
-    span: 'sm:col-span-2'
-  },
-  {
-    kind: 'image',
-    src: sibshall2,
-    title: 'Studio Frame 2',
-    copy: 'Lighting study and texture.',
-    span: 'col-span-1'
-  },
-  {
-    kind: 'image',
-    src: sibshall3,
-    title: 'Studio Frame 3',
-    copy: 'Gesture and motion captured.',
-    span: 'col-span-1'
-  },
-  {
-    kind: 'image',
-    src: craftedImage,
-    title: 'Tools & Craft',
-    copy: 'Precision and thoughtful tools.',
-    span: 'sm:col-span-2'
-  }
+  { src: sibshall1, title: 'Studio Frame 01', copy: 'A quiet behind-the-scenes moment.' },
+  { src: sibshall2, title: 'Studio Frame 02', copy: 'Lighting study and texture.' },
+  { src: sibshall3, title: 'Studio Frame 03', copy: 'Gesture and motion captured.' },
+  { src: detoxImage, title: 'Detail Study', copy: 'Botanical precision up close.' },
 ];
 
 const GalleryPage = () => {
-  // The horizontal section uses this ref to pin and move the gallery track.
-  // The same ref is what the ScrollTrigger animation uses to slide the whole storyboard sideways.
-  const scrollRef = useRef(null);
-  // This wrapper starts hidden so the initial route swap does not flash.
-  // Hiding the page for a beat prevents the user from seeing the old route tear down.
-  const pageWrapperRef = useRef(null);
+  const containerRef = useRef<HTMLDivElement>(null);
 
+  // Entry + scroll animations — safe pattern (elements visible by default,
+  // animate on enter). Never depends on JS to make content visible.
   useEffect(() => {
     window.scrollTo(0, 0);
-    
-    // Initial state: hidden for a split second to avoid flash
-    gsap.set(pageWrapperRef.current, { visibility: 'hidden', opacity: 0 });
 
-    const mm = gsap.matchMedia();
-    const ctx = gsap.context(() => {
-      // The title and cards fade in first, then the wide gallery section starts its scroll trick.
-      // Delay to ensure previous page has unmounted and layout is settled
-      gsap.to(pageWrapperRef.current, {
-        visibility: 'visible',
-        opacity: 1,
-        duration: 0.8,
-        delay: 0.2, // The "split second" blank state
-        ease: "power2.inOut"
-      });
+    // Safety net: force container visible after a short delay so the page
+    // is never stuck invisible if the GSAP timeline is interrupted.
+    const safetyNet = window.setTimeout(() => {
+      if (containerRef.current) {
+        gsap.set(containerRef.current, { opacity: 1, clearProps: 'all' });
+      }
+      gsap.set('.gallery-title, .gallery-eyebrow, .gallery-sub', { opacity: 1, y: 0, clearProps: 'all' });
+    }, 2000);
 
-      // Header Animation
-      gsap.fromTo('.gallery-title', 
-        { opacity: 0, y: 50 },
-        { 
-          opacity: 1, 
-          y: 0, 
-          duration: 1.5, 
-          delay: 0.4,
-          ease: "power4.out" 
-        }
-      );
-
-      // Grid Stagger Animation
-      gsap.fromTo('.gallery-item', 
-        { opacity: 0, scale: 0.95, y: 30 },
-        { 
-          opacity: 1, 
-          scale: 1, 
-          y: 0, 
-          duration: 1.2,
-          stagger: 0.1,
-          delay: 0.5,
-          ease: "expo.out",
-          scrollTrigger: {
-            trigger: '.gallery-grid',
-            start: 'top 80%',
-          }
-        }
-      );
-
-      // Lateral Scroll Animation for the "Extended Curation"
-      mm.add('(min-width: 768px)', () => {
-        // Desktop gets the full horizontal storyboard; mobile keeps the layout vertical.
-        // On desktop, each panel becomes one slice of a long horizontal storyboard.
-        // The sideways track only exists on larger screens because it needs the extra width.
-        const sections = gsap.utils.toArray(".lateral-item");
-        if (sections.length > 0) {
-          // This is the sideways scroll bit. It makes the gallery feel more like a magazine spread.
-          gsap.to(sections, {
-            xPercent: -100 * (sections.length - 1),
-            ease: "none",
-            scrollTrigger: {
-              trigger: ".lateral-container",
-              pin: true,
-              scrub: 1,
-              snap: 1 / (sections.length - 1),
-              end: () => "+=" + (window.innerWidth * sections.length),
-              invalidateOnRefresh: true,
-              onToggle: (self) => {
-                gsap.to('nav', { 
-                  yPercent: self.isActive ? -100 : 0, 
-                  opacity: self.isActive ? 0 : 1, 
-                  duration: 0.5, 
-                  ease: 'power2.inOut' 
-                });
-              }
-            }
-          });
-        }
-      });
+    const tl = gsap.timeline({
+      onComplete: () => {
+        gsap.set(containerRef.current, { opacity: 1, clearProps: 'all' });
+        gsap.set('.gallery-title, .gallery-eyebrow, .gallery-sub', { opacity: 1, y: 0, clearProps: 'all' });
+      },
     });
+    tl.fromTo(containerRef.current, { opacity: 0 }, { opacity: 1, duration: 1, ease: 'power2.inOut' })
+      .fromTo('.gallery-eyebrow', { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.8, ease: 'power3.out' }, '-=0.5')
+      .fromTo('.gallery-title', { opacity: 0, y: 40 }, { opacity: 1, y: 0, duration: 1.2, ease: 'expo.out' }, '-=0.5')
+      .fromTo('.gallery-sub', { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.8, ease: 'power3.out' }, '-=0.8');
+
+    // Scroll reveals
+    const createdTriggers: ScrollTrigger[] = [];
+    const revealEls = gsap.utils.toArray<HTMLElement>('.gallery-reveal');
+    revealEls.forEach((el) => {
+      gsap.set(el, { opacity: 1, y: 0 });
+      const st = ScrollTrigger.create({
+        trigger: el,
+        start: 'top 88%',
+        once: true,
+        onEnter: () => {
+          gsap.fromTo(el, { y: 60, opacity: 0 }, {
+            y: 0, opacity: 1, duration: 1, ease: 'power3.out',
+          });
+        },
+      });
+      createdTriggers.push(st);
+    });
+    ScrollTrigger.refresh();
 
     return () => {
-      // Reverting the GSAP context matters because the page pins content while scrolling.
-      // Killing the ScrollTriggers keeps the next page from inheriting the gallery animations.
-      mm.revert();
-      ctx.revert();
-      ScrollTrigger.getAll().forEach(t => t.kill());
+      window.clearTimeout(safetyNet);
+      tl.kill();
+      createdTriggers.forEach((t) => t.kill());
     };
   }, []);
 
+  const navigateToBooking = () => {
+    const event = new CustomEvent('trigger-curtain', { detail: { path: '/booking' } });
+    window.dispatchEvent(event);
+  };
+
+  // Memoize the dome image list so it doesn't rebuild on every render.
+  const domeImagesMemo = useMemo(() => domeImages, []);
+
   return (
-    <div 
-      ref={pageWrapperRef} 
-      className="bg-[#FAF9F6] min-h-screen font-body selection:bg-[#F2529D] selection:text-white"
-    >
-      
-      {/* Header Section */}
-      <header className="pt-48 pb-20 text-center px-6 gallery-title">
-        <h1 className="text-4xl sm:text-6xl md:text-9xl font-display italic font-black text-[#0A0E1A] mb-4">
-          The Visual Edit
+    <div ref={containerRef} className="bg-[#FAF9F6] min-h-screen overflow-x-hidden">
+      {/* ==================== HEADER ==================== */}
+      <div className="max-w-5xl mx-auto px-4 pt-32 md:pt-48 pb-16 md:pb-24 text-center">
+        <div className="gallery-eyebrow flex items-center justify-center gap-4 mb-6 md:mb-8">
+          <span className="h-px w-12 md:w-16 bg-[#BF9C34]" />
+          <span className="text-[10px] md:text-xs font-black uppercase tracking-[0.45em] text-[#BF9C34]">The Visual Edit</span>
+          <span className="h-px w-12 md:w-16 bg-[#BF9C34]" />
+        </div>
+        <h1 className="gallery-title text-5xl sm:text-7xl md:text-9xl font-display italic font-black text-[#F2529D] leading-none tracking-tighter mb-6 md:mb-8">
+          The Gallery
         </h1>
-        <p className="text-gray-500 font-body italic text-xl max-w-2xl mx-auto">
-          A curation of radiance and refined beauty rituals.
+        <p className="gallery-sub text-gray-500 text-base md:text-xl font-medium italic max-w-2xl mx-auto leading-relaxed">
+          A curation of radiance, texture, and the quiet moments behind every ritual.
         </p>
-        <div className="w-24 h-px bg-gray-200 mx-auto mt-12"></div>
-      </header>
+      </div>
 
-      {/* Main Grid Section - Exactly like screenshot */}
-      <section className="max-w-[1400px] mx-auto px-4 sm:px-6 gallery-grid">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6 md:gap-8 auto-rows-[220px] sm:auto-rows-[260px] md:auto-rows-[300px]">
-          {images.map((img, i) => (
-            <div 
-              key={i} 
-              className={`gallery-item group relative overflow-hidden rounded-sm cursor-crosshair border border-black/5 ${img.span}`}
-            >
-              <img 
-                src={img.url} 
-                alt={img.title} 
-                className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110"
-              />
-              <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex flex-col justify-end p-4 sm:p-8">
-                <span className="text-[0.65rem] sm:text-xs font-black uppercase tracking-[0.3em] text-[#F2529D] mb-2">{img.category}</span>
-                <span className="text-lg sm:text-2xl font-display italic text-white">{img.title}</span>
-              </div>
-            </div>
-          ))}
+      {/* ==================== SECTION 1: SKiper30 PARALLAX ==================== */}
+      <section className="gallery-reveal">
+        {/* Section label above the parallax */}
+        <div className="max-w-7xl mx-auto px-4 md:px-8 mb-8 md:mb-12 text-center">
+          <div className="inline-flex items-center gap-3 px-4 py-2 rounded-full bg-white border border-gray-100 shadow-sm">
+            <span className="w-2 h-2 rounded-full bg-[#F2529D] animate-pulse" />
+            <span className="text-[0.6rem] md:text-xs font-black uppercase tracking-[0.3em] text-gray-500">Scroll Parallax</span>
+          </div>
+        </div>
+        <Skiper30 />
+      </section>
+
+      {/* ==================== TRANSITION DIVIDER ==================== */}
+      <div className="max-w-5xl mx-auto px-4 py-16 md:py-24 text-center gallery-reveal">
+        <div className="flex items-center justify-center gap-4 mb-4 md:mb-6">
+          <span className="h-px w-10 md:w-14 bg-[#BF9C34]" />
+          <span className="text-[10px] md:text-xs font-black uppercase tracking-[0.45em] text-[#BF9C34]">Interactive</span>
+          <span className="h-px w-10 md:w-14 bg-[#BF9C34]" />
+        </div>
+        <h2 className="text-4xl md:text-7xl font-display italic font-black text-gray-900 leading-none tracking-tighter mb-4">
+          Step <span className="text-[#F2529D]">Inside</span>
+        </h2>
+        <p className="text-sm md:text-base text-gray-500 max-w-xl mx-auto font-medium">
+          Drag to rotate the dome. Click any image to enlarge it.
+        </p>
+      </div>
+
+      {/* ==================== SECTION 2: DOME GALLERY ==================== */}
+      <section className="gallery-reveal relative">
+        {/* Dark themed backdrop so the dome's overlay blur blends with the page. */}
+        <div className="absolute inset-0 bg-[#0A0E1A]" />
+        <div className="absolute top-0 left-1/4 w-96 h-96 bg-[#F2529D]/15 rounded-full blur-[120px] pointer-events-none" />
+        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-[#BF9C34]/15 rounded-full blur-[120px] pointer-events-none" />
+
+        <div className="relative z-10 h-[100vh] min-h-[600px] w-full">
+          <DomeGallery
+            images={domeImagesMemo}
+            fit={0.7}
+            minRadius={600}
+            maxVerticalRotationDeg={8}
+            segments={26}
+            dragDampening={3.4}
+            grayscale={false}
+            overlayBlurColor="#0A0E1A"
+            imageBorderRadius="16px"
+            openedImageBorderRadius="20px"
+            openedImageWidth="300px"
+            openedImageHeight="420px"
+          />
+        </div>
+
+        {/* Drag hint */}
+        <div className="relative z-10 text-center pb-12 md:pb-20">
+          <p className="text-[0.6rem] md:text-xs font-black uppercase tracking-[0.3em] text-white/30">
+            Click and drag to explore
+          </p>
         </div>
       </section>
 
-      {/* Lateral / Unique Sideways Scroll Section */}
-      <section className="md:hidden mt-20 px-4 sm:px-6 pb-12 bg-[#FAF9F6]">
-        {/* The mobile version keeps the story compact so the images do not feel cramped. */}
-        {/* Mobile keeps the narrative stacked so each image still gets a little breathing room. */}
-        <div className="rounded-[2rem] bg-[#0A0E1A] p-6 sm:p-8 shadow-2xl border border-white/10">
-          <p className="text-[#F2529D] uppercase tracking-[0.35em] text-[10px] sm:text-xs font-black mb-3">Extended Curation</p>
-          <h2 className="text-3xl sm:text-5xl font-display italic text-white leading-tight">Behind The Canvas</h2>
-          <p className="text-gray-400 text-sm sm:text-base italic leading-relaxed mt-4">
-            Exploring the delicate intersection of chemistry and artistry. Every product we choose is a testament to purity.
-          </p>
-        </div>
-
-        <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-          {behindCanvasImages.map((frame, index) => (
-            <div key={`frame-${index}`} className={`${frame.span} relative overflow-hidden rounded-[1.5rem] sm:rounded-[2rem] bg-black shadow-[0_20px_50px_-20px_rgba(0,0,0,0.35)]`}>
-              <img src={frame.src} alt={frame.title} className="w-full h-full object-cover" />
-              <div className="absolute bottom-0 left-0 right-0 p-4 sm:p-6 bg-gradient-to-t from-black/80 to-transparent">
-                <p className="text-[0.55rem] sm:text-[0.7rem] font-black tracking-[0.35em] uppercase text-[#F2529D] mb-2">{frame.title}</p>
-                <p className="text-white/80 text-xs sm:text-sm leading-relaxed">{frame.copy}</p>
-              </div>
+      {/* ==================== BEHIND THE CANVAS (editorial grid) ==================== */}
+      <section className="py-16 md:py-24 px-4 md:px-8 bg-[#FAF9F6]">
+        <div className="max-w-7xl mx-auto">
+          <div className="gallery-reveal text-center mb-10 md:mb-16">
+            <div className="flex items-center justify-center gap-4 mb-4 md:mb-6">
+              <span className="h-px w-10 md:w-14 bg-[#F2529D]" />
+              <span className="text-[10px] md:text-xs font-black uppercase tracking-[0.45em] text-[#F2529D]">Behind the Canvas</span>
+              <span className="h-px w-10 md:w-14 bg-[#F2529D]" />
             </div>
-          ))}
-        </div>
+            <h2 className="text-4xl md:text-7xl font-display italic font-black text-gray-900 leading-none tracking-tighter mb-3">
+              Studio <span className="text-[#F2529D]">Moments</span>
+            </h2>
+            <p className="text-sm md:text-base text-gray-500 max-w-xl mx-auto font-medium">
+              Quiet frames from inside the lounge, where every ritual is prepared.
+            </p>
+          </div>
 
-        <div className="mt-4 sm:mt-6 rounded-[2rem] sm:rounded-[3rem] bg-[#FAF9F6] p-6 sm:p-8 border border-gray-100 shadow-xl text-center">
-          <h3 className="text-2xl sm:text-4xl font-display italic font-black text-[#0A0E1A]">The Essence of Eternity</h3>
-          <p className="text-gray-500 text-sm sm:text-base italic mt-3 leading-relaxed">
-            A softer mobile narrative that keeps every image visible and balanced.
-          </p>
-          <Link to="/booking" className="inline-block mt-5 px-8 py-4 bg-[#F2529D] text-white text-[10px] sm:text-xs font-black uppercase tracking-[0.4em] rounded-full hover:bg-black transition-colors">
-            BOOK THE EXPERIENCE
-          </Link>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
+            {behindCanvasImages.map((item, idx) => (
+              <div
+                key={idx}
+                className={`gallery-reveal group relative overflow-hidden rounded-[2rem] shadow-lg ${idx % 2 === 1 ? 'md:translate-y-12' : ''}`}
+              >
+                <div className="aspect-[4/3] overflow-hidden">
+                  <img
+                    src={item.src}
+                    alt={item.title}
+                    className="w-full h-full object-cover transition-transform duration-[1.2s] group-hover:scale-110"
+                  />
+                </div>
+                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                <div className="absolute bottom-0 left-0 right-0 p-6 md:p-8 text-white translate-y-4 group-hover:translate-y-0 opacity-0 group-hover:opacity-100 transition-all duration-500">
+                  <h3 className="text-xl md:text-2xl font-display italic font-black mb-1">{item.title}</h3>
+                  <p className="text-sm text-white/70">{item.copy}</p>
+                </div>
+                <span className="absolute top-4 right-4 text-[0.55rem] font-black tracking-widest text-white/40 uppercase">
+                  {String(idx + 1).padStart(2, '0')}
+                </span>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
 
-      <section className="hidden md:block mt-20 sm:mt-40 overflow-hidden lateral-container relative w-full h-auto md:h-screen">
-        {/* Desktop gets the full sideways gallery because the wider screen can support it. */}
-        {/* The pinned desktop layout turns scrolling into a guided magazine-style walkthrough. */}
-        <div className="flex w-[1200vw] h-auto md:h-screen bg-[#0A0E1A] absolute top-0 left-0" ref={scrollRef}>
-          <div className="lateral-item w-screen min-h-[80vh] md:h-full flex items-center justify-center p-4 sm:p-8 md:p-20 shrink-0">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8 md:gap-20 w-full max-w-7xl px-4 sm:px-6 md:px-0">
-              <div className="space-y-4 sm:space-y-8 flex flex-col justify-center">
-                <h2 className="text-3xl sm:text-5xl md:text-7xl font-display italic text-white">Behind The Canvas</h2>
-                <p className="text-gray-400 text-base sm:text-xl font-body italic leading-relaxed">
-                  Exploring the delicate intersection of chemistry and artistry. Every product we choose is a testament to purity.
-                </p>
+      {/* ==================== CTA ==================== */}
+      <section className="py-16 md:py-24 px-4 md:px-8 bg-[#FAF9F6]">
+        <div className="max-w-4xl mx-auto text-center gallery-reveal">
+          <div className="bg-[#0A0E1A] rounded-[2rem] md:rounded-[3rem] p-8 md:p-16 relative overflow-hidden">
+            <div className="absolute top-0 left-1/4 w-64 h-64 bg-[#F2529D]/20 rounded-full blur-[100px]" />
+            <div className="absolute bottom-0 right-1/4 w-64 h-64 bg-[#BF9C34]/20 rounded-full blur-[100px]" />
+            <div className="relative z-10">
+              <div className="flex items-center justify-center gap-4 mb-4 md:mb-6">
+                <span className="h-px w-10 md:w-12 bg-[#BF9C34]" />
+                <span className="text-[10px] md:text-xs font-black uppercase tracking-[0.45em] text-[#BF9C34]">Your Turn</span>
+                <span className="h-px w-10 md:w-12 bg-[#BF9C34]" />
               </div>
-              <img 
-                src="https://images.unsplash.com/photo-1540555700478-4be289fbecef?q=80&w=1200&auto=format&fit=crop" 
-                className="w-full h-[280px] sm:h-[420px] md:h-[600px] object-cover rounded-sm grayscale hover:grayscale-0 transition-all duration-1000"
-                alt="Laboratory aesthetic"
-              />
-            </div>
-          </div>
-
-          {/* Frame 1 */}
-          <div className="lateral-item w-screen h-full flex items-center justify-center bg-[#0d1321] shrink-0 p-8">
-            <img src={sibshall1} alt="Studio Frame 1" className="w-full max-h-[95vh] object-cover rounded-sm shadow-2xl" />
-          </div>
-
-          {/* Frame 2 */}
-          <div className="lateral-item w-screen h-full flex items-center justify-center bg-[#0b0f1a] shrink-0 p-8">
-            <img src={sibshall2} alt="Studio Frame 2" className="w-full max-h-[95vh] object-cover rounded-sm shadow-2xl" />
-          </div>
-
-          {/* Frame 3 */}
-          <div className="lateral-item w-screen h-full flex items-center justify-center bg-[#0d1321] shrink-0 p-8">
-            <img src={sibshall3} alt="Studio Frame 3" className="w-full max-h-[95vh] object-cover rounded-sm shadow-2xl" />
-          </div>
-
-          {/* Frame 4 */}
-          <div className="lateral-item w-screen h-full flex items-center justify-center bg-[#0d1321] shrink-0 p-8">
-            <img src={craftedImage} alt="Tools & Craft" className="w-full max-h-[95vh] object-cover rounded-sm shadow-2xl" />
-          </div>
-
-          <div className="lateral-item w-screen h-full flex items-center justify-center p-20 bg-white shrink-0">
-            <div className="text-center space-y-12">
-              <h3 className="text-3xl sm:text-5xl md:text-8xl lg:text-[12rem] font-display italic font-black leading-none text-[#0A0E1A] opacity-20">Sibs Style</h3>
-              <p className="text-2xl font-body italic tracking-widest uppercase text-[#0A0E1A]">The Essence of Eternity</p>
-              <Link to="/booking" className="inline-block px-12 py-5 bg-[#F2529D] text-white text-[12px] font-black uppercase tracking-[0.5em] rounded-full hover:bg-black hover:text-white transition-all">
-                BOOK THE EXPERIENCE
-              </Link>
+              <h2 className="text-3xl md:text-5xl lg:text-6xl font-display italic font-black text-white mb-4 md:mb-6 leading-tight">
+                Become part of <span className="text-[#F2529D]">the edit</span>
+              </h2>
+              <p className="text-sm md:text-base text-white/60 max-w-lg mx-auto mb-6 md:mb-8 font-medium">
+                Book a ritual and let your transformation join the gallery.
+              </p>
+              <button
+                onClick={navigateToBooking}
+                className="inline-flex items-center gap-3 px-8 md:px-12 py-4 md:py-5 rounded-full bg-[#F2529D] hover:bg-white hover:text-black text-white text-[10px] md:text-xs font-black uppercase tracking-[0.3em] md:tracking-[0.4em] transition-all duration-300 hover:scale-105 active:scale-95 shadow-2xl group"
+              >
+                Book Your Ritual
+                <ArrowRight className="w-4 h-4 md:w-5 md:h-5 group-hover:translate-x-1 transition-transform" />
+              </button>
             </div>
           </div>
         </div>
