@@ -4,8 +4,13 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { ArrowRight, X } from 'lucide-react';
 import silkyCoolProductsImage from './assets/Silkycoolproducts.jpeg';
 import goldProductsImage from './assets/Goldproducts.jpeg';
+import nailsImage from './assets/Nails.jpeg';
+import sibshallImage from './assets/Sibshall.jpeg';
+import sibshall2Image from './assets/Sibshall2.jpeg';
+import herbalEssenceImage from './assets/HerbalEssence.jpeg';
 import { getCollections, getCurrentAuthUser, getStoredAuthToken, type CollectionItem } from './api/convex-api';
 import availableProductAssets from './availableProductAssets';
+import FlowingMenu, { type FlowingMenuItem } from './components/FlowingMenu';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -20,6 +25,23 @@ const HomePage = () => {
   // A couple of animation branches depend on whether the screen is small.
   // The modal moves differently on mobile because there is less room for the product grid.
   const isMobileViewport = () => window.innerWidth < 768;
+
+  // The FlowingMenu drives the same curtain transition the nav and the Book Now
+  // button already use, so every route change on the home page feels identical.
+  const handleFlowingNavigate = (path: string) => {
+    const event = new CustomEvent('trigger-curtain', { detail: { path } });
+    window.dispatchEvent(event);
+  };
+
+  // Each entry pairs a destination route with one of the salon's own product
+  // images so the hover marquee stays fully on-brand.
+  const flowingMenuItems: FlowingMenuItem[] = [
+    { link: '/booking', text: 'Treatments', image: nailsImage },
+    { link: '/gallery', text: 'Gallery', image: sibshallImage },
+    { link: '/offers', text: 'Offers', image: goldProductsImage },
+    { link: '/testimonials', text: 'Chronicles', image: herbalEssenceImage },
+    { link: '/contact', text: 'Contact', image: sibshall2Image },
+  ];
 
   useEffect(() => {
     let tl: gsap.core.Timeline | undefined;
@@ -76,7 +98,7 @@ const HomePage = () => {
     );
 
     // Initial positioning for hero elements (guard selectors to avoid GSAP warnings)
-    const heroElems = gsap.utils.toArray('.hero-title, .hero-p, .hero-btn, .hero-img-wrap, .hero-img-bg');
+    const heroElems = gsap.utils.toArray('.hero-title, .hero-eyebrow, .hero-p, .hero-btn, .hero-img-wrap, .hero-img-bg, .hero-scroll-cue');
     if (heroElems.length) {
       gsap.set(heroElems, {
         opacity: 0,
@@ -90,10 +112,12 @@ const HomePage = () => {
       delay: 0.2
     });
 
-    tl.to('.hero-title', { y: 0, opacity: 1, duration: 1.5, clearProps: 'all' })
+    tl.to('.hero-eyebrow', { y: 0, opacity: 1, duration: 0.8, clearProps: 'all' })
+      .to('.hero-title', { y: 0, opacity: 1, duration: 1.5, clearProps: 'all' }, '-=0.5')
       .to('.hero-p', { y: 0, opacity: 1, duration: 1 }, '-=1.2')
       .to('.hero-btn', { y: 0, opacity: 1, duration: 1 }, '-=1')
-      .to('.hero-img-wrap, .hero-img-bg', { y: 0, opacity: 1, duration: 1.8, clearProps: 'opacity,visibility' }, '-=1.5');
+      .to('.hero-img-wrap, .hero-img-bg', { y: 0, opacity: 1, duration: 1.8, clearProps: 'opacity,visibility' }, '-=1.5')
+      .to('.hero-scroll-cue', { y: 0, opacity: 1, duration: 1, clearProps: 'all' }, '-=0.6');
 
     revealRefs.current.forEach((el) => {
       if (el) {
@@ -191,9 +215,15 @@ const HomePage = () => {
   return (
     <div ref={containerRef} className="bg-[#FAF9F6] selection:bg-[#F2529D] selection:text-white pb-16 md:pb-32 opacity-100 overflow-x-hidden">
       {/* Hero Section */}
-      <header className="min-h-[50vh] md:min-h-screen flex items-center px-4 md:px-6 bg-[#FAF9F6] pt-36 sm:pt-40 md:pt-0">
+      <header className="min-h-[50vh] md:min-h-screen flex items-center px-4 md:px-6 bg-[#FAF9F6] pt-36 sm:pt-40 md:pt-0 relative">
         <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-10 md:gap-20 items-center w-full relative">
-          <div className="relative z-0 space-y-8 md:space-y-12">
+          <div className="relative z-0 space-y-6 md:space-y-10">
+            <div className="hero-eyebrow flex items-center gap-4 !opacity-100 !visible">
+              <span className="h-px w-10 md:w-16 bg-[#BF9C34]" />
+              <span className="text-[10px] md:text-xs font-black uppercase tracking-[0.45em] text-[#BF9C34]">
+                Dubai · Beauty Lounge
+              </span>
+            </div>
             <h1 className="hero-title text-5xl md:text-[8rem] leading-[1] md:leading-[0.85] text-black font-display font-black tracking-tighter !opacity-100 !visible mb-10 md:mb-30">
               The Art <br className="hidden md:block"/> <span className="text-[#F2529D] italic font-black">of Radiant</span>
             </h1>
@@ -219,6 +249,12 @@ const HomePage = () => {
             <div className="absolute -top-10 -right-10 w-48 md:w-96 h-48 md:h-96 bg-[#F29ABF] rounded-full mix-blend-multiply filter blur-[50px] md:blur-[100px] opacity-30 animate-pulse"></div>
             <div className="absolute -bottom-10 -left-10 w-48 md:w-96 h-48 md:h-96 bg-[#F2529D] rounded-full mix-blend-multiply filter blur-[50px] md:blur-[100px] opacity-20"></div>
           </div>
+        </div>
+
+        {/* Scroll cue — a quiet invitation to keep moving down the page. */}
+        <div className="hero-scroll-cue absolute left-1/2 -translate-x-1/2 bottom-6 md:bottom-10 hidden md:flex flex-col items-center gap-2 !opacity-100 !visible">
+          <span className="text-[9px] font-black uppercase tracking-[0.4em] text-black/40">Scroll</span>
+          <span className="block w-px h-10 bg-gradient-to-b from-black/40 to-transparent" />
         </div>
       </header>
 
@@ -319,27 +355,71 @@ const HomePage = () => {
                 alt="Texture" 
               />
             </div>
-            <div className="absolute -bottom-10 -right-10 bg-white p-12 rounded-3xl shadow-2xl border border-gray-50 hidden lg:block">
-              <span className="text-7xl text-[#F2529D] font-display italic block">100%</span>
+            <div className="absolute -bottom-10 -right-10 bg-white p-10 md:p-12 rounded-3xl shadow-2xl border border-gray-50 hidden lg:block">
+              <span className="text-6xl md:text-7xl text-[#F2529D] font-display italic block leading-none">100%</span>
               <span className="text-[10px] font-bold uppercase tracking-widest text-gray-400">Botanical Essence</span>
             </div>
           </div>
           <div ref={addToRefs} className="space-y-8 md:space-y-12">
-            <div className="w-16 md:w-20 h-[2px] bg-[#BF9C34]"></div>
+            <div className="flex items-center gap-4">
+              <span className="w-16 md:w-20 h-[2px] bg-[#BF9C34]" />
+              <span className="text-[10px] md:text-xs font-black uppercase tracking-[0.45em] text-[#BF9C34]">Our Philosophy</span>
+            </div>
             <h2 className="text-4xl md:text-8xl italic leading-tight text-gray-900 font-light font-display">
               Our Philosophy <span className="text-[#BF9C34]">of Beauty</span>
             </h2>
             <div className="space-y-6 md:space-y-8 text-gray-500 leading-relaxed text-base md:text-xl font-light">
               <p>True radiance comes from a harmony of nature's finest ingredients and the artful application of sophisticated rituals.</p>
-              <p>Our curation represents the pinnacle of <span className="text-pink-400 italic font-display">botanical luxury</span>, transforming routines into ceremonies.</p>
+              <p>Our curation represents the pinnacle of <span className="text-[#F2529D] italic font-display">botanical luxury</span>, transforming routines into ceremonies.</p>
             </div>
           </div>
+        </div>
+      </section>
+
+      {/* Explore / FlowingMenu Section — interactive navigation into the rest of the lounge.
+          The dark backdrop flows straight into the CTA below so the page ends on one
+          continuous, dramatic finale. */}
+      <section ref={addToRefs} className="bg-[#0A0E1A] relative overflow-hidden">
+        {/* Soft brand auras keep the dark zone from feeling flat. */}
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[500px] h-[500px] bg-[#F2529D]/10 rounded-full blur-[140px] pointer-events-none" />
+        <div className="absolute bottom-0 right-0 w-[400px] h-[400px] bg-[#BF9C34]/10 rounded-full blur-[140px] pointer-events-none" />
+
+        <div className="max-w-7xl mx-auto px-6 md:px-12 pt-20 md:pt-32 pb-6 md:pb-10 text-center relative">
+          <div className="flex items-center justify-center gap-4 mb-5 md:mb-7">
+            <span className="h-px w-10 md:w-16 bg-[#BF9C34]" />
+            <span className="text-[10px] md:text-xs font-black uppercase tracking-[0.45em] text-[#BF9C34]">The Lounge</span>
+            <span className="h-px w-10 md:w-16 bg-[#BF9C34]" />
+          </div>
+          <h2 className="text-4xl md:text-7xl font-display italic text-[#FAF9F6] leading-tight">
+            Explore the <span className="text-[#F2529D]">Experience</span>
+          </h2>
+          <p className="text-gray-400 text-sm md:text-lg max-w-xl mx-auto mt-4 md:mt-6 font-light">
+            Every door opens into a different ritual. Hover, drift, and step inside.
+          </p>
+        </div>
+
+        <div className="h-[60vh] min-h-[440px] md:h-[600px] w-full relative">
+          <FlowingMenu
+            items={flowingMenuItems}
+            speed={18}
+            textColor="#FAF9F6"
+            bgColor="#0A0E1A"
+            marqueeBgColor="#F2529D"
+            marqueeTextColor="#FAF9F6"
+            borderColor="rgba(250,249,246,0.10)"
+            onNavigate={handleFlowingNavigate}
+          />
         </div>
       </section>
 
       {/* Footer-like CTA */}
       <section className="py-24 md:py-40 px-6 bg-[#0A0E1A] text-white overflow-hidden relative -mb-35 shadow-[0_-20px_50px_rgba(0,0,0,0.5)] z-20">
         <div className="max-w-7xl mx-auto flex flex-col items-center text-center space-y-8 md:space-y-12">
+            <div className="flex items-center gap-4">
+              <span className="h-px w-10 md:w-16 bg-[#BF9C34]" />
+              <span className="text-[10px] md:text-xs font-black uppercase tracking-[0.45em] text-[#BF9C34]">Begin Your Journey</span>
+              <span className="h-px w-10 md:w-16 bg-[#BF9C34]" />
+            </div>
             <h2 className="text-4xl md:text-5xl lg:text-7xl font-display italic text-balance">Ready to Begin Your Ritual?</h2>
             <p className="text-gray-400 text-base md:text-xl max-w-2xl font-light px-4">Experience the synergy of botanical science and artistic beauty at Sibs Style.</p>
             <button 
