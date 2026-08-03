@@ -1,6 +1,6 @@
 ﻿import { useState, useEffect, useRef } from 'react';
 import { BrowserRouter as Router, Routes, Route, Link, useLocation, useNavigate } from 'react-router-dom';
-import { Menu, X, ChevronRight } from 'lucide-react';
+import { X, ChevronRight, ArrowRight } from 'lucide-react';
 import gsap from 'gsap';
 import logo from './assets/Sibs Style BL logo.png';
 import HomeScreen from './HomePage.tsx';
@@ -167,82 +167,125 @@ const Navigation = () => {
 
   return (
     <>
-      <nav className="fixed top-0 w-full z-50 bg-[#FAF9F6]/95 md:bg-[#FAF9F6]/92 backdrop-blur-xl md:backdrop-blur-2xl border-b border-gray-100 shadow-sm">
-        <div className="max-w-[1800px] mx-auto px-4 sm:px-8 h-20 sm:h-32 flex items-center justify-between gap-6">
-          <Link to="/" className="flex items-center gap-3 shrink-0" aria-label="Sibs Style home">
-            <img src={logo} alt="Sibs Style logo" className="h-14 w-auto rounded-full border-2 border-transparent transition-transform duration-300 hover:scale-105 shadow-sm sm:h-16 lg:h-24 xl:h-28" />
+      <nav className="fixed top-0 w-full z-50 group/nav">
+        {/* Glass background that intensifies on scroll */}
+        <div className="absolute inset-0 bg-[#FAF9F6]/80 backdrop-blur-xl border-b border-gray-100/50 transition-all duration-500" />
+
+        {/* Top accent line */}
+        <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[#F2529D]/40 to-transparent" />
+
+        <div className="relative max-w-[1800px] mx-auto px-4 sm:px-6 lg:px-8 h-20 lg:h-24 flex items-center justify-between gap-4 lg:gap-8">
+          {/* Logo */}
+          <Link to="/" className="flex items-center gap-3 shrink-0 group/logo" aria-label="Sibs Style home">
+            <div className="relative">
+              <div className="absolute inset-0 bg-[#F2529D]/20 rounded-full blur-md opacity-0 group-hover/logo:opacity-100 transition-opacity duration-500" />
+              <img
+                src={logo}
+                alt="Sibs Style logo"
+                className="relative h-12 sm:h-14 lg:h-16 xl:h-20 w-auto rounded-full border-2 border-white shadow-[0_4px_20px_-4px_rgba(0,0,0,0.15)] transition-transform duration-500 group-hover/logo:scale-105"
+              />
+            </div>
+            <div className="hidden sm:block">
+              <p className="text-sm font-black uppercase tracking-[0.3em] text-[#F2529D] leading-none">Sibs Style</p>
+              <p className="text-[8px] lg:text-[9px] font-bold uppercase tracking-[0.2em] text-gray-400 mt-1">Beauty Lounge</p>
+            </div>
           </Link>
 
-          <div className="hidden lg:flex items-center px-4 flex-1 justify-center">
-            <div className="flex items-center gap-4 overflow-hidden">
+          {/* Desktop nav links */}
+          <div className="hidden lg:flex items-center flex-1 justify-center">
+            <div className="flex items-center gap-1 bg-white/60 backdrop-blur-md rounded-full p-1.5 border border-gray-100 shadow-[0_4px_30px_-10px_rgba(0,0,0,0.08)]">
               {navLinks.map((link) => {
                 const isActive = location.pathname === link.path;
                 return (
                   <Link
                     key={link.path}
                     to={link.path}
-                    className={`group relative flex items-center justify-center px-4 py-2 rounded-full transition-all duration-350 transform ${
+                    className={`group/link relative flex items-center justify-center px-4 xl:px-5 py-2.5 rounded-full transition-all duration-400 transform ${
                       isActive
-                        ? 'bg-gradient-to-r from-[#F2529D]/30 via-[#7C61FF]/20 to-[#C79D33]/20 text-[#0A0E1A] scale-105 shadow-[0_6px_22px_-8px_rgba(199,57,128,0.28)]'
-                        : 'bg-transparent text-gray-600 hover:text-[#0A0E1A] hover:scale-[1.03]'
-                    }`}>
-                    <span className="text-[14px] font-black uppercase tracking-[0.18em] pointer-events-none">{link.name}</span>
-                    <span className={`absolute left-1/2 -bottom-1 h-1 rounded-full bg-gradient-to-r from-[#F2529D] via-[#7C61FF] to-[#C79D33] transition-all duration-300 ${isActive ? 'w-10 -translate-x-1/2' : 'w-0 group-hover:w-10 -translate-x-1/2'}`} />
+                        ? 'bg-[#0A0E1A] text-white shadow-[0_4px_20px_-6px_rgba(0,0,0,0.4)]'
+                        : 'text-gray-600 hover:text-[#0A0E1A] hover:bg-white'
+                    }`}
+                  >
+                    <span className="text-[12px] xl:text-[13px] font-black uppercase tracking-[0.15em] pointer-events-none transition-transform group-hover/link:scale-105">{link.name}</span>
+                    {isActive && (
+                      <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full bg-[#F2529D]" />
+                    )}
                   </Link>
                 );
               })}
             </div>
           </div>
 
-          <div className="hidden lg:flex items-center gap-4 shrink-0">
+          {/* Right side: Auth + Reserve */}
+          <div className="hidden lg:flex items-center gap-3 shrink-0">
             {currentUser && currentUser.role === 'admin' && (
-              // Only the real admin sees this link, so customers do not reach the dashboard by mistake.
               <Link
                 to="/admin"
-                className="rounded-xl border border-[#F2529D]/30 bg-[#F2529D]/5 px-6 py-4 text-[13px] font-black uppercase tracking-[0.3em] text-[#F2529D] hover:bg-[#F2529D]/10 hover:border-[#F2529D]/60 transition-all whitespace-nowrap"
+                className="group/admin flex items-center gap-2 rounded-full border border-[#F2529D]/30 bg-[#F2529D]/5 px-4 py-2.5 text-[11px] font-black uppercase tracking-[0.25em] text-[#F2529D] hover:bg-[#F2529D]/10 hover:border-[#F2529D]/60 transition-all whitespace-nowrap"
               >
+                <span className="w-1.5 h-1.5 rounded-full bg-[#F2529D] animate-pulse" />
                 Admin
               </Link>
             )}
-            
+
             {currentUser ? (
               <>
-                <div className="rounded-lg border border-gray-200 bg-white px-3 py-2 text-center shadow-sm">
-                  <p className="text-[9px] font-black uppercase tracking-[0.35em] text-gray-400">Signed in</p>
-                  <p className="mt-0.5 max-w-[140px] truncate text-xs font-black text-[#0A0E1A]">{currentUser.fullName}</p>
+                <div className="group/user flex items-center gap-2.5 rounded-full border border-gray-200 bg-white px-4 py-2.5 shadow-sm hover:border-[#F2529D]/30 transition-colors">
+                  <div className="w-7 h-7 rounded-full bg-gradient-to-br from-[#F2529D] to-[#BF9C34] flex items-center justify-center text-white text-[10px] font-black">
+                    {currentUser.fullName.charAt(0)}
+                  </div>
+                  <div className="text-left">
+                    <p className="text-[8px] font-black uppercase tracking-[0.3em] text-gray-400 leading-none">Signed in</p>
+                    <p className="mt-0.5 max-w-[120px] truncate text-xs font-black text-[#0A0E1A]">{currentUser.fullName}</p>
+                  </div>
+                  <button
+                    onClick={handleSignOut}
+                    className="ml-1 text-gray-400 hover:text-[#F2529D] transition-colors text-[10px] font-black uppercase tracking-wider"
+                    aria-label="Sign out"
+                  >
+                    Exit
+                  </button>
                 </div>
-                <button
-                  onClick={handleSignOut}
-                  className="rounded-xl border border-gray-200 bg-white px-6 py-4 text-[13px] font-black uppercase tracking-[0.3em] text-gray-600 hover:border-[#F2529D]/30 hover:text-[#F2529D] transition-all whitespace-nowrap"
-                >
-                  Sign out
-                </button>
               </>
             ) : (
               <Link
                 to="/auth"
-                className="rounded-xl border border-gray-200 bg-white px-6 py-4 text-[13px] font-black uppercase tracking-[0.3em] text-gray-600 hover:border-[#F2529D]/30 hover:text-[#F2529D] transition-all whitespace-nowrap"
+                className="group/signin flex items-center gap-2 rounded-full border border-gray-200 bg-white px-5 py-2.5 text-[11px] font-black uppercase tracking-[0.25em] text-gray-600 hover:border-[#F2529D]/40 hover:text-[#F2529D] hover:shadow-[0_4px_20px_-8px_rgba(242,82,157,0.3)] transition-all whitespace-nowrap"
               >
+                <svg viewBox="0 0 24 24" className="w-3.5 h-3.5 fill-current" aria-hidden="true">
+                  <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                </svg>
                 Sign in
               </Link>
             )}
 
-            {/* Reserve uses the curtain transition so booking feels like an intentional reveal. */}
-            {/* Using a custom event here keeps the button logic separate from route rendering. */}
+            {/* Reserve button */}
             <button
               onClick={() => {
                 const event = new CustomEvent('trigger-curtain', { detail: { path: '/booking' } });
                 window.dispatchEvent(event);
               }}
-              className="bg-black text-white px-10 py-4 rounded-xl text-[13px] font-black uppercase tracking-[0.3em] hover:bg-[#F2529D] transition-all whitespace-nowrap cursor-pointer"
+              className="group/reserve relative overflow-hidden rounded-full bg-[#0A0E1A] text-white px-6 xl:px-8 py-3 text-[11px] font-black uppercase tracking-[0.25em] hover:bg-[#F2529D] transition-all whitespace-nowrap cursor-pointer shadow-[0_4px_20px_-6px_rgba(0,0,0,0.4)] hover:shadow-[0_6px_30px_-8px_rgba(242,82,157,0.5)] hover:scale-105 active:scale-95"
             >
-              RESERVE
+              <span className="relative z-10 flex items-center gap-2">
+                Reserve
+                <ArrowRight size={13} className="group-hover/reserve:translate-x-1 transition-transform" />
+              </span>
+              <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover/reserve:translate-x-full transition-transform duration-700" />
             </button>
           </div>
 
-          <button className="lg:hidden text-black ml-auto" onClick={() => setIsMenuOpen(true)} aria-label="Toggle menu">
-            {/* The mobile icon opens the full-screen menu instead of squeezing links into the header. */}
-            <Menu size={28} />
+          {/* Mobile menu button */}
+          <button
+            className="lg:hidden flex items-center justify-center w-11 h-11 rounded-full bg-white border border-gray-100 shadow-sm text-black ml-auto hover:border-[#F2529D]/30 transition-colors"
+            onClick={() => setIsMenuOpen(true)}
+            aria-label="Toggle menu"
+          >
+            <div className="flex flex-col gap-1.5">
+              <span className="block w-5 h-0.5 bg-current rounded-full transition-all" />
+              <span className="block w-5 h-0.5 bg-current rounded-full transition-all" />
+              <span className="block w-3.5 h-0.5 bg-current rounded-full ml-auto transition-all" />
+            </div>
           </button>
         </div>
       </nav>
