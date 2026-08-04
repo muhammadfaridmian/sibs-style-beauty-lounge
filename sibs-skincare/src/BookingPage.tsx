@@ -5,7 +5,9 @@ import {
   Clock, ChevronRight, ChevronLeft, Mail as MailIcon, Phone, MapPin,
   Calendar as CalendarIcon, User, ArrowRight, AlertCircle, Sparkles,
   Info, Tag, Gift, X, Check, Leaf, ShieldCheck, Timer,
+  Download,
 } from 'lucide-react';
+import { toPng } from 'html-to-image';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import Lenis from 'lenis';
@@ -13,7 +15,7 @@ import {
   getServices, getAvailability, createAppointment,
   formatPrice, formatDuration, formatDate,
   getStoredAuthToken, getCurrentAuthUser,
-  getPromotions, type Service, type Promotion,
+  getPromotions, type Service, type Promotion, type AuthUser,
 } from './api/convex-api';
 import bookingHeroImage from './assets/Sibshall.jpeg';
 import experienceImage from './assets/Jikai.jpeg';
@@ -68,7 +70,14 @@ const BookingPage: React.FC = () => {
   const [bookingSuccess, setBookingSuccess] = useState<{
     serviceName: string; date: string; time: string; endTime: string;
     price: string; location: string; reference: string;
+    originalPrice: string; discountPercent: number; discountAmount: string;
+    finalPrice: string; promoCode: string | null; duration: string;
+    customerName: string;
   } | null>(null);
+  const [currentUser, setCurrentUser] = useState<AuthUser | null>(null);
+  const [usedOfferCodes, setUsedOfferCodes] = useState<string[]>([]);
+  const [isDownloading, setIsDownloading] = useState(false);
+  const proofRef = useRef<HTMLDivElement>(null);
 
   const [formData, setFormData] = useState({
     fullName: '',
@@ -123,12 +132,18 @@ const BookingPage: React.FC = () => {
     getCurrentAuthUser(authToken)
       .then((user) => {
         if (!user) return;
+        setCurrentUser(user);
         setFormData((prev) => ({
           ...prev,
           fullName: user.fullName || prev.fullName,
           email: user.email || prev.email,
           phone: user.phone || prev.phone,
         }));
+        // Load used offers for this user from localStorage.
+        try {
+          const stored = localStorage.getItem(`sibs-used-offers-${user.id}`);
+          if (stored) setUsedOfferCodes(JSON.parse(stored));
+        } catch { /* ignore */ }
       })
       .catch(() => {});
   }, [authToken]);
@@ -252,11 +267,20 @@ const BookingPage: React.FC = () => {
 
       const result = await createAppointment(appointmentData, sessionToken);
       if (result) {
-        const finalPrice = appliedDiscount
-          ? formatPrice(getDiscountedPrice(service.priceCents))
-          : (service.priceLabel ?? formatPrice(service.priceCents));
         const endTime = getEstimatedEndTime(selectedTime, service.durationMinutes);
         const reference = `SIBS-${result.id.slice(-6).toUpperCase()}`;
+        const originalPrice = service.priceLabel ?? formatPrice(service.priceCents);
+        const discountPercent = appliedDiscount ? parseDiscountPercent(appliedDiscount.discountText) : 0;
+        const hasDiscount = appliedDiscount && discountPercent > 0;
+        const finalPriceCents = hasDiscount ? getDiscountedPrice(service.priceCents) : service.priceCents;
+        const finalPrice = formatPrice(finalPriceCents);
+        const discountAmount = hasDiscount ? formatPrice(service.priceCents - finalPriceCents) : '0 AED';
+
+        // Mark the offer as used so it cannot be redeemed again.
+        if (appliedDiscount) {
+          markOfferAsUsed(appliedDiscount.code);
+        }
+
         setBookingSuccess({
           serviceName: service.name,
           date: appointmentData.appointmentDate,
@@ -265,10 +289,18 @@ const BookingPage: React.FC = () => {
           price: finalPrice,
           location: formData.location,
           reference,
+          originalPrice,
+          discountPercent,
+          discountAmount,
+          finalPrice,
+          promoCode: appliedDiscount?.code ?? null,
+          duration: formatDuration(service.durationMinutes),
+          customerName: formData.fullName,
         });
         setFormData({ fullName: '', email: '', phone: '', location: 'Downtown Sibs Lounge', info: '' });
         setSelectedService(null);
         setSelectedTime(null);
+        setAppliedDiscount(null);
         window.scrollTo({ top: 0, behavior: 'smooth' });
       }
     } catch (error) {
@@ -276,6 +308,27 @@ const BookingPage: React.FC = () => {
       setSubmitError(error instanceof Error ? error.message : 'Failed to create appointment. Please try again.');
     } finally {
       setIsSubmitting(false);
+    }
+  };
+
+  // ==================== DOWNLOAD PROOF ====================
+  const handleDownloadProof = async () => {
+    if (!proofRef.current) return;
+    try {
+      setIsDownloading(true);
+      const dataUrl = await toPng(proofRef.current, {
+        quality: 0.95,
+        pixelRatio: 2,
+        backgroundColor: '#0A0E1A',
+      });
+      const link = document.createElement('a');
+      link.download = `Sibs-Proof-${bookingSuccess?.reference ?? 'booking'}.png`;
+      link.href = dataUrl;
+      link.click();
+    } catch (err) {
+      console.error('Failed to download proof:', err);
+    } finally {
+      setIsDownloading(false);
     }
   };
 
@@ -287,6 +340,23 @@ const BookingPage: React.FC = () => {
     [services, selectedService],
   );
 
+  // ==================== OFFER USAGE TRACKING ====================
+  // Offers can only be used once per customer. Admin users are exempt.
+  const isAdmin = currentUser?.role === 'admin';
+  const isOfferUsed = (code: string): boolean => {
+    if (isAdmin) return false; // Admin can use offers infinitely for testing.
+    return usedOfferCodes.some((c) => c.toLowerCase() === code.toLowerCase());
+  };
+  const markOfferAsUsed = (code: string) => {
+    if (isAdmin) return; // Admin usage is never tracked.
+    if (!currentUser) return;
+    const updated = [...usedOfferCodes, code];
+    setUsedOfferCodes(updated);
+    try {
+      localStorage.setItem(`sibs-used-offers-${currentUser.id}`, JSON.stringify(updated));
+    } catch { /* ignore */ }
+  };
+
   // ==================== DISCOUNT HANDLING ====================
   const applyPromoCode = () => {
     if (!promoCode.trim()) { setPromoError('Please enter a discount code'); return; }
@@ -295,6 +365,11 @@ const BookingPage: React.FC = () => {
     if (claimedOffers.some((o) => o.id === matchedPromo.id)) { setPromoError('You have already redeemed this offer'); return; }
     const endDate = new Date(matchedPromo.endDate);
     if (new Date() > endDate) { setPromoError('This offer has expired'); return; }
+    if (isOfferUsed(matchedPromo.code)) {
+      setPromoError('This offer has already been used. Each offer can only be redeemed once.');
+      setPromoCode('');
+      return;
+    }
     if (matchedPromo.offerType === 'LIMITED_EXCLUSIVE') {
       setAppliedDiscount(matchedPromo);
       setPromoSuccess(`Great! Applied ${matchedPromo.discountText} to your services`);
@@ -468,47 +543,150 @@ const BookingPage: React.FC = () => {
           )}
 
           {bookingSuccess && (
-            <div className="rounded-[2rem] sm:rounded-[3rem] bg-[#0A0E1A] text-white p-6 sm:p-10 border border-white/10 shadow-[0_30px_90px_-30px_rgba(0,0,0,0.35)] relative overflow-hidden reveal-on-scroll">
-              <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(242,82,157,0.16),transparent_28%),radial-gradient(circle_at_bottom_left,rgba(191,156,52,0.1),transparent_22%)]" />
-              <div className="relative z-10 space-y-6">
-                <div className="flex items-center gap-4">
-                  <div className="w-14 h-14 md:w-16 md:h-16 rounded-full bg-[#F2529D] flex items-center justify-center shadow-[0_0_30px_rgba(242,82,157,0.5)]">
-                    <Check className="w-7 h-7 md:w-8 md:h-8 text-white" />
+            <div className="space-y-4 reveal-on-scroll">
+              {/* === PROOF OF BOOKING CARD (downloadable) === */}
+              <div
+                ref={proofRef}
+                className="rounded-[2rem] sm:rounded-[2.5rem] bg-[#0A0E1A] text-white p-6 sm:p-8 md:p-10 border border-white/10 shadow-[0_30px_90px_-30px_rgba(0,0,0,0.35)] relative overflow-hidden"
+              >
+                <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(242,82,157,0.18),transparent_30%),radial-gradient(circle_at_bottom_left,rgba(191,156,52,0.12),transparent_25%)]" />
+                <div className="relative z-10 space-y-6">
+                  {/* Header */}
+                  <div className="flex items-start justify-between gap-4">
+                    <div className="flex items-center gap-4">
+                      <div className="w-14 h-14 md:w-16 md:h-16 rounded-full bg-[#F2529D] flex items-center justify-center shadow-[0_0_30px_rgba(242,82,157,0.5)] shrink-0">
+                        <Check className="w-7 h-7 md:w-8 md:h-8 text-white" />
+                      </div>
+                      <div>
+                        <p className="text-[10px] sm:text-xs font-black uppercase tracking-[0.35em] text-[#F2529D]">Ritual Confirmed</p>
+                        <h3 className="text-2xl sm:text-3xl md:text-4xl font-display italic font-black leading-tight">Your appointment is booked</h3>
+                      </div>
+                    </div>
+                    {/* QR-style decorative element */}
+                    <div className="hidden sm:flex flex-col items-center gap-1 shrink-0">
+                      <div className="w-16 h-16 md:w-20 md:h-20 rounded-2xl bg-white p-2">
+                        <div className="w-full h-full grid grid-cols-5 gap-0.5">
+                          {Array.from({ length: 25 }).map((_, i) => {
+                            const seed = (bookingSuccess.reference.charCodeAt(i % bookingSuccess.reference.length) + i) % 3;
+                            return <div key={i} className={`rounded-sm ${seed === 0 ? 'bg-[#0A0E1A]' : seed === 1 ? 'bg-[#F2529D]' : 'bg-transparent'}`} />;
+                          })}
+                        </div>
+                      </div>
+                      <span className="text-[8px] font-black uppercase tracking-widest text-white/40">Scan at lounge</span>
+                    </div>
                   </div>
-                  <div>
-                    <p className="text-[10px] sm:text-xs font-black uppercase tracking-[0.35em] text-[#F2529D]">Ritual Confirmed</p>
-                    <h3 className="text-2xl sm:text-4xl font-display italic font-black">Your appointment is booked</h3>
+
+                  {/* Reference number bar */}
+                  <div className="flex items-center justify-between rounded-2xl bg-white/5 border border-white/10 px-5 py-4">
+                    <div>
+                      <p className="text-[10px] font-black uppercase tracking-[0.3em] text-white/40">Reference Number</p>
+                      <p className="text-xl md:text-2xl font-black tracking-wider text-[#BF9C34] font-mono">{bookingSuccess.reference}</p>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-[10px] font-black uppercase tracking-[0.3em] text-white/40">Booked By</p>
+                      <p className="text-sm font-black text-white">{bookingSuccess.customerName}</p>
+                    </div>
+                  </div>
+
+                  {/* Booking details grid */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
+                    <div className="bg-white/5 rounded-2xl p-4 md:p-5 border border-white/10">
+                      <p className="text-[10px] font-black uppercase tracking-[0.3em] text-[#BF9C34] mb-2 flex items-center gap-1.5">
+                        <Sparkles size={11} /> Service
+                      </p>
+                      <p className="text-base md:text-lg font-display italic font-black">{bookingSuccess.serviceName}</p>
+                      <p className="text-xs text-white/50 mt-1 flex items-center gap-1">
+                        <Clock size={11} /> {bookingSuccess.duration}
+                      </p>
+                    </div>
+                    <div className="bg-white/5 rounded-2xl p-4 md:p-5 border border-white/10">
+                      <p className="text-[10px] font-black uppercase tracking-[0.3em] text-[#BF9C34] mb-2 flex items-center gap-1.5">
+                        <CalendarIcon size={11} /> Date and Time
+                      </p>
+                      <p className="text-sm md:text-base font-black">{formatDate(bookingSuccess.date)}</p>
+                      <p className="text-xs text-white/70 font-medium mt-0.5">{bookingSuccess.time} to {bookingSuccess.endTime}</p>
+                    </div>
+                    <div className="bg-white/5 rounded-2xl p-4 md:p-5 border border-white/10">
+                      <p className="text-[10px] font-black uppercase tracking-[0.3em] text-[#BF9C34] mb-2 flex items-center gap-1.5">
+                        <MapPin size={11} /> Location
+                      </p>
+                      <p className="text-sm md:text-base font-black">{bookingSuccess.location}</p>
+                    </div>
+                    <div className="bg-white/5 rounded-2xl p-4 md:p-5 border border-white/10">
+                      <p className="text-[10px] font-black uppercase tracking-[0.3em] text-[#BF9C34] mb-2 flex items-center gap-1.5">
+                        <User size={11} /> Guest
+                      </p>
+                      <p className="text-sm md:text-base font-black">{bookingSuccess.customerName}</p>
+                    </div>
+                  </div>
+
+                  {/* Price breakdown — the discount proof */}
+                  <div className="rounded-2xl bg-gradient-to-br from-[#F2529D]/8 to-[#BF9C34]/8 border border-[#F2529D]/15 p-5 md:p-6 space-y-3">
+                    <p className="text-[10px] font-black uppercase tracking-[0.3em] text-[#F2529D] flex items-center gap-1.5">
+                      <Tag size={11} /> Investment Breakdown
+                    </p>
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between text-sm">
+                        <span className="text-white/60">Service Price</span>
+                        <span className="font-black text-white">{bookingSuccess.originalPrice}</span>
+                      </div>
+                      {bookingSuccess.discountPercent > 0 && (
+                        <>
+                          <div className="flex items-center justify-between text-sm">
+                            <span className="text-[#F2529D] flex items-center gap-1.5">
+                              <Tag size={12} /> Discount ({bookingSuccess.discountPercent}%)
+                              <span className="px-2 py-0.5 rounded-full bg-[#F2529D]/15 text-[#F2529D] text-[9px] font-black tracking-wider font-mono">
+                                {bookingSuccess.promoCode}
+                              </span>
+                            </span>
+                            <span className="font-black text-green-400">- {bookingSuccess.discountAmount}</span>
+                          </div>
+                          <div className="h-px bg-white/10" />
+                        </>
+                      )}
+                      <div className="flex items-center justify-between pt-1">
+                        <span className="text-xs font-black uppercase tracking-[0.25em] text-white/50">Total to Pay at Lounge</span>
+                        <span className="text-2xl md:text-3xl font-display italic font-black text-[#F2529D]">{bookingSuccess.finalPrice}</span>
+                      </div>
+                    </div>
+                    <p className="text-[10px] text-white/40 flex items-center gap-1.5 pt-1 border-t border-white/5">
+                      <ShieldCheck size={11} className="text-[#BF9C34]" />
+                      Payment is settled at the lounge after your service. Show this proof at reception.
+                    </p>
+                  </div>
+
+                  {/* Footer */}
+                  <div className="flex items-center justify-between pt-2 border-t border-white/10">
+                    <div>
+                      <p className="text-[9px] font-black uppercase tracking-[0.3em] text-white/30">Sibs Style Beauty Lounge</p>
+                      <p className="text-[9px] text-white/20 mt-0.5">Deira, Dubai, UAE</p>
+                    </div>
+                    <p className="text-[9px] font-black uppercase tracking-[0.2em] text-white/30">
+                      {new Date().toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' })}
+                    </p>
                   </div>
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
-                  <div className="bg-white/5 rounded-2xl p-4 md:p-6 border border-white/10">
-                    <p className="text-[10px] font-black uppercase tracking-[0.3em] text-[#BF9C34] mb-2">Service</p>
-                    <p className="text-lg md:text-xl font-display italic font-black">{bookingSuccess.serviceName}</p>
-                  </div>
-                  <div className="bg-white/5 rounded-2xl p-4 md:p-6 border border-white/10">
-                    <p className="text-[10px] font-black uppercase tracking-[0.3em] text-[#BF9C34] mb-2">Date and Time</p>
-                    <p className="text-base md:text-lg font-black">{formatDate(bookingSuccess.date)}</p>
-                    <p className="text-sm text-white/70 font-medium">{bookingSuccess.time} to {bookingSuccess.endTime}</p>
-                  </div>
-                  <div className="bg-white/5 rounded-2xl p-4 md:p-6 border border-white/10">
-                    <p className="text-[10px] font-black uppercase tracking-[0.3em] text-[#BF9C34] mb-2">Location</p>
-                    <p className="text-base md:text-lg font-black">{bookingSuccess.location}</p>
-                  </div>
-                  <div className="bg-white/5 rounded-2xl p-4 md:p-6 border border-white/10">
-                    <p className="text-[10px] font-black uppercase tracking-[0.3em] text-[#BF9C34] mb-2">Investment</p>
-                    <p className="text-xl md:text-2xl font-display italic font-black text-[#F2529D]">{bookingSuccess.price}</p>
-                    <p className="text-xs text-white/50 mt-1">Pay at the lounge after your service</p>
-                  </div>
-                </div>
-                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pt-4 border-t border-white/10">
-                  <div>
-                    <p className="text-[10px] font-black uppercase tracking-[0.3em] text-white/40">Reference</p>
-                    <p className="text-lg font-black tracking-wider text-[#BF9C34]">{bookingSuccess.reference}</p>
-                  </div>
-                  <button type="button" onClick={() => setBookingSuccess(null)} className="inline-flex items-center justify-center rounded-full border border-white/15 bg-white/5 px-5 py-3 text-[10px] sm:text-xs font-black uppercase tracking-[0.35em] text-white hover:bg-white hover:text-black transition-colors">
-                    Book Another Ritual
-                  </button>
-                </div>
+              </div>
+
+              {/* === ACTION BUTTONS (not part of downloadable image) === */}
+              <div className="flex flex-col sm:flex-row gap-3">
+                <button
+                  type="button"
+                  onClick={handleDownloadProof}
+                  disabled={isDownloading}
+                  className="group relative flex-1 overflow-hidden rounded-2xl bg-[#F2529D] text-white px-6 py-4 text-xs font-black uppercase tracking-[0.25em] hover:bg-white hover:text-black transition-all hover:scale-[1.02] active:scale-[0.98] disabled:opacity-60 flex items-center justify-center gap-3 shadow-lg"
+                >
+                  <Download size={16} className={isDownloading ? 'animate-bounce' : 'group-hover:translate-y-0.5 transition-transform'} />
+                  {isDownloading ? 'Preparing...' : 'Download Proof'}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setBookingSuccess(null)}
+                  className="flex-1 rounded-2xl border-2 border-gray-200 bg-white px-6 py-4 text-xs font-black uppercase tracking-[0.25em] text-gray-600 hover:border-[#F2529D] hover:text-[#F2529D] transition-all flex items-center justify-center gap-3"
+                >
+                  <ArrowRight size={16} />
+                  Book Another Ritual
+                </button>
               </div>
             </div>
           )}
@@ -906,6 +1084,20 @@ const BookingPage: React.FC = () => {
                 {promotions.length > 0 && !appliedDiscount && claimedOffers.length === 0 && (
                   <div className="text-center py-4 text-gray-500 text-xs sm:text-sm italic">
                     Have a promo code? Enter it above to unlock exclusive savings or special offers.
+                  </div>
+                )}
+
+                {/* Used offers indicator */}
+                {usedOfferCodes.length > 0 && !isAdmin && (
+                  <div className="flex flex-wrap items-center gap-2 pt-3 border-t border-gray-100">
+                    <span className="text-[10px] font-black uppercase tracking-[0.25em] text-gray-400 flex items-center gap-1.5">
+                      <Check size={11} className="text-green-500" /> Used offers:
+                    </span>
+                    {usedOfferCodes.map((code) => (
+                      <span key={code} className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-gray-100 text-gray-400 text-[10px] font-black tracking-wider line-through font-mono">
+                        {code}
+                      </span>
+                    ))}
                   </div>
                 )}
               </div>

@@ -859,12 +859,10 @@ export async function getStylists(): Promise<Stylist[]> {
  */
 export function formatPrice(priceCents: number): string {
   // Currency formatting stays simple because the app always displays AED.
-  // Converting from cents here keeps the UI code from repeating the same math everywhere.
-  const amount = (priceCents / 100).toLocaleString('en-AE', {
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0,
-  });
-  return `${amount} AED`;
+  // Math.floor ensures discounted prices always round down (e.g. 187.50 -> 187, not 188)
+  // so the customer never pays more than the displayed price at the lounge.
+  const amount = Math.floor(priceCents / 100);
+  return `${amount.toLocaleString('en-AE')} AED`;
 }
 
 /**
