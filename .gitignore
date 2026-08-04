@@ -23,3 +23,5 @@ Thumbs.db
 
 # Convex local envs
 convex/.env.local
+convex-deploy.env
+convex/.env

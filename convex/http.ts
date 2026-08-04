@@ -17,6 +17,29 @@ import { defaultAppointmentLocation } from "./seedData";
 
 // This file is the public door into Convex.
 // The React app calls these routes, and these routes call the Convex database.
+
+// ====== LOGIN RATE LIMITING ======
+// In-memory rate limit store for login attempts.
+// Keyed by email. Tracks failed attempts within a 15-minute window.
+// After 5 failures the account is temporarily blocked.
+const loginAttempts = new Map<string, { count: number; firstAttemptAt: number; blockedUntil: number }>();
+
+function recordFailedAttempt(key: string, now: number, windowMs: number): void {
+  const MAX_ATTEMPTS = 5;
+  const existing = loginAttempts.get(key);
+  if (!existing || existing.firstAttemptAt + windowMs < now) {
+    // Start a fresh window.
+    loginAttempts.set(key, { count: 1, firstAttemptAt: now, blockedUntil: 0 });
+    return;
+  }
+  const newCount = existing.count + 1;
+  if (newCount >= MAX_ATTEMPTS) {
+    // Block for 15 minutes from now.
+    loginAttempts.set(key, { count: newCount, firstAttemptAt: existing.firstAttemptAt, blockedUntil: now + windowMs });
+  } else {
+    loginAttempts.set(key, { count: newCount, firstAttemptAt: existing.firstAttemptAt, blockedUntil: existing.blockedUntil });
+  }
+}
 type PublicUser = {
   id: string;
   fullName: string;
@@ -502,6 +525,15 @@ http.route({
       if (blob.size === 0) {
         return jsonResponse({ ok: false, error: "File is empty." }, 400);
       }
+      // File size limit: 5 MB
+      if (blob.size > 5 * 1024 * 1024) {
+        return jsonResponse({ ok: false, error: "File is too large. Maximum size is 5 MB." }, 400);
+      }
+      // File type validation: only images allowed
+      const allowedTypes = ["image/jpeg", "image/png", "image/webp", "image/gif", "image/jpg"];
+      if (!allowedTypes.includes(blob.type)) {
+        return jsonResponse({ ok: false, error: "Only image files (JPEG, PNG, WebP, GIF) are allowed." }, 400);
+      }
 
       const storageId = await (ctx as any).storage.store(blob);
       const imageUrl = await (ctx as any).storage.getUrl(storageId);
@@ -722,6 +754,14 @@ http.route({
         return jsonResponse({ ok: false, error: "Full name, email, phone, and password are required." }, 400);
       }
 
+      // Password strength: minimum 8 characters, at least one letter and one number.
+      if (body.password.length < 8) {
+        return jsonResponse({ ok: false, error: "Password must be at least 8 characters long." }, 400);
+      }
+      if (!/[a-zA-Z]/.test(body.password) || !/[0-9]/.test(body.password)) {
+        return jsonResponse({ ok: false, error: "Password must include at least one letter and one number." }, 400);
+      }
+
       const normalizedEmail = normalizeEmail(body.email);
       const existingUser = await ctx.runQuery(internal.data.findUserByEmail, { email: normalizedEmail });
       if (existingUser) {
@@ -755,7 +795,7 @@ http.route({
       await ctx.runMutation(internal.data.createSession, {
         userId,
         tokenHash,
-        expiresAt: now + 1000 * 60 * 60 * 24 * 30,
+        expiresAt: now + 1000 * 60 * 60 * 24 * 7,
         createdAt: now,
         lastUsedAt: now,
       });
@@ -785,8 +825,23 @@ http.route({
       }
 
       const normalizedEmail = normalizeEmail(body.email);
+
+      // Rate limiting: max 5 failed attempts per email per 15 minutes.
+      const rateLimitKey = `login:${normalizedEmail}`;
+      const now = Date.now();
+      const windowMs = 15 * 60 * 1000;
+      const entry = loginAttempts.get(rateLimitKey);
+      if (entry && entry.blockedUntil > now) {
+        const minsLeft = Math.ceil((entry.blockedUntil - now) / 60000);
+        return jsonResponse(
+          { ok: false, error: `Too many login attempts. Please try again in ${minsLeft} minute${minsLeft === 1 ? "" : "s"}.` },
+          429,
+        );
+      }
+
       const user = await ctx.runQuery(internal.data.findUserByEmail, { email: normalizedEmail });
       if (!user) {
+        recordFailedAttempt(rateLimitKey, now, windowMs);
         return jsonResponse({ ok: false, error: "Invalid email or password." }, 401);
       }
       if (!user.isActive) {
@@ -796,10 +851,13 @@ http.route({
       // Password verification happens against the stored salt and hash pair.
       const validPassword = await verifyPassword(body.password, user.passwordSalt, user.passwordHash);
       if (!validPassword) {
+        recordFailedAttempt(rateLimitKey, now, windowMs);
         return jsonResponse({ ok: false, error: "Invalid email or password." }, 401);
       }
 
-      const now = Date.now();
+      // Successful login clears the rate limit counter.
+      loginAttempts.delete(rateLimitKey);
+
       // Touching the login timestamp lets the dashboard show when the user last came back.
       await (ctx as any).runMutation(internal.data.touchUserLogin, {
         userId: user._id,
@@ -811,7 +869,7 @@ http.route({
       await (ctx as any).runMutation(internal.data.createSession, {
         userId: user._id,
         tokenHash,
-        expiresAt: now + 1000 * 60 * 60 * 24 * 30,
+        expiresAt: now + 1000 * 60 * 60 * 24 * 7,
         createdAt: now,
         lastUsedAt: now,
       });
@@ -1137,6 +1195,15 @@ http.route({
         // Binary uploads are stored directly in Convex storage and linked from the gallery row.
         const blob = await request.blob();
         if (blob.size > 0) {
+          // File size limit: 5 MB
+          if (blob.size > 5 * 1024 * 1024) {
+            return jsonResponse({ ok: false, error: "File is too large. Maximum size is 5 MB." }, 400);
+          }
+          // File type validation: only images allowed
+          const allowedTypes = ["image/jpeg", "image/png", "image/webp", "image/gif", "image/jpg"];
+          if (blob.type && !allowedTypes.includes(blob.type)) {
+            return jsonResponse({ ok: false, error: "Only image files (JPEG, PNG, WebP, GIF) are allowed." }, 400);
+          }
           storageId = await (ctx as any).storage.store(blob);
         }
       }

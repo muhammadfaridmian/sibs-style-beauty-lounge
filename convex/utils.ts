@@ -1,16 +1,46 @@
+// Allowed origins for CORS. Only your live site and local dev can call the API.
+const ALLOWED_ORIGINS = [
+  "https://sibs-style-beauty-lounge.onrender.com",
+  "http://localhost:5173",
+  "http://localhost:3000",
+];
+
+function getCorsOrigin(request: Request): string {
+  const origin = request.headers.get("Origin");
+  if (origin && ALLOWED_ORIGINS.includes(origin)) {
+    return origin;
+  }
+  // Fallback to the first allowed origin (the live site).
+  return ALLOWED_ORIGINS[0];
+}
+
+function buildCorsHeaders(request: Request): Record<string, string> {
+  return {
+    "Access-Control-Allow-Origin": getCorsOrigin(request),
+    "Access-Control-Allow-Methods": "GET,POST,PUT,DELETE,OPTIONS",
+    "Access-Control-Allow-Headers": "Content-Type, Authorization",
+    "Access-Control-Max-Age": "86400",
+    "Vary": "Origin",
+  };
+}
+
+// Static CORS for OPTIONS preflight (no request body to inspect origin from).
 export const corsHeaders: Record<string, string> = {
-  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Origin": ALLOWED_ORIGINS[0],
   "Access-Control-Allow-Methods": "GET,POST,PUT,DELETE,OPTIONS",
   "Access-Control-Allow-Headers": "Content-Type, Authorization",
   "Access-Control-Max-Age": "86400",
+  "Vary": "Origin",
 };
 
 // These helpers keep the route file readable and stop the same code from being repeated everywhere.
-export function jsonResponse(data: unknown, status = 200): Response {
+// Each response now uses dynamic CORS so only allowed origins can read the response.
+export function jsonResponse(data: unknown, status = 200, request?: Request): Response {
+  const headers = request ? buildCorsHeaders(request) : corsHeaders;
   return new Response(JSON.stringify(data), {
     status,
     headers: {
-      ...corsHeaders,
+      ...headers,
       "Content-Type": "application/json; charset=utf-8",
     },
   });

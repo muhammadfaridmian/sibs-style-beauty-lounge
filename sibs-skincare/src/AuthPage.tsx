@@ -303,11 +303,13 @@ const AuthPage: React.FC = () => {
                     <input
                       required
                       type="password"
+                      minLength={8}
                       value={registerData.password}
                       onChange={(event) => setRegisterData((prev) => ({ ...prev, password: event.target.value }))}
                       className="w-full rounded-[1.5rem] border border-gray-200 bg-[#FAF9F6] px-4 sm:px-5 py-4 text-base sm:text-lg focus:outline-none focus:border-[#F2529D]"
-                      placeholder="Create a password"
+                      placeholder="Min 8 chars, 1 letter + 1 number"
                     />
+                    <span className="text-[9px] text-gray-400 font-medium">Must be at least 8 characters with one letter and one number.</span>
                   </label>
 
                   <label className="block space-y-2">
