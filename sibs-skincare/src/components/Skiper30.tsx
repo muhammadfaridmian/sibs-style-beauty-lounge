@@ -109,7 +109,7 @@ type ColumnProps = {
 const Column = ({ images, y }: ColumnProps) => {
   return (
     <motion.div
-      className="relative top-0 sm:-top-[45%] flex h-full w-1/2 sm:w-1/3 md:w-1/4 min-w-0 flex-col gap-[2vw] first:top-0 sm:first:top-[-45%] [&:nth-child(2)]:top-0 sm:[&:nth-child(2)]:top-[-95%] [&:nth-child(3)]:top-0 sm:[&:nth-child(3)]:top-[-45%] [&:nth-child(3)]:hidden sm:[&:nth-child(3)]:flex [&:nth-child(4)]:top-0 sm:[&:nth-child(4)]:top-[-75%] [&:nth-child(4)]:hidden md:[&:nth-child(4)]:flex"
+      className="relative -top-[45%] flex h-full w-1/2 sm:w-1/3 md:w-1/4 min-w-0 flex-col gap-[2vw] first:top-[-45%] [&:nth-child(2)]:top-[-95%] [&:nth-child(3)]:top-[-45%] [&:nth-child(3)]:hidden sm:[&:nth-child(3)]:flex [&:nth-child(4)]:top-[-75%] [&:nth-child(4)]:hidden md:[&:nth-child(4)]:flex"
       style={{ y }}
     >
       {images.map((src, i) => (
