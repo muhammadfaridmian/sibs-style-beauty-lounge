@@ -3,6 +3,7 @@ import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import Footer from './components/Footer';
 import { Skiper30 } from './components/Skiper30';
+import MobileGallery from './components/MobileGallery';
 import DomeGallery from './components/DomeGallery';
 import { ArrowRight } from 'lucide-react';
 
@@ -118,14 +119,20 @@ const GalleryPage = () => {
 
       {/* ==================== SECTION 1: SKiper30 PARALLAX ==================== */}
       <section className="gallery-reveal">
-        {/* Section label above the parallax */}
-        <div className="max-w-7xl mx-auto px-4 md:px-8 mb-8 md:mb-12 text-center">
+        {/* Section label above the parallax — desktop only */}
+        <div className="hidden md:block max-w-7xl mx-auto px-4 md:px-8 mb-8 md:mb-12 text-center">
           <div className="inline-flex items-center gap-3 px-4 py-2 rounded-full bg-white border border-gray-100 shadow-sm">
             <span className="w-2 h-2 rounded-full bg-[#F2529D] animate-pulse" />
             <span className="text-[0.6rem] md:text-xs font-black uppercase tracking-[0.3em] text-gray-500">Scroll Parallax</span>
           </div>
         </div>
-        <Skiper30 />
+        {/* Desktop: Skiper30 parallax (untouched). Mobile: horizontal swipe gallery. */}
+        <div className="hidden md:block">
+          <Skiper30 />
+        </div>
+        <div className="md:hidden">
+          <MobileGallery />
+        </div>
       </section>
 
       {/* ==================== TRANSITION DIVIDER ==================== */}
